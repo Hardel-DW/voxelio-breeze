@@ -9,6 +9,10 @@ on:
 jobs:
   publish:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./packages/core
+
     steps:
       - uses: actions/checkout@v4
 
@@ -23,7 +27,9 @@ jobs:
           cache: "pnpm"
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: |
+          cd ../..
+          pnpm install --no-frozen-lockfile
 
       - name: Build
         run: pnpm run build
