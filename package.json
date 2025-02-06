@@ -1,5 +1,15 @@
 {
-    "name": "@voxel/core",
+    "name": "@voxelio/core",
+    "author": {
+        "name": "Hardel",
+        "email": "teams.voxel@gmail.com",
+        "url": "https://voxel.hardel.io"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/Hardel-DW/voxel-core.git"
+    },
+    "homepage": "https://voxel.hardel.io",
     "license": "MIT",
     "type": "module",
     "version": "0.3.0",
@@ -10,7 +20,12 @@
         "biome:check": "biome check ./package",
         "biome:unsafefix": "biome check --write --unsafe  ./package",
         "check": "tsc --noEmit",
-        "test": "vitest"
+        "test": "vitest",
+        "prepublishOnly": "pnpm run build",
+        "version": "pnpm run build",
+        "release:patch": "pnpm version patch && pnpm publish",
+        "release:minor": "pnpm version minor && pnpm publish",
+        "release:major": "pnpm version major && pnpm publish"
     },
     "dependencies": {
         "jszip": "^3.10.1",
@@ -23,8 +38,12 @@
         "@rollup/plugin-terser": "^0.4.4",
         "@rollup/plugin-typescript": "^11.1.6",
         "rollup": "^4.9.6",
-        "tsup": "^8.3.6",
+        "rollup-plugin-tsconfig-paths": "^1.5.2",
+        "tslib": "^2.6.2",
         "typescript": "^5.7.3",
         "vitest": "^3.0.5"
+    },
+    "publishConfig": {
+        "access": "public"
     }
 }
