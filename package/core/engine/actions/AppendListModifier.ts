@@ -1,10 +1,10 @@
-import { type ActionValue, type BaseAction, getFieldValue } from "./index.ts";
+import { type ActionValue, type BaseAction, getFieldValue } from "@/core/engine/actions/index";
 
 export interface ListAction extends BaseAction {
-	type: "list_operation";
-	mode: "prepend" | "append";
-	flag?: "not_duplicate"[];
-	value: ActionValue;
+    type: "list_operation";
+    mode: "prepend" | "append";
+    flag?: "not_duplicate"[];
+    value: ActionValue;
 }
 
 /**
@@ -13,26 +13,22 @@ export interface ListAction extends BaseAction {
  * @param action - The action to perform
  * @param element - The element to modify
  */
-export default function AppendListModifier(
-	action: ListAction,
-	element: Record<string, unknown>,
-): Record<string, unknown> | undefined {
-	const { value, field, mode, flag } = action;
-	const computedValue = getFieldValue(value);
-	const shadowCopy = structuredClone(element);
+export default function AppendListModifier(action: ListAction, element: Record<string, unknown>): Record<string, unknown> | undefined {
+    const { value, field, mode, flag } = action;
+    const computedValue = getFieldValue(value);
+    const shadowCopy = structuredClone(element);
 
-	const list = (shadowCopy[field] as unknown[]) || [];
-	if (!Array.isArray(list)) {
-		return;
-	}
+    const list = (shadowCopy[field] as unknown[]) || [];
+    if (!Array.isArray(list)) {
+        return;
+    }
 
-	// Check if we should prevent duplicates
-	if (flag?.includes("not_duplicate") && list.includes(computedValue)) {
-		return element;
-	}
+    // Check if we should prevent duplicates
+    if (flag?.includes("not_duplicate") && list.includes(computedValue)) {
+        return element;
+    }
 
-	const newList =
-		mode === "prepend" ? [computedValue, ...list] : [...list, computedValue];
+    const newList = mode === "prepend" ? [computedValue, ...list] : [...list, computedValue];
 
-	return { ...element, [field]: newList };
+    return { ...element, [field]: newList };
 }

@@ -1,13 +1,13 @@
-import { isVoxelElement, sortVoxelElements } from "../Element.ts";
-import type { Analysers, GetAnalyserVoxel } from "./Analyser.ts";
-import { compileDatapack } from "./Compiler.ts";
-import type { LabeledElement } from "../schema/primitive/label.ts";
-import type { ParseDatapackResult } from "./Parser.ts";
-import type { Action, ActionValue } from "./actions/index.ts";
-import { updateData } from "./actions/index.ts";
-import type { Logger } from "./migrations/logger.ts";
-import type { ToolConfiguration } from "../schema/primitive/index.ts";
-import type { ToggleSection } from "../schema/primitive/toggle.ts";
+import { isVoxelElement, sortVoxelElements } from "@/core/Element";
+import type { Analysers, GetAnalyserVoxel } from "@/core/engine/Analyser";
+import { compileDatapack } from "@/core/engine/Compiler";
+import type { ParseDatapackResult } from "@/core/engine/Parser";
+import type { Action, ActionValue } from "@/core/engine/actions/index";
+import { updateData } from "@/core/engine/actions/index";
+import type { Logger } from "@/core/engine/migrations/logger";
+import type { ToolConfiguration } from "@/core/schema/primitive/index";
+import type { LabeledElement } from "@/core/schema/primitive/label";
+import type { ToggleSection } from "@/core/schema/primitive/toggle";
 import { create } from "zustand";
 
 export interface ConfiguratorState<T extends keyof Analysers> {

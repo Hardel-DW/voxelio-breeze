@@ -1,4 +1,4 @@
-import type { RegistryKey } from "../collections/one_twenty_one/name.ts";
+import type { RegistryKey } from "@/collections/one_twenty_one/name.ts";
 
 const CACHE_NAME = "minecraft-collections-v1";
 
@@ -6,6 +6,9 @@ const CACHE_NAME = "minecraft-collections-v1";
  * URL of the raw GitHub data containing Minecraft registries.
  */
 const GITHUB_RAW_URL = "https://raw.githubusercontent.com/misode/mcmeta/summary/registries/data.min.json";
+
+// Add this to check if we're in a test environment
+const isTestEnv = typeof process !== "undefined" && process.env.NODE_ENV === "test";
 
 /**
  * Fetches a specific Minecraft registry by its key.
@@ -21,9 +24,7 @@ export async function getRegistry(key: RegistryKey): Promise<string[]> {
         }
         return data[key];
     } catch (e) {
-        throw new Error(
-            `Failed to fetch registry '${key}': ${e instanceof Error ? e.message : String(e)}`,
-        );
+        throw new Error(`Failed to fetch registry '${key}': ${e instanceof Error ? e.message : String(e)}`);
     }
 }
 
@@ -44,10 +45,13 @@ interface FetchOptions {
  * @returns {Promise<T>} A promise that resolves to the fetched data.
  * @throws {Error} If the cache operation fails.
  */
-async function cachedFetch<T>(
-    url: string,
-    options: FetchOptions = {},
-): Promise<T> {
+async function cachedFetch<T>(url: string, options: FetchOptions = {}): Promise<T> {
+    // Skip cache in test environment
+    if (isTestEnv) {
+        const response = await fetch(url);
+        return response.json() as Promise<T>;
+    }
+
     try {
         const cache = await caches.open(CACHE_NAME);
         const cachedResponse = await cache.match(url);
@@ -64,9 +68,7 @@ async function cachedFetch<T>(
         await cache.put(url, responseClone);
         return data as T;
     } catch (e) {
-        throw new Error(
-            `Cache operation failed: ${e instanceof Error ? e.message : String(e)}`,
-        );
+        throw new Error(`Cache operation failed: ${e instanceof Error ? e.message : String(e)}`);
     }
 }
 
@@ -75,6 +77,8 @@ async function cachedFetch<T>(
  * @returns {Promise<void>} A promise that resolves when the cache is refreshed.
  */
 export async function refreshCache(): Promise<void> {
+    if (isTestEnv) return;
+
     try {
         const cache = await caches.open(CACHE_NAME);
         await cache.delete(GITHUB_RAW_URL);

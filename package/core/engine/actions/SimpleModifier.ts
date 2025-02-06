@@ -1,8 +1,8 @@
-import { type ActionValue, type BaseAction, getFieldValue } from "./index.ts";
+import { type ActionValue, type BaseAction, getFieldValue } from "@/core/engine/actions/index";
 
 export interface SimpleAction extends BaseAction {
-	type: "set_value" | "toggle_value";
-	value: ActionValue;
+    type: "set_value" | "toggle_value";
+    value: ActionValue;
 }
 
 /**
@@ -13,16 +13,13 @@ export interface SimpleAction extends BaseAction {
  * @param element - The element to modify.
  * @constructor
  */
-export function SimpleModifier(
-	action: SimpleAction,
-	element: Record<string, unknown>,
-): Record<string, unknown> | undefined {
-	const { field } = action;
-	const value = getFieldValue(action.value);
+export function SimpleModifier(action: SimpleAction, element: Record<string, unknown>): Record<string, unknown> | undefined {
+    const { field } = action;
+    const value = getFieldValue(action.value);
 
-	if (action.type === "toggle_value" && element[field] === value) {
-		return { ...element, [field]: undefined };
-	}
+    if (action.type === "toggle_value" && element[field] === value) {
+        return { ...element, [field]: undefined };
+    }
 
-	return { ...element, [field]: value };
+    return { ...element, [field]: value };
 }

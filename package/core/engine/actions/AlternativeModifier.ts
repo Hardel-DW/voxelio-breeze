@@ -1,17 +1,12 @@
-import {
-	type Action,
-	type ActionValue,
-	type BaseAction,
-	getFieldValue,
-} from "./index.ts";
-import { updateData } from "./index.ts";
+import { type Action, type ActionValue, type BaseAction, getFieldValue } from "@/core/engine/actions/index";
+import { updateData } from "@/core/engine/actions/index";
 
 export interface AlternativeAction extends BaseAction {
-	type: "alternative";
-	cases: {
-		when: ActionValue;
-		do: Action;
-	}[];
+    type: "alternative";
+    cases: {
+        when: ActionValue;
+        do: Action;
+    }[];
 }
 
 /**
@@ -23,28 +18,23 @@ export interface AlternativeAction extends BaseAction {
  * @param value
  */
 export default function AlternativeModifier(
-	action: AlternativeAction,
-	element: Record<string, unknown>,
-	version: number,
+    action: AlternativeAction,
+    element: Record<string, unknown>,
+    version: number
 ): Record<string, unknown> | undefined {
-	let currentElement = element;
-	const { field } = action;
-	const value = element[field] as ActionValue | undefined;
-	if (value === undefined) return undefined;
-	const computedValue = getFieldValue(value);
+    let currentElement = element;
+    const { field } = action;
+    const value = element[field] as ActionValue | undefined;
+    if (value === undefined) return undefined;
+    const computedValue = getFieldValue(value);
 
-	for (const subAction of action.cases) {
-		if (subAction.when === computedValue) {
-			const updatedElement = updateData(
-				subAction.do,
-				currentElement,
-				version,
-				value,
-			);
-			if (!updatedElement) return undefined;
-			currentElement = updatedElement;
-		}
-	}
+    for (const subAction of action.cases) {
+        if (subAction.when === computedValue) {
+            const updatedElement = updateData(subAction.do, currentElement, version, value);
+            if (!updatedElement) return undefined;
+            currentElement = updatedElement;
+        }
+    }
 
-	return currentElement;
+    return currentElement;
 }

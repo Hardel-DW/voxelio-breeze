@@ -146,7 +146,7 @@ export const REGISTRY_NAME = [
     "worldgen/template_pool",
     "worldgen/tree_decorator_type",
     "worldgen/trunk_placer_type",
-    "worldgen/world_preset",
+    "worldgen/world_preset"
 ];
 
 export default REGISTRY_NAME;

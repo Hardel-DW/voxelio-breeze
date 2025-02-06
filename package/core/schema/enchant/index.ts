@@ -1,5 +1,5 @@
-import { SECTIONS } from "@/lib/minecraft/core/schema/enchant/sections";
-import type { ToolConfiguration } from "@/lib/minecraft/core/schema/primitive";
+import { SECTIONS } from "@/core/schema/enchant/sections";
+import type { ToolConfiguration } from "@/core/schema/primitive";
 
 export const ENCHANT_TOOL_CONFIG: ToolConfiguration = {
     interface: SECTIONS,

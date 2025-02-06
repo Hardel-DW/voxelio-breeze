@@ -1,14 +1,16 @@
-import type { VoxelElement } from "@/lib/minecraft/core/Element";
-import type { DataDrivenRegistryElement } from "@/lib/minecraft/core/Element";
-import { Identifier, type IdentifierObject } from "@/lib/minecraft/core/Identifier";
-import { tagsToIdentifiers } from "@/lib/minecraft/core/Tag";
-import type { Analysers } from "@/lib/minecraft/core/engine/Analyser.ts";
-import type { Compiler } from "@/lib/minecraft/core/engine/Compiler.ts";
-import type { Parser, ParserParams } from "@/lib/minecraft/core/engine/Parser.ts";
-import type { SlotRegistryType } from "@/lib/minecraft/core/engine/managers/SlotManager.ts";
-import type { FieldProperties } from "@/lib/minecraft/core/schema/primitive/properties";
-import { I18n } from "@/lib/minecraft/i18n/i18n";
-import type { EffectComponentsRecord, Enchantment, TextComponentType } from "@voxel/definitions";
+import type { VoxelElement } from "@/core/Element";
+import type { DataDrivenRegistryElement } from "@/core/Element";
+import { Identifier, type IdentifierObject } from "@/core/Identifier";
+import { tagsToIdentifiers } from "@/core/Tag";
+import type { Analysers } from "@/core/engine/Analyser";
+import type { Compiler } from "@/core/engine/Compiler";
+import type { Parser, ParserParams } from "@/core/engine/Parser";
+import type { SlotRegistryType } from "@/core/engine/managers/SlotManager";
+import type { FieldProperties } from "@/core/schema/primitive/properties";
+import { I18n } from "@/i18n/i18n";
+import type { Enchantment } from "@/schema/enchantment/Enchantment";
+import type { TextComponentType } from "@/schema/text/TextComponentType";
+import type { SingleOrMultiple } from "@/utils";
 
 const tags_related_to_functionality = [
     { namespace: "minecraft", registry: "tags/enchantment", resource: "curse" },
@@ -109,7 +111,7 @@ export interface EnchantmentProps extends VoxelElement {
     minCostPerLevelAboveFirst: number;
     maxCostBase: number;
     maxCostPerLevelAboveFirst: number;
-    effects: EffectComponentsRecord | undefined;
+    effects: Record<string, unknown> | undefined;
     slots: SlotRegistryType[];
     tags: string[];
     mode: "normal" | "soft_delete" | "only_creative";

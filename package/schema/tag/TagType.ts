@@ -1,4 +1,4 @@
-import type { DataDrivenElement } from "../../index.ts";
+import type { DataDrivenElement } from "@/core/Element";
 
 export interface TagType extends DataDrivenElement {
     replace?: boolean;

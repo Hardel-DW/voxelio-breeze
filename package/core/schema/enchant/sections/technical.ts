@@ -1,4 +1,4 @@
-import type { InterfaceConfiguration } from "@/lib/minecraft/core/schema/primitive";
+import type { InterfaceConfiguration } from "@/core/schema/primitive";
 
 export const technical: InterfaceConfiguration = {
     id: "enchant.technical",

@@ -1,4 +1,4 @@
-import { capitalize } from "@/lib/utils.ts";
+import { capitalize } from "@/utils";
 
 const owner = "misode";
 const repository = "mcmeta";

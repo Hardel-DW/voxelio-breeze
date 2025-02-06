@@ -1,20 +1,9 @@
-import type { DataDrivenElement } from "../../index.ts";
-import type { SingleOrMultiple } from "../../utils.ts";
-import type { TextComponentType } from "../text/TextComponentType.ts";
-import type { EffectComponentsRecord } from "./EffectComponents.ts";
-import type { EnchantmentCost } from "./EnchantmentCost.ts";
+import type { DataDrivenElement } from "@/core/Element";
+import type { EnchantmentCost } from "@/schema/enchantment/EnchantmentCost";
+import type { TextComponentType } from "@/schema/text/TextComponentType";
+import type { SingleOrMultiple } from "@/utils";
 
-const SlotManager = [
-    "any",
-    "mainhand",
-    "offhand",
-    "hand",
-    "head",
-    "chest",
-    "legs",
-    "feet",
-    "armor",
-] as const;
+const SlotManager = ["any", "mainhand", "offhand", "hand", "head", "chest", "legs", "feet", "armor"] as const;
 export type SlotRegistryType = (typeof SlotManager)[number];
 export interface Enchantment extends DataDrivenElement {
     description: TextComponentType;
@@ -27,5 +16,5 @@ export interface Enchantment extends DataDrivenElement {
     max_cost: EnchantmentCost;
     anvil_cost: number;
     slots: SlotRegistryType[];
-    effects?: EffectComponentsRecord;
+    effects?: Record<string, any>;
 }

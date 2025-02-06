@@ -1,4 +1,5 @@
-import type { TranslateTextType } from "@/lib/minecraft/core/schema/primitive/text";
+import { getDescription, getMinecraftVersion } from "@/core/Version";
+import type { TranslateTextType } from "@/core/schema/primitive/text";
 
 export type ToggleSection = {
     name: string;

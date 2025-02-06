@@ -1,5 +1,5 @@
-import type { RegistryKey } from "./one_twenty_one/name.ts";
-import { CollectionRegistry } from "./registry.ts";
+import type { RegistryKey } from "@/collections/one_twenty_one/name.ts";
+import { CollectionRegistry } from "@/collections/registry";
 
 /**
  * Retrieves a list based on its key

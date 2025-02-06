@@ -1,15 +1,15 @@
-import Datapack from "../Datapack.ts";
-import type { ConfiguratorConfigFromDatapack, DataDrivenElement, VoxelElement } from "../Element.ts";
-import type { DataDrivenRegistryElement } from "../Element.ts";
-import { sortVoxelElements } from "../Element.ts";
-import type { Analysers, GetAnalyserMinecraft, GetAnalyserVoxel } from "./Analyser.ts";
-import { getAnalyserForVersion } from "./Analyser.ts";
-import { calculateInitialToggle } from "./managers/InitialToggle.ts";
-import { Logger } from "./migrations/logger.ts";
-import { DatapackError } from "../errors/DatapackError.ts";
-import type { ToolConfiguration } from "../schema/primitive/index.ts";
-import type { ToggleSectionMap } from "../schema/primitive/toggle.ts";
-import { Identifier } from "../Identifier.ts";
+import Datapack from "@/core/Datapack";
+import type { ConfiguratorConfigFromDatapack, DataDrivenElement, VoxelElement } from "@/core/Element";
+import type { DataDrivenRegistryElement } from "@/core/Element";
+import { sortVoxelElements } from "@/core/Element";
+import { Identifier } from "@/core/Identifier";
+import type { Analysers, GetAnalyserMinecraft, GetAnalyserVoxel } from "@/core/engine/Analyser";
+import { getAnalyserForVersion } from "@/core/engine/Analyser";
+import { calculateInitialToggle } from "@/core/engine/managers/InitialToggle";
+import { Logger } from "@/core/engine/migrations/logger";
+import { DatapackError } from "@/core/errors/DatapackError";
+import type { ToolConfiguration } from "@/core/schema/primitive/index";
+import type { ToggleSectionMap } from "@/core/schema/primitive/toggle";
 export interface ParserParams<K extends DataDrivenElement> {
     element: DataDrivenRegistryElement<K>;
     tags?: string[];

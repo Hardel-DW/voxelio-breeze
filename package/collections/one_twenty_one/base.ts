@@ -1,4 +1,4 @@
-import type { CollectionRegistry } from "../registry.ts";
+import type { CollectionRegistry } from "@/collections/registry.ts";
 
 export function initCollections(collections: CollectionRegistry) {
     collections.register("keybind", [
@@ -34,36 +34,14 @@ export function initCollections(collections: CollectionRegistry) {
         "key.sprint",
         "key.swapOffhand",
         "key.togglePerspective",
-        "key.use",
+        "key.use"
     ]);
 
-    collections.register("equipment_slot", [
-        "mainhand",
-        "offhand",
-        "head",
-        "chest",
-        "legs",
-        "feet",
-        "body",
-    ]);
+    collections.register("equipment_slot", ["mainhand", "offhand", "head", "chest", "legs", "feet", "body"]);
 
-    collections.register("equipment_slot_group", [
-        "any",
-        "mainhand",
-        "offhand",
-        "hand",
-        "head",
-        "chest",
-        "legs",
-        "feet",
-        "armor",
-        "body",
-    ]);
+    collections.register("equipment_slot_group", ["any", "mainhand", "offhand", "hand", "head", "chest", "legs", "feet", "armor", "body"]);
 
-    const slotRange = (prefix: string, size: number) => [
-        `${prefix}.*`,
-        ...[...Array(size)].map((_, i) => `${prefix}.${i}`),
-    ];
+    const slotRange = (prefix: string, size: number) => [`${prefix}.*`, ...[...Array(size)].map((_, i) => `${prefix}.${i}`)];
 
     collections.register("slot_range", [
         "contents",
@@ -86,36 +64,21 @@ export function initCollections(collections: CollectionRegistry) {
         "horse.saddle",
         "horse.chest",
         "player.cursor",
-        ...slotRange("player.crafting", 4),
+        ...slotRange("player.crafting", 4)
     ]);
 
-    collections.register("gamemode", [
-        "survival",
-        "creative",
-        "adventure",
-        "spectator",
-    ]);
+    collections.register("gamemode", ["survival", "creative", "adventure", "spectator"]);
 
     // LootContext.EntityTarget
-    collections.register("entity_source", [
-        "this",
-        "attacker",
-        "direct_attacker",
-        "attacking_player",
-    ]);
+    collections.register("entity_source", ["this", "attacker", "direct_attacker", "attacking_player"]);
 
     // CopyNameFunction.NameSource
-    collections.register("copy_source", [
-        "block_entity",
-        "this",
-        "attacking_entity",
-        "last_damage_player",
-    ]);
+    collections.register("copy_source", ["block_entity", "this", "attacking_entity", "last_damage_player"]);
 
     collections.register("loot_table_apply_bonus_formula", [
         "minecraft:uniform_bonus_count",
         "minecraft:binomial_with_bonus_count",
-        "minecraft:ore_drops",
+        "minecraft:ore_drops"
     ]);
 
     collections.register("map_decoration", [
@@ -152,7 +115,7 @@ export function initCollections(collections: CollectionRegistry) {
         "banner_brown",
         "banner_green",
         "banner_red",
-        "banner_black",
+        "banner_black"
     ]);
 
     collections.register("map_feature", [
@@ -173,7 +136,7 @@ export function initCollections(collections: CollectionRegistry) {
         "shipwreck",
         "stronghold",
         "swamp_hut",
-        "village",
+        "village"
     ]);
 
     collections.register("recipe_group", [
@@ -215,7 +178,7 @@ export function initCollections(collections: CollectionRegistry) {
         "blue_dye",
         "white_dye",
         "banner",
-        "netherite_ingot",
+        "netherite_ingot"
     ]);
 
     collections.register("biome_category", [
@@ -237,7 +200,7 @@ export function initCollections(collections: CollectionRegistry) {
         "swamp",
         "taiga",
         "the_end",
-        "underground",
+        "underground"
     ]);
 
     collections.register("heightmap_type", [
@@ -246,7 +209,7 @@ export function initCollections(collections: CollectionRegistry) {
         "OCEAN_FLOOR",
         "OCEAN_FLOOR_WG",
         "WORLD_SURFACE",
-        "WORLD_SURFACE_WG",
+        "WORLD_SURFACE_WG"
     ]);
 
     collections.register("generation_step", ["air", "liquid"]);
@@ -262,7 +225,7 @@ export function initCollections(collections: CollectionRegistry) {
         "underground_decoration",
         "fluid_springs",
         "vegetal_decoration",
-        "top_layer_modification",
+        "top_layer_modification"
     ]);
 
     collections.register("loot_context_type", [
@@ -283,7 +246,7 @@ export function initCollections(collections: CollectionRegistry) {
         "minecraft:block_use",
         "minecraft:generic",
         "minecraft:block",
-        "minecraft:shearing",
+        "minecraft:shearing"
     ]);
 
     collections.register("banner_pattern", [
@@ -327,7 +290,7 @@ export function initCollections(collections: CollectionRegistry) {
         "skull",
         "flower",
         "mojang",
-        "piglin",
+        "piglin"
     ]);
 
     collections.register("dye_color", [
@@ -346,19 +309,12 @@ export function initCollections(collections: CollectionRegistry) {
         "brown",
         "green",
         "red",
-        "black",
+        "black"
     ]);
 
     collections.register("cave_surface", ["floor", "ceiling"]);
 
-    collections.register("direction", [
-        "down",
-        "up",
-        "north",
-        "east",
-        "south",
-        "west",
-    ]);
+    collections.register("direction", ["down", "up", "north", "east", "south", "west"]);
 
     collections.register("axis", ["x", "y", "z"]);
 
@@ -370,7 +326,7 @@ export function initCollections(collections: CollectionRegistry) {
         "gui",
         "head",
         "ground",
-        "fixed",
+        "fixed"
     ]);
 
     collections.register("gui_light", ["front", "side"]);
@@ -390,16 +346,10 @@ export function initCollections(collections: CollectionRegistry) {
         "pull",
         "pulling",
         "throwing",
-        "time",
+        "time"
     ]);
 
-    collections.register("glyph_provider_type", [
-        "bitmap",
-        "reference",
-        "ttf",
-        "space",
-        "unihex",
-    ]);
+    collections.register("glyph_provider_type", ["bitmap", "reference", "ttf", "space", "unihex"]);
 
     collections.register("mob_category", [
         "monster",
@@ -409,23 +359,12 @@ export function initCollections(collections: CollectionRegistry) {
         "underground_water_creature",
         "water_creature",
         "water_ambient",
-        "misc",
+        "misc"
     ]);
 
-    collections.register("feature_flags", [
-        "vanilla",
-        "bundle",
-        "trade_rebalance",
-        "update_1_21",
-    ]);
+    collections.register("feature_flags", ["vanilla", "bundle", "trade_rebalance", "update_1_21"]);
 
-    collections.register("sprite_source_type", [
-        "single",
-        "directory",
-        "filter",
-        "unstitch",
-        "paletted_permutations",
-    ]);
+    collections.register("sprite_source_type", ["single", "directory", "filter", "unstitch", "paletted_permutations"]);
 
     collections.register("type_specific_type", [
         "axolotl",
@@ -444,61 +383,24 @@ export function initCollections(collections: CollectionRegistry) {
         "rabbit",
         "slime",
         "tropical_fish",
-        "villager",
+        "villager"
     ]);
 
-    collections.register("axolotl_variant", [
-        "lucy",
-        "wild",
-        "gold",
-        "cyan",
-        "blue",
-    ]);
+    collections.register("axolotl_variant", ["lucy", "wild", "gold", "cyan", "blue"]);
 
-    collections.register("boat_variant", [
-        "oak",
-        "spruce",
-        "birch",
-        "jungle",
-        "acacia",
-        "dark_oak",
-        "mangrove",
-        "bamboo",
-    ]);
+    collections.register("boat_variant", ["oak", "spruce", "birch", "jungle", "acacia", "dark_oak", "mangrove", "bamboo"]);
 
     collections.register("fox_variant", ["red", "snow"]);
 
-    collections.register("horse_variant", [
-        "white",
-        "creamy",
-        "chestnut",
-        "brown",
-        "black",
-        "gray",
-        "dark_brown",
-    ]);
+    collections.register("horse_variant", ["white", "creamy", "chestnut", "brown", "black", "gray", "dark_brown"]);
 
     collections.register("llama_variant", ["creamy", "white", "brown", "gray"]);
 
     collections.register("mooshroom_variant", ["red", "brown"]);
 
-    collections.register("parrot_variant", [
-        "red_blue",
-        "blue",
-        "green",
-        "yellow_blue",
-        "gray",
-    ]);
+    collections.register("parrot_variant", ["red_blue", "blue", "green", "yellow_blue", "gray"]);
 
-    collections.register("rabbit_variant", [
-        "brown",
-        "white",
-        "black",
-        "white_splotched",
-        "gold",
-        "salt",
-        "evil",
-    ]);
+    collections.register("rabbit_variant", ["brown", "white", "black", "white_splotched", "gold", "salt", "evil"]);
 
     collections.register("tropical_fish_variant", [
         "kob",
@@ -512,71 +414,26 @@ export function initCollections(collections: CollectionRegistry) {
         "glitter",
         "blockfish",
         "betty",
-        "clayfish",
+        "clayfish"
     ]);
 
-    collections.register("armor_material", [
-        "leather",
-        "chainmail",
-        "iron",
-        "gold",
-        "diamond",
-        "turtle",
-        "netherite",
-    ]);
+    collections.register("armor_material", ["leather", "chainmail", "iron", "gold", "diamond", "turtle", "netherite"]);
 
-    collections.register("damage_scaling", [
-        "never",
-        "always",
-        "when_caused_by_living_non_player",
-    ]);
+    collections.register("damage_scaling", ["never", "always", "when_caused_by_living_non_player"]);
 
-    collections.register("damage_effects", [
-        "hurt",
-        "thorns",
-        "drowning",
-        "burning",
-        "poking",
-        "freezing",
-    ]);
+    collections.register("damage_effects", ["hurt", "thorns", "drowning", "burning", "poking", "freezing"]);
 
-    collections.register("death_message_type", [
-        "default",
-        "fall_variants",
-        "intentional_game_design",
-    ]);
+    collections.register("death_message_type", ["default", "fall_variants", "intentional_game_design"]);
 
-    collections.register("recipe_category", [
-        "blocks",
-        "building",
-        "equipment",
-        "food",
-        "misc",
-        "redstone",
-    ]);
+    collections.register("recipe_category", ["blocks", "building", "equipment", "food", "misc", "redstone"]);
 
     collections.register("font_option", ["uniform", "jp"]);
 
-    collections.register("attribute_modifier_operation", [
-        "add_value",
-        "add_multiplied_base",
-        "add_multiplied_total",
-    ]);
+    collections.register("attribute_modifier_operation", ["add_value", "add_multiplied_base", "add_multiplied_total"]);
 
-    collections.register("firework_explosion_shape", [
-        "small_ball",
-        "large_ball",
-        "star",
-        "creeper",
-        "burst",
-    ]);
+    collections.register("firework_explosion_shape", ["small_ball", "large_ball", "star", "creeper", "burst"]);
 
-    collections.register("list_operation", [
-        "replace_all",
-        "replace_section",
-        "insert",
-        "append",
-    ]);
+    collections.register("list_operation", ["replace_all", "replace_section", "insert", "append"]);
 
     collections.register("toggleable_data_component_type", [
         "minecraft:trim",
@@ -586,43 +443,22 @@ export function initCollections(collections: CollectionRegistry) {
         "minecraft:unbreakable",
         "minecraft:can_break",
         "minecraft:can_place_on",
-        "minecraft:attribute_modifiers",
+        "minecraft:attribute_modifiers"
     ]);
 
     collections.register("container_component_manipulators", [
         "minecraft:container",
         "minecraft:bundle_contents",
-        "minecraft:charged_projectiles",
+        "minecraft:charged_projectiles"
     ]);
 
     collections.register("rarity", ["common", "uncommon", "rare", "epic"]);
 
-    collections.register("enchantment_target", [
-        "attacker",
-        "damaging_entity",
-        "victim",
-    ]);
+    collections.register("enchantment_target", ["attacker", "damaging_entity", "victim"]);
 
-    collections.register("explosion_interaction", [
-        "none",
-        "block",
-        "mob",
-        "tnt",
-        "trigger",
-    ]);
+    collections.register("explosion_interaction", ["none", "block", "mob", "tnt", "trigger"]);
 
-    collections.register("use_animation", [
-        "none",
-        "eat",
-        "drink",
-        "block",
-        "bow",
-        "spear",
-        "crossbow",
-        "spyglass",
-        "toot_horn",
-        "brush",
-    ]);
+    collections.register("use_animation", ["none", "eat", "drink", "block", "bow", "spear", "crossbow", "spyglass", "toot_horn", "brush"]);
 
     collections.register("salmon_variant", ["small", "medium", "large"]);
 }

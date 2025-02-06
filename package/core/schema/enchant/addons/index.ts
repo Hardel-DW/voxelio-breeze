@@ -1,4 +1,4 @@
-import { dungeon } from "@/lib/minecraft/core/schema/enchant/addons/dungeon.ts";
-import { yggdrasil } from "@/lib/minecraft/core/schema/enchant/addons/yggdrasil.ts";
+import { dungeon } from "@/core/schema/enchant/addons/dungeon";
+import { yggdrasil } from "@/core/schema/enchant/addons/yggdrasil";
 
 export const ADDONS = [yggdrasil, dungeon];

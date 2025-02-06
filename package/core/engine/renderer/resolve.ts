@@ -1,4 +1,4 @@
-import type { ToggleSectionMap } from "@/lib/minecraft/core/schema/primitive/toggle";
+import type { ToggleSectionMap } from "@/core/schema/primitive/toggle";
 
 export function resolve<T>(value: T, toggleSection: ToggleSectionMap): T {
     return resolveField(value, toggleSection);

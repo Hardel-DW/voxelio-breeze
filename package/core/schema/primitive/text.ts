@@ -1,4 +1,4 @@
-import type { BaseComponent } from "@/lib/minecraft/core/schema/primitive/component";
+import type { BaseComponent } from "@/core/schema/primitive/component";
 
 export type InternalTranslateType = {
     type: "translate";

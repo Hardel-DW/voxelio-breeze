@@ -1,15 +1,15 @@
-import type { DataDrivenElement } from "@/lib/minecraft/core/Element";
-import type { DataDrivenRegistryElement } from "@/lib/minecraft/core/Element";
-import { Identifier, type IdentifierObject } from "@/lib/minecraft/core/Identifier";
-import { createTagFromElement, isPresentInTag, mergeDataDrivenRegistryElement } from "@/lib/minecraft/core/Tag";
-import { getMinecraftVersion } from "@/lib/minecraft/core/Version";
-import type { Analysers, GetAnalyserMinecraft } from "@/lib/minecraft/core/engine/Analyser";
-import type { Compiler } from "@/lib/minecraft/core/engine/Compiler";
-import type { Logger } from "@/lib/minecraft/core/engine/migrations/logger";
-import type { LabeledElement } from "@/lib/minecraft/core/schema/primitive/label";
-import { parseZip } from "@/lib/minecraft/core/engine/utils/zip";
-import { DatapackError } from "@/lib/minecraft/core/errors/DatapackError";
-import type { TagType } from "@voxel/definitions";
+import type { DataDrivenElement } from "@/core/Element";
+import type { DataDrivenRegistryElement } from "@/core/Element";
+import { Identifier, type IdentifierObject } from "@/core/Identifier";
+import { createTagFromElement, isPresentInTag, mergeDataDrivenRegistryElement } from "@/core/Tag";
+import { getMinecraftVersion } from "@/core/Version";
+import type { Analysers, GetAnalyserMinecraft } from "@/core/engine/Analyser";
+import type { Compiler } from "@/core/engine/Compiler";
+import type { Logger } from "@/core/engine/migrations/logger";
+import { parseZip } from "@/core/engine/utils/zip";
+import { DatapackError } from "@/core/errors/DatapackError";
+import type { LabeledElement } from "@/core/schema/primitive/label";
+import type { TagType } from "@/schema/tag/TagType";
 import JSZip from "jszip";
 
 export interface PackMcmeta {
@@ -96,14 +96,11 @@ export default class Datapack {
     getFileName(): string {
         const nameWithoutExtension = this.fileName.replace(/\.(zip|jar)$/, "");
         const versionMatch = nameWithoutExtension.match(/^V(\d+)-/);
+        if (!versionMatch?.[1]) return `V0-${nameWithoutExtension}`;
 
-        if (versionMatch) {
-            const currentVersion = +versionMatch[1];
-            const newVersion = currentVersion + 1;
-            return nameWithoutExtension.replace(/^V\d+-/, `V${newVersion}-`);
-        }
-
-        return `V0-${nameWithoutExtension}`;
+        const currentVersion = +versionMatch[1];
+        const newVersion = currentVersion + 1;
+        return nameWithoutExtension.replace(/^V\d+-/, `V${newVersion}-`);
     }
 
     /**
@@ -158,7 +155,7 @@ export default class Datapack {
             if (!compressedPath.startsWith(`${registry}/`) && compressedPath !== registry) continue;
 
             const resource = compressedPath.slice(registry.length + 1);
-            if (!resource) continue;
+            if (!resource || !namespace || !registry) continue;
 
             registries.push({
                 identifier: { namespace, registry, resource },

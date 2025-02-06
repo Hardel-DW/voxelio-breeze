@@ -1,31 +1,25 @@
-import { resolve } from "../renderer/resolve.ts";
-import type { InterfaceConfiguration } from "../../schema/primitive/index.ts";
-import type { ToolSectionType } from "../../schema/primitive/component.ts";
-import type { ToggleSectionMap } from "../../schema/primitive/toggle.ts";
+import { resolve } from "@/core/engine/renderer/resolve";
+import type { InterfaceConfiguration } from "@/core/schema/primitive";
+import type { ToolSectionType } from "@/core/schema/primitive/component";
+import type { ToggleSectionMap } from "@/core/schema/primitive/toggle";
 
-export function calculateInitialToggle(
-	interface_: InterfaceConfiguration[],
-): ToggleSectionMap {
-	const result: ToggleSectionMap = {};
+export function calculateInitialToggle(interface_: InterfaceConfiguration[]): ToggleSectionMap {
+    const result: ToggleSectionMap = {};
 
-	for (const section of interface_) {
-		for (const component of section.components) {
-			if (component.type === "Section") {
-				const sectionComponent = component as ToolSectionType;
-				if (sectionComponent.toggle && sectionComponent.toggle.length > 0) {
-					const firstToggle = sectionComponent.toggle[0];
+    for (const section of interface_) {
+        for (const component of section.components) {
+            if (component.type === "Section") {
+                const sectionComponent = component as ToolSectionType;
+                if (sectionComponent.toggle && sectionComponent.toggle.length > 0) {
+                    const firstToggle = sectionComponent.toggle[0];
 
-					if (
-						typeof sectionComponent.id === "string" &&
-						firstToggle &&
-						typeof firstToggle === "object"
-					) {
-						result[sectionComponent.id] = resolve(firstToggle, {});
-					}
-				}
-			}
-		}
-	}
+                    if (typeof sectionComponent.id === "string" && firstToggle && typeof firstToggle === "object") {
+                        result[sectionComponent.id] = resolve(firstToggle, {});
+                    }
+                }
+            }
+        }
+    }
 
-	return result;
+    return result;
 }

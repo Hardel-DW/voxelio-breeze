@@ -1,5 +1,5 @@
-import { translations } from "./translations.ts";
-import type { LanguageCode, TranslationKey } from "./types.ts";
+import { translations } from "@/i18n/translations";
+import type { LanguageCode, TranslationKey } from "@/i18n/types";
 
 export class I18n {
     private currentLanguage: LanguageCode = "en-us";
@@ -37,9 +37,8 @@ export class I18n {
         if (!translation) {
             translation = translations[this.fallbackLanguage]?.[key];
         }
-
         if (!translation) {
-            return translations[this.fallbackLanguage]["generic.missing_key"];
+            return translations[this.fallbackLanguage]?.["generic.missing_key"] ?? `[missing translation: ${key}]`;
         }
 
         // Remplace les %s par les arguments

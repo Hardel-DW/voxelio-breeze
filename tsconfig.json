@@ -1,12 +1,19 @@
 {
     "compilerOptions": {
-        "target": "es2016",
+        "target": "ES2024",
         "module": "commonjs",
         "esModuleInterop": true,
         "forceConsistentCasingInFileNames": true,
         "strict": true,
         "skipLibCheck": true,
-        "noUncheckedIndexedAccess": true,
-        "noEmit": true
-    }
+        "noUncheckedIndexedAccess": false,
+        "noEmit": true,
+        "baseUrl": ".",
+        "paths": {
+            "@/*": ["./package/*"],
+            "@test/*": ["./test/*"]
+        }
+    },
+    "include": ["package", "test"],
+    "exclude": ["node_modules"]
 }

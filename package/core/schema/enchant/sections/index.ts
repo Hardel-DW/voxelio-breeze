@@ -1,8 +1,8 @@
-import { exclusive } from "@/lib/minecraft/core/schema/enchant/sections/exclusive.ts";
-import { find } from "@/lib/minecraft/core/schema/enchant/sections/find.ts";
-import { global } from "@/lib/minecraft/core/schema/enchant/sections/global.ts";
-import { slots } from "@/lib/minecraft/core/schema/enchant/sections/slots.ts";
-import { supported } from "@/lib/minecraft/core/schema/enchant/sections/supported.ts";
-import { technical } from "@/lib/minecraft/core/schema/enchant/sections/technical.ts";
+import { exclusive } from "@/core/schema/enchant/sections/exclusive";
+import { find } from "@/core/schema/enchant/sections/find";
+import { global } from "@/core/schema/enchant/sections/global";
+import { slots } from "@/core/schema/enchant/sections/slots";
+import { supported } from "@/core/schema/enchant/sections/supported";
+import { technical } from "@/core/schema/enchant/sections/technical";
 
 export const SECTIONS = [global, find, slots, supported, exclusive, technical];

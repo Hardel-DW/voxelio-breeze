@@ -1,12 +1,12 @@
-import type { VoxelElement } from "../../Element.ts";
-import { getCurrentElement, useConfiguratorStore } from "../Store.ts";
-import { type Condition, checkCondition } from "../condition/index.ts";
-import { checkLocks } from "../renderer/index.ts";
-import type { ValueRenderer } from "../renderer/value.ts";
-import { getValue } from "../renderer/value.ts";
-import { getConditionFields, getLockFields, getRendererFields } from "../utils/field.ts";
-import type { Lock } from "../../schema/primitive/component.ts";
-import type { TranslateTextType } from "../../schema/primitive/text.ts";
+import type { VoxelElement } from "@/core/Element";
+import { getCurrentElement, useConfiguratorStore } from "@/core/engine/Store";
+import { type Condition, checkCondition } from "@/core/engine/condition/index";
+import { checkLocks } from "@/core/engine/renderer/index";
+import type { ValueRenderer } from "@/core/engine/renderer/value";
+import { getValue } from "@/core/engine/renderer/value";
+import { getConditionFields, getLockFields, getRendererFields } from "@/core/engine/utils/field";
+import type { Lock } from "@/core/schema/primitive/component";
+import type { TranslateTextType } from "@/core/schema/primitive/text";
 import { useShallow } from "zustand/shallow";
 
 const useElementFields = (fields: string[], elementId?: string): Partial<VoxelElement> | null => {

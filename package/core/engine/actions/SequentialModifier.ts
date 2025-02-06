@@ -1,9 +1,9 @@
-import type { Action, ActionValue } from "./index.ts";
-import { updateData } from "./index.ts";
+import type { Action, ActionValue } from "@/core/engine/actions/index";
+import { updateData } from "@/core/engine/actions/index";
 
 export interface SequentialAction {
-	type: "sequential";
-	actions: Action[];
+    type: "sequential";
+    actions: Action[];
 }
 
 /**
@@ -15,23 +15,18 @@ export interface SequentialAction {
  * @param value
  */
 export default function SequentialModifier(
-	action: SequentialAction,
-	element: Record<string, unknown>,
-	version: number,
-	value?: ActionValue,
+    action: SequentialAction,
+    element: Record<string, unknown>,
+    version: number,
+    value?: ActionValue
 ): Record<string, unknown> | undefined {
-	let currentElement = element;
+    let currentElement = element;
 
-	for (const subAction of action.actions) {
-		const updatedElement = updateData(
-			subAction,
-			currentElement,
-			version,
-			value,
-		);
-		if (!updatedElement) return undefined;
-		currentElement = updatedElement;
-	}
+    for (const subAction of action.actions) {
+        const updatedElement = updateData(subAction, currentElement, version, value);
+        if (!updatedElement) return undefined;
+        currentElement = updatedElement;
+    }
 
-	return currentElement;
+    return currentElement;
 }

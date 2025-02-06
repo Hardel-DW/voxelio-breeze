@@ -1,8 +1,8 @@
-import { type ActionValue, type BaseAction, getFieldValue } from "./index.ts";
+import { type ActionValue, type BaseAction, getFieldValue } from "@/core/engine/actions/index";
 
 export interface RemoveKeyAction extends BaseAction {
-	type: "remove_key";
-	value: ActionValue;
+    type: "remove_key";
+    value: ActionValue;
 }
 
 /**
@@ -11,22 +11,19 @@ export interface RemoveKeyAction extends BaseAction {
  * @param element - The element to modify
  * @constructor
  */
-export default function RemoveKeyModifier(
-	action: RemoveKeyAction,
-	element: Record<string, unknown>,
-): Record<string, unknown> | undefined {
-	const { value, field } = action;
-	const computedValue = getFieldValue(value);
+export default function RemoveKeyModifier(action: RemoveKeyAction, element: Record<string, unknown>): Record<string, unknown> | undefined {
+    const { value, field } = action;
+    const computedValue = getFieldValue(value);
 
-	if (typeof computedValue !== "string") {
-		throw new Error("Remove Key action requires a string value");
-	}
+    if (typeof computedValue !== "string") {
+        throw new Error("Remove Key action requires a string value");
+    }
 
-	const shadowCopy = structuredClone(element);
-	const effects = shadowCopy[field] as Record<string, unknown> | undefined;
-	if (effects) {
-		delete effects[computedValue];
-	}
+    const shadowCopy = structuredClone(element);
+    const effects = shadowCopy[field] as Record<string, unknown> | undefined;
+    if (effects) {
+        delete effects[computedValue];
+    }
 
-	return { ...element, [field]: effects };
+    return { ...element, [field]: effects };
 }

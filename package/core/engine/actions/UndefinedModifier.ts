@@ -1,7 +1,7 @@
-import type { BaseAction } from "./index.ts";
+import type { BaseAction } from "@/core/engine/actions/index";
 
 export interface UndefinedAction extends BaseAction {
-	type: "set_undefined";
+    type: "set_undefined";
 }
 
 /**
@@ -13,9 +13,6 @@ export interface UndefinedAction extends BaseAction {
  * @param element - The element to modify.
  * @constructor
  */
-export function UndefinedModifier(
-	action: UndefinedAction,
-	element: Record<string, unknown>,
-): Record<string, unknown> | undefined {
-	return { ...element, [action.field]: undefined };
+export function UndefinedModifier(action: UndefinedAction, element: Record<string, unknown>): Record<string, unknown> | undefined {
+    return { ...element, [action.field]: undefined };
 }

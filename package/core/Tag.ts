@@ -1,8 +1,8 @@
-import type { DataDrivenRegistryElement } from "@/lib/minecraft/core/Element";
-import { Identifier } from "@/lib/minecraft/core/Identifier";
-import type { IdentifierObject } from "@/lib/minecraft/core/Identifier";
-import type { Compiler } from "@/lib/minecraft/core/engine/Compiler";
-import type { TagType } from "@voxel/definitions";
+import type { DataDrivenRegistryElement } from "@/core/Element";
+import { Identifier } from "@/core/Identifier";
+import type { IdentifierObject } from "@/core/Identifier";
+import type { Compiler } from "@/core/engine/Compiler";
+import type { TagType } from "@/schema/tag/TagType";
 
 /**
  * Searches for a tag in a list of tags.

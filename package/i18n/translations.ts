@@ -1,7 +1,7 @@
-import type { TranslateTextType } from "../core/schema/primitive/text.ts";
-import { english } from "./lang/en.ts";
-import { french } from "./lang/fr.ts";
-import type { LanguageMap } from "./types.ts";
+import type { TranslateTextType } from "@/core/schema/primitive/text";
+import { english } from "@/i18n/lang/en";
+import { french } from "@/i18n/lang/fr";
+import type { LanguageMap } from "@/i18n/types";
 
 export function getKey(content: TranslateTextType | undefined): string {
     if (!content) {

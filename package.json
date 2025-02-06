@@ -1,19 +1,30 @@
 {
     "name": "@voxel/core",
     "license": "MIT",
+    "type": "module",
     "version": "0.3.0",
-    "exports": "./package/index.ts",
+    "exports": "./package/dist/index.esm.js",
     "scripts": {
+        "build": "rollup -c rollup.config.js",
         "biome:format": "biome format --write ./package",
         "biome:check": "biome check ./package",
-        "biome:unsafefix": "biome check --write --unsafe  ./package"
+        "biome:unsafefix": "biome check --write --unsafe  ./package",
+        "check": "tsc --noEmit",
+        "test": "vitest"
     },
     "dependencies": {
         "jszip": "^3.10.1",
         "zustand": "^5.0.3"
     },
     "devDependencies": {
-        "biome": "^0.3.3",
-        "typescript": "^5.7.3"
+        "@biomejs/biome": "^1.9.4",
+        "@rollup/plugin-commonjs": "^25.0.7",
+        "@rollup/plugin-node-resolve": "^15.2.3",
+        "@rollup/plugin-terser": "^0.4.4",
+        "@rollup/plugin-typescript": "^11.1.6",
+        "rollup": "^4.9.6",
+        "tsup": "^8.3.6",
+        "typescript": "^5.7.3",
+        "vitest": "^3.0.5"
     }
 }
