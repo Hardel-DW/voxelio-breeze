@@ -18,11 +18,33 @@ describe("Registry Fetcher", () => {
                                 "random_blockstate_match",
                                 "tag_match"
                             ]
-                        })
+                        }),
+                    clone: () => ({
+                        json: () =>
+                            Promise.resolve({
+                                rule_test: [
+                                    "always_true",
+                                    "block_match",
+                                    "blockstate_match",
+                                    "random_block_match",
+                                    "random_blockstate_match",
+                                    "tag_match"
+                                ]
+                            })
+                    })
                 });
             }
             return Promise.reject(new Error("Not found"));
         });
+
+        // Mock the caches API
+        global.caches = {
+            open: vi.fn().mockResolvedValue({
+                match: vi.fn().mockResolvedValue(null),
+                put: vi.fn().mockResolvedValue(undefined),
+                delete: vi.fn().mockResolvedValue(undefined)
+            })
+        } as any;
     });
 
     it("should fetch existing registry", async () => {
