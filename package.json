@@ -12,7 +12,7 @@
     "homepage": "https://voxel.hardel.io",
     "license": "MIT",
     "type": "module",
-    "version": "0.3.0",
+    "version": "0.3.1",
     "exports": "./package/dist/index.esm.js",
     "scripts": {
         "build": "rollup -c rollup.config.js",
