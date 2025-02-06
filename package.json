@@ -1,0 +1,19 @@
+{
+    "name": "@voxel/core",
+    "license": "MIT",
+    "version": "0.3.0",
+    "exports": "./package/index.ts",
+    "scripts": {
+        "biome:format": "biome format --write ./package",
+        "biome:check": "biome check ./package",
+        "biome:unsafefix": "biome check --write --unsafe  ./package"
+    },
+    "dependencies": {
+        "jszip": "^3.10.1",
+        "zustand": "^5.0.3"
+    },
+    "devDependencies": {
+        "biome": "^0.3.3",
+        "typescript": "^5.7.3"
+    }
+}
