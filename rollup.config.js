@@ -1,31 +1,31 @@
 import typescript from "@rollup/plugin-typescript";
-import commonjs from "@rollup/plugin-commonjs";
 import resolve from "@rollup/plugin-node-resolve";
 import terser from "@rollup/plugin-terser";
 import tsconfigPaths from "rollup-plugin-tsconfig-paths";
 
-export default {
-    input: "package/index.ts", // Point d'entrée de votre module
-    output: [
-        {
-            file: "package/dist/index.cjs", // Sortie CommonJS
-            format: "cjs",
-            sourcemap: true
-        },
-        {
-            file: "package/dist/index.esm.js", // Sortie ESM
-            format: "esm",
-            sourcemap: true
-        }
-    ],
+const createConfig = (input, output) => ({
+    input,
+    output: {
+        file: `dist/${output}.esm.js`,
+        format: "esm",
+        sourcemap: true
+    },
     plugins: [
         tsconfigPaths(),
         resolve(),
-        commonjs(),
         typescript({
-            tsconfig: "./tsconfig.build.json",
-            include: ["package/**/*"]
+            tsconfig: "./tsconfig.json",
+            include: ["src/**/*"]
         }),
         terser()
     ]
-};
+});
+
+export default [
+    createConfig("src/exports/core.ts", "core"),
+    createConfig("src/exports/collections.ts", "collections"),
+    createConfig("src/exports/converter.ts", "converter"),
+    createConfig("src/exports/net.ts", "net"),
+    createConfig("src/exports/render.ts", "render"),
+    createConfig("src/exports/i18n.ts", "i18n")
+];

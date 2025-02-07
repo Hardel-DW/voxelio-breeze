@@ -1,5 +1,5 @@
 import { translations } from "@/i18n/translations";
-import type { LanguageCode, TranslationKey } from "@/i18n/types";
+import type { LanguageCode } from "@/i18n/types";
 
 export class I18n {
     private currentLanguage: LanguageCode = "en-us";
@@ -29,7 +29,7 @@ export class I18n {
      * i18n.translate('hello %s comment tu vas %s', 'John', 'aujourdhui')
      * // => "Bonjour John comment tu vas aujourdhui"
      */
-    public translate(key: TranslationKey, options?: { lang?: LanguageCode; args?: (string | number)[] }): string {
+    public translate(key: string, options?: { lang?: LanguageCode; args?: (string | number)[] }): string {
         const lang = options?.lang ?? this.currentLanguage;
         const args = options?.args ?? [];
 

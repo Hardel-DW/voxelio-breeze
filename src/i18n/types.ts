@@ -1,8 +1,7 @@
-export type TranslationKey = string;
 export type LanguageCode = string;
 
 export interface TranslationMap {
-    [key: TranslationKey]: string;
+    [key: string]: string;
 }
 
 export interface LanguageMap {

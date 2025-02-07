@@ -13,12 +13,37 @@
     "license": "MIT",
     "type": "module",
     "version": "0.3.1",
-    "exports": "./package/dist/index.esm.js",
+    "exports": {
+        "./core": {
+            "types": "./dist/core.d.ts",
+            "default": "./dist/core.esm.js"
+        },
+        "./collections": {
+            "types": "./dist/collections.d.ts",
+            "default": "./dist/collections.esm.js"
+        },
+        "./converter": {
+            "types": "./dist/converter.d.ts",
+            "default": "./dist/converter.esm.js"
+        },
+        "./net": {
+            "types": "./dist/net.d.ts",
+            "default": "./dist/net.esm.js"
+        },
+        "./render": {
+            "types": "./dist/render.d.ts",
+            "default": "./dist/render.esm.js"
+        },
+        "./i18n": {
+            "types": "./dist/i18n.d.ts",
+            "default": "./dist/i18n.esm.js"
+        }
+    },
     "scripts": {
         "build": "rollup -c rollup.config.js",
-        "biome:format": "biome format --write ./package",
-        "biome:check": "biome check ./package",
-        "biome:unsafefix": "biome check --write --unsafe  ./package",
+        "biome:format": "biome format --write ./src",
+        "biome:check": "biome check ./src",
+        "biome:unsafefix": "biome check --write --unsafe  ./src",
         "check": "tsc --noEmit",
         "test": "vitest",
         "prepublishOnly": "pnpm run build",
@@ -32,7 +57,7 @@
         "zustand": "^5.0.3"
     },
     "devDependencies": {
-        "@biomejs/biome": "^1.9.4",
+        "@biomejs/biome": "^1.9.3",
         "@rollup/plugin-commonjs": "^25.0.7",
         "@rollup/plugin-node-resolve": "^15.2.3",
         "@rollup/plugin-terser": "^0.4.4",
