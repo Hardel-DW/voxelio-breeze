@@ -32,6 +32,15 @@ jobs:
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
 
+      - name: Type Check
+        run: pnpm run check
+
+      - name: Lint Check
+        run: pnpm run biome:check
+
+      - name: Run Tests
+        run: pnpm run test run
+
       - name: Configure Git
         run: |
           git config --global user.name 'github-actions[bot]'
