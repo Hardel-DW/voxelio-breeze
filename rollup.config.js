@@ -31,6 +31,5 @@ export default [
     createConfig("src/exports/collections.ts", "collections"),
     createConfig("src/exports/converter.ts", "converter"),
     createConfig("src/exports/net.ts", "net"),
-    createConfig("src/exports/render.ts", "render"),
     createConfig("src/exports/i18n.ts", "i18n")
 ];

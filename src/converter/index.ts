@@ -3,55 +3,7 @@ import { generateForgeMods } from "@/converter/forge-neoforge";
 import { generateQuiltMod } from "@/converter/quilt";
 import Datapack from "@/core/Datapack";
 import { parseZip } from "@/core/engine/utils/zip";
-
-/**
- * Supported Minecraft mod platforms for conversion
- */
-export enum ModPlatforms {
-    FORGE = "forge",
-    NEOFORGE = "neoforge",
-    FABRIC = "fabric",
-    QUILT = "quilt"
-}
-
-/**
- * Common metadata structure for mod generation
- * @interface
- * @property {string} id - Unique mod identifier
- * @property {string} version - Mod version
- * @property {string} name - Display name of the mod
- * @property {string} description - Mod description
- * @property {string[]} authors - List of authors
- * @property {string} [icon] - Path to mod icon (optional)
- * @property {string} [homepage] - Homepage URL (optional)
- * @property {string} [issues] - Issue tracker URL (optional)
- * @property {string} [sources] - Source code URL (optional)
- */
-export interface ModMetadata {
-    id: string;
-    version: string;
-    name: string;
-    description: string;
-    authors: string[];
-    icon?: string;
-    homepage?: string;
-    issues?: string;
-    sources?: string;
-}
-
-/**
- * Default metadata used when information is missing
- */
-export const DEFAULT_MOD_METADATA: ModMetadata = {
-    id: "datapack",
-    name: "Converted Datapack",
-    description: "Converted Datapack",
-    authors: [],
-    version: "1.0.0",
-    homepage: "",
-    issues: "",
-    sources: ""
-};
+import { ModPlatforms, type ModMetadata, DEFAULT_MOD_METADATA } from "./types";
 
 /**
  * Converts a datapack ZIP file to mod(s) for specified platforms

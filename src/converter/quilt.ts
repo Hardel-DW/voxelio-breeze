@@ -1,5 +1,5 @@
-import type { ModMetadata } from "@/converter/index";
-import { DEFAULT_MOD_METADATA } from "@/converter/index";
+import type { ModMetadata } from "@/converter/types";
+import { DEFAULT_MOD_METADATA } from "@/converter/types";
 
 /**
  * Generates Quilt mod JSON content from common metadata

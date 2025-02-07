@@ -30,10 +30,6 @@
             "types": "./dist/net.d.ts",
             "default": "./dist/net.esm.js"
         },
-        "./render": {
-            "types": "./dist/render.d.ts",
-            "default": "./dist/render.esm.js"
-        },
         "./i18n": {
             "types": "./dist/i18n.d.ts",
             "default": "./dist/i18n.esm.js"

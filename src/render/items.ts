@@ -1,4 +1,4 @@
-const ITEMS = {
+export const ITEMS = {
     "minecraft:acacia_button": [0, 0, 37, 37],
     "minecraft:acacia_fence": [37, 0, 37, 37],
     "minecraft:acacia_fence_gate": [74, 0, 37, 37],
