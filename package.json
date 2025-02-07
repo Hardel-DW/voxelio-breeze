@@ -12,7 +12,7 @@
     "homepage": "https://voxel.hardel.io",
     "license": "MIT",
     "type": "module",
-    "version": "0.4.3",
+    "version": "0.4.4",
     "exports": {
         "./core": {
             "types": "./dist/core.d.ts",
@@ -86,5 +86,8 @@
             ]
         }
     },
-    "files": ["dist", "package.json"]
+    "files": [
+        "dist",
+        "package.json"
+    ]
 }
