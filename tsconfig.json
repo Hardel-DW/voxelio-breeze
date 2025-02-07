@@ -1,5 +1,7 @@
 {
     "compilerOptions": {
+        "rootDir": "src",
+		"outDir": "lib",
         "target": "ES2020",
         "useDefineForClassFields": true,
         "module": "ESNext",
@@ -10,7 +12,7 @@
         "noImplicitAny": false,
         "esModuleInterop": true,
         "pretty": true,
-		"composite": true,
+		"composite": true, 
 		"sourceMap": true,
 		"declaration": true,
 		"declarationMap": true,

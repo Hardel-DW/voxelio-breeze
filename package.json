@@ -44,7 +44,7 @@
         }
     },
     "scripts": {
-        "build": "tsc -b src --clean && tsc -b src && vite build",
+        "build": "tsc && vite build",
         "biome:format": "biome format --write ./src",
         "biome:check": "biome check ./src",
         "biome:unsafefix": "biome check --write --unsafe  ./src",
