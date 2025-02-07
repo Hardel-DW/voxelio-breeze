@@ -18,6 +18,7 @@
         "incremental": true,
         "newLine": "LF",
         "skipLibCheck": true,
+        "types": ["node", "vitest/globals"],
         "baseUrl": ".",
         "paths": {
             "@/*": ["./src/*"],
