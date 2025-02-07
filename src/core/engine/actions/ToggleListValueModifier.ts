@@ -1,10 +1,5 @@
-import { type ActionValue, type BaseAction, getFieldValue } from "@/core/engine/actions/index";
-
-export interface ToggleListValueAction extends BaseAction {
-    type: "toggle_value_in_list";
-    mode?: ("remove_if_empty" | "override")[];
-    value?: ActionValue;
-}
+import { getFieldValue } from "@/core/engine/actions/utils";
+import type { ActionValue, ToggleListValueAction } from "@/core/engine/actions/types";
 
 /**
  * Toggle the value in the list field of the element.

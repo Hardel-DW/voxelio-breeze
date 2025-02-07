@@ -1,8 +1,8 @@
 import { isRegistryVoxelElement } from "@/core/Element";
 import type { Analysers, GetAnalyserVoxel } from "@/core/engine/Analyser";
 import type { ParseDatapackResult } from "@/core/engine/Parser";
-import type { Action } from "@/core/engine/actions/index";
-import { updateData } from "@/core/engine/actions/index";
+import { updateData } from "@/core/engine/actions";
+import type { Action } from "@/core/engine/actions/types";
 
 /**
  * Applies migration actions to a target datapack

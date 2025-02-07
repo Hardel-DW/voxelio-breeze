@@ -1,5 +1,5 @@
 import { Identifier, type IdentifierObject, isIdentifier } from "@/core/Identifier";
-import type { BaseAction } from "@/core/engine/actions/index";
+import type { BaseAction } from "@/core/engine/actions/types";
 import { getPropertySafely } from "@/core/engine/utils/property";
 
 export type ValidType = string | number | IdentifierObject;

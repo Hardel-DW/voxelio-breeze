@@ -1,26 +1,13 @@
-import type { ActionValue } from "@/core/engine/actions/index";
-import { CheckContainCondition, type ConditionContain } from "@/core/engine/condition/contains/ContainCondition";
-import { CheckEqualConditionString, type ConditionEqualsString } from "@/core/engine/condition/equals/EqualConditionString";
-import { CheckEqualConditionUndefined, type ConditionEqualsUndefined } from "@/core/engine/condition/equals/EqualConditionUndefined";
-import { CheckEqualFieldValueCondition, type ConditionEqualsFieldValue } from "@/core/engine/condition/equals/EqualFieldValueCondition";
-import { type AllOfCondition, checkAllOfCondition } from "@/core/engine/condition/generic/AllOfCondition";
-import { type AnyOfCondition, checkAnyOfCondition } from "@/core/engine/condition/generic/AnyOfCondition";
-import { type InvertedCondition, checkInvertedCondition } from "@/core/engine/condition/generic/InvertedCondition";
-import { type ObjectCondition, checkObjectCondition } from "@/core/engine/condition/generic/ObjectCondition";
-
-export type BaseCondition = {
-    field: string;
-};
-
-export type Condition =
-    | ConditionEqualsString
-    | ConditionEqualsUndefined
-    | ConditionEqualsFieldValue
-    | ConditionContain
-    | AllOfCondition
-    | AnyOfCondition
-    | InvertedCondition
-    | ObjectCondition;
+import type { ActionValue } from "@/core/engine/actions/types";
+import { CheckContainCondition } from "@/core/engine/condition/contains/ContainCondition";
+import { CheckEqualConditionString } from "@/core/engine/condition/equals/EqualConditionString";
+import { CheckEqualConditionUndefined } from "@/core/engine/condition/equals/EqualConditionUndefined";
+import { CheckEqualFieldValueCondition } from "@/core/engine/condition/equals/EqualFieldValueCondition";
+import { checkAllOfCondition } from "@/core/engine/condition/generic/AllOfCondition";
+import { checkAnyOfCondition } from "@/core/engine/condition/generic/AnyOfCondition";
+import { checkInvertedCondition } from "@/core/engine/condition/generic/InvertedCondition";
+import { checkObjectCondition } from "@/core/engine/condition/generic/ObjectCondition";
+import type { Condition } from "@/core/engine/condition/types";
 
 export function checkCondition(condition: Condition | undefined, element: Record<string, unknown>, value?: ActionValue): boolean {
     if (!condition) return true;
@@ -35,13 +22,13 @@ export function checkCondition(condition: Condition | undefined, element: Record
         case "contains":
             return CheckContainCondition(condition, element, value);
         case "all_of":
-            return checkAllOfCondition(condition, element, value);
+            return checkAllOfCondition(condition, element, checkCondition, value);
         case "any_of":
-            return checkAnyOfCondition(condition, element, value);
+            return checkAnyOfCondition(condition, element, checkCondition, value);
         case "inverted":
-            return checkInvertedCondition(condition, element, value);
+            return checkInvertedCondition(condition, element, checkCondition, value);
         case "object":
-            return checkObjectCondition(condition, element, value);
+            return checkObjectCondition(condition, element, checkCondition, value);
         default:
             return false;
     }

@@ -1,8 +1,4 @@
-export type ConditionEqualsString = {
-    condition: "compare_to_value";
-    compare: string;
-    value: string;
-};
+import type { ConditionEqualsString } from "@/core/engine/condition/types";
 
 export function CheckEqualConditionString(condition: ConditionEqualsString): boolean {
     return condition.compare === condition.value;

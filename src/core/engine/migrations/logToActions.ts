@@ -1,4 +1,5 @@
-import type { Action, ActionValue } from "@/core/engine/actions/index";
+import type { ActionValue } from "@/core/engine/actions/types";
+import type { Action } from "@/core/engine/actions/types";
 import type { FileLog, Log, LogDifference, LogValue } from "@/core/engine/migrations/types";
 
 /**

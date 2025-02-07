@@ -1,9 +1,5 @@
-import { type ActionValue, type BaseAction, getFieldValue } from "@/core/engine/actions/index";
-
-export interface SimpleAction extends BaseAction {
-    type: "set_value" | "toggle_value";
-    value: ActionValue;
-}
+import { getFieldValue } from "@/core/engine/actions/utils";
+import type { SimpleAction } from "@/core/engine/actions/types";
 
 /**
  * Modifies the field of the element with the hardcoded value given.

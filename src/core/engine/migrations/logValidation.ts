@@ -1,7 +1,8 @@
 import { Identifier } from "@/core/Identifier";
 import type { Analysers, GetAnalyserVoxel } from "@/core/engine/Analyser";
-import type { Action, ActionValue } from "@/core/engine/actions/index";
-import { updateData } from "@/core/engine/actions/index";
+import { updateData } from "@/core/engine/actions";
+import type { ActionValue } from "@/core/engine/actions/types";
+import type { Action } from "@/core/engine/actions/types";
 import type { Logger } from "@/core/engine/migrations/logger";
 import type { LogDifference, LogValue } from "@/core/engine/migrations/types";
 

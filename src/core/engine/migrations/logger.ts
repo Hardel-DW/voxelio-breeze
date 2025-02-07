@@ -1,7 +1,8 @@
 import { Identifier } from "@/core/Identifier";
 import { ENGINE_VERSION } from "@/core/Version";
 import type { Analysers, GetAnalyserVoxel } from "@/core/engine/Analyser";
-import type { Action, ActionValue } from "@/core/engine/actions/index";
+import type { ActionValue } from "@/core/engine/actions/types";
+import type { Action } from "@/core/engine/actions/types";
 import { createDifferenceFromAction } from "@/core/engine/migrations/logValidation";
 import type { FileLog, FileLogUpdated, Log, LogDifference, LogValue } from "@/core/engine/migrations/types";
 

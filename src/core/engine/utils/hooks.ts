@@ -1,6 +1,7 @@
 import type { VoxelElement } from "@/core/Element";
 import { getCurrentElement, useConfiguratorStore } from "@/core/engine/Store";
-import { type Condition, checkCondition } from "@/core/engine/condition/index";
+import { checkCondition } from "@/core/engine/condition/index";
+import type { Condition } from "@/core/engine/condition/types";
 import { checkLocks } from "@/core/engine/renderer/index";
 import type { ValueRenderer } from "@/core/engine/renderer/value";
 import { getValue } from "@/core/engine/renderer/value";

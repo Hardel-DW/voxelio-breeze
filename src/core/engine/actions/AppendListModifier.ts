@@ -1,11 +1,5 @@
-import { type ActionValue, type BaseAction, getFieldValue } from "@/core/engine/actions/index";
-
-export interface ListAction extends BaseAction {
-    type: "list_operation";
-    mode: "prepend" | "append";
-    flag?: "not_duplicate"[];
-    value: ActionValue;
-}
+import { getFieldValue } from "@/core/engine/actions/utils";
+import type { ListAction } from "@/core/engine/actions/types";
 
 /**
  * This action adds a value to a list field, either at the beginning (prepend) or at the end (append)

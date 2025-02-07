@@ -1,5 +1,5 @@
-import type { Action } from "@/core/engine/actions";
-import type { Condition } from "@/core/engine/condition";
+import type { Action } from "@/core/engine/actions/types";
+import type { Condition } from "@/core/engine/condition/types";
 import type { IterationValue, TemplateReplacer } from "@/core/engine/renderer/iteration/type";
 import type { ValueRenderer } from "@/core/engine/renderer/value";
 import type { TextRenderType, TranslateTextType } from "@/core/schema/primitive/text";

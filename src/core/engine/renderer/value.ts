@@ -1,4 +1,5 @@
-import { type Condition, checkCondition } from "@/core/engine/condition/index";
+import { checkCondition } from "@/core/engine/condition/index";
+import type { Condition } from "@/core/engine/condition/types";
 
 type ConditionnalValueRendererBase = {
     type: "conditionnal";

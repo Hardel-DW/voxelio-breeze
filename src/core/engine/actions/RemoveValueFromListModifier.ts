@@ -1,10 +1,5 @@
-import { type ActionValue, type BaseAction, getFieldValue } from "@/core/engine/actions/index";
-
-export interface RemoveValueFromListAction extends BaseAction {
-    type: "remove_value_from_list";
-    mode?: ("remove_if_empty" | "if_type_string")[];
-    value?: ActionValue;
-}
+import { getFieldValue } from "@/core/engine/actions/utils";
+import type { ActionValue, RemoveValueFromListAction } from "@/core/engine/actions/types";
 
 /**
  * Removes a specific value from a list field if it exists

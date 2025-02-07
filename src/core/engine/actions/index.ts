@@ -1,39 +1,15 @@
-import type { IdentifierObject } from "@/core/Identifier";
-import AlternativeModifier, { type AlternativeAction } from "@/core/engine/actions/AlternativeModifier";
-import AppendListModifier, { type ListAction } from "@/core/engine/actions/AppendListModifier";
-import { type ComputedAction, ComputedModifier } from "@/core/engine/actions/ComputedModifier";
-import MultipleModifier, { type MultipleAction } from "@/core/engine/actions/MultipleModifier";
-import RemoveKeyModifier, { type RemoveKeyAction } from "@/core/engine/actions/RemoveKeyModifier";
-import RemoveValueFromListModifier, { type RemoveValueFromListAction } from "@/core/engine/actions/RemoveValueFromListModifier";
-import SequentialModifier, { type SequentialAction } from "@/core/engine/actions/SequentialModifier";
-import { type SimpleAction, SimpleModifier } from "@/core/engine/actions/SimpleModifier";
-import { type SlotAction, SlotModifier } from "@/core/engine/actions/SlotModifier";
-import ToggleListValueModifier, { type ToggleListValueAction } from "@/core/engine/actions/ToggleListValueModifier";
-import { type UndefinedAction, UndefinedModifier } from "@/core/engine/actions/UndefinedModifier";
-
-export type ActionValue = string | number | boolean | IdentifierObject | GetValueField;
-type GetValueField = {
-    type: "get_value_from_field";
-    field: string;
-};
-
-export interface BaseAction {
-    field: string;
-}
-
-// Type pour les actions résolues
-export type Action =
-    | RemoveKeyAction
-    | UndefinedAction
-    | SimpleAction
-    | SlotAction
-    | ToggleListValueAction
-    | MultipleAction
-    | SequentialAction
-    | ListAction
-    | ComputedAction
-    | RemoveValueFromListAction
-    | AlternativeAction;
+import AlternativeModifier from "@/core/engine/actions/AlternativeModifier";
+import AppendListModifier from "@/core/engine/actions/AppendListModifier";
+import { ComputedModifier } from "@/core/engine/actions/ComputedModifier";
+import MultipleModifier from "@/core/engine/actions/MultipleModifier";
+import RemoveKeyModifier from "@/core/engine/actions/RemoveKeyModifier";
+import RemoveValueFromListModifier from "@/core/engine/actions/RemoveValueFromListModifier";
+import SequentialModifier from "@/core/engine/actions/SequentialModifier";
+import { SimpleModifier } from "@/core/engine/actions/SimpleModifier";
+import { SlotModifier } from "@/core/engine/actions/SlotModifier";
+import ToggleListValueModifier from "@/core/engine/actions/ToggleListValueModifier";
+import { UndefinedModifier } from "@/core/engine/actions/UndefinedModifier";
+import type { Action, ActionValue } from "@/core/engine/actions/types";
 
 export function updateData(
     action: Action,
@@ -62,11 +38,11 @@ export function updateData(
             case "remove_value_from_list":
                 return RemoveValueFromListModifier(action, element, value);
             case "sequential":
-                return SequentialModifier(action, element, version, value);
+                return SequentialModifier(action, element, version, updateData, value);
             case "list_operation":
                 return AppendListModifier(action, element);
             case "alternative":
-                return AlternativeModifier(action, element, version);
+                return AlternativeModifier(action, element, version, updateData);
         }
     })();
 }
@@ -81,17 +57,4 @@ export function SplitSequentialAction(action: Action): Action[] {
         return action.actions.flatMap((subAction) => SplitSequentialAction(subAction));
     }
     return [action];
-}
-
-/**
- * Get the field value from the action value
- * @param value - The action value
- * @returns The field value
- */
-export function getFieldValue(value: ActionValue): ActionValue {
-    if (typeof value === "object" && "type" in value && value.type === "get_value_from_field") {
-        return value.field;
-    }
-
-    return value;
 }

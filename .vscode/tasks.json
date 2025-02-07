@@ -21,9 +21,17 @@
         },
         {
             "type": "npm",
+            "script": "biome:unsafefix",
+            "problemMatcher": [],
+            "label": "Fix Code",
+            "detail": "biome check --write --unsafe  ./src"
+        },
+        {
+            "type": "npm",
             "script": "biome:check",
             "problemMatcher": [],
             "label": "Check Code",
+
             "detail": "biome check ./src"
         },
         {

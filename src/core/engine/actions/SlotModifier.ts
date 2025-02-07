@@ -1,12 +1,8 @@
 import { getManager } from "@/core/engine/Manager";
-import { type ActionValue, type BaseAction, getFieldValue } from "@/core/engine/actions/index";
+import { getFieldValue } from "@/core/engine/actions/utils";
+import type { SlotAction } from "@/core/engine/actions/types";
 import { type SlotRegistryType, isArraySlotRegistryType, isSlotRegistryType } from "@/core/engine/managers/SlotManager";
 import { isStringArray } from "@/core/engine/utils/property";
-
-export interface SlotAction extends BaseAction {
-    type: "set_computed_slot";
-    value: ActionValue;
-}
 
 /**
  * This action modifies the slot field of the element with the given value. It adds or removes the value from the slot. If the value is already in the slot, it will be removed, otherwise it will be added.

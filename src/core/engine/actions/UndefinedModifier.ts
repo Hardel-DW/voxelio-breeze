@@ -1,8 +1,4 @@
-import type { BaseAction } from "@/core/engine/actions/index";
-
-export interface UndefinedAction extends BaseAction {
-    type: "set_undefined";
-}
+import type { UndefinedAction } from "@/core/engine/actions/types";
 
 /**
  * Modifies the field of the element with the hardcoded value given.

@@ -2,6 +2,7 @@ import typescript from "@rollup/plugin-typescript";
 import resolve from "@rollup/plugin-node-resolve";
 import terser from "@rollup/plugin-terser";
 import tsconfigPaths from "rollup-plugin-tsconfig-paths";
+import commonjs from "@rollup/plugin-commonjs";
 
 const createConfig = (input, output) => ({
     input,
@@ -10,9 +11,13 @@ const createConfig = (input, output) => ({
         format: "esm",
         sourcemap: true
     },
+    external: ["jszip", "react", "zustand", "zustand/vanilla/shallow"],
     plugins: [
         tsconfigPaths(),
-        resolve(),
+        resolve({
+            preferBuiltins: true
+        }),
+        commonjs(),
         typescript({
             tsconfig: "./tsconfig.json",
             include: ["src/**/*"]

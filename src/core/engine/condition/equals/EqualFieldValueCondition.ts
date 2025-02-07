@@ -1,9 +1,4 @@
-import type { BaseCondition } from "@/core/engine/condition/index";
-
-export interface ConditionEqualsFieldValue extends BaseCondition {
-    condition: "compare_value_to_field_value";
-    value: string;
-}
+import type { ConditionEqualsFieldValue } from "@/core/engine/condition/types";
 
 export function CheckEqualFieldValueCondition(condition: ConditionEqualsFieldValue, element: Record<string, unknown>): boolean {
     const compared = element[condition.field];

@@ -1,13 +1,5 @@
-import { type Action, type ActionValue, type BaseAction, getFieldValue } from "@/core/engine/actions/index";
-import { updateData } from "@/core/engine/actions/index";
-
-export interface AlternativeAction extends BaseAction {
-    type: "alternative";
-    cases: {
-        when: ActionValue;
-        do: Action;
-    }[];
-}
+import { getFieldValue } from "@/core/engine/actions/utils";
+import type { ActionValue, AlternativeAction, UpdateDataFunction } from "@/core/engine/actions/types";
 
 /**
  * This action allows to choose between multiple actions based on the value.
@@ -15,12 +7,13 @@ export interface AlternativeAction extends BaseAction {
  * @param action - The action to perform
  * @param element - The element to modify
  * @param version - The version of the element
- * @param value
+ * @param updateDataFn - The function to update the data
  */
 export default function AlternativeModifier(
     action: AlternativeAction,
     element: Record<string, unknown>,
-    version: number
+    version: number,
+    updateDataFn: UpdateDataFunction
 ): Record<string, unknown> | undefined {
     let currentElement = element;
     const { field } = action;
@@ -30,7 +23,7 @@ export default function AlternativeModifier(
 
     for (const subAction of action.cases) {
         if (subAction.when === computedValue) {
-            const updatedElement = updateData(subAction.do, currentElement, version, value);
+            const updatedElement = updateDataFn(subAction.do, currentElement, version, value);
             if (!updatedElement) return undefined;
             currentElement = updatedElement;
         }

@@ -1,11 +1,11 @@
-import type { ActionValue } from "@/core/engine/actions/index";
-import { type Condition, checkCondition } from "@/core/engine/condition/index";
+import type { ActionValue } from "@/core/engine/actions/types";
+import type { AnyOfCondition, CheckConditionFunction } from "@/core/engine/condition/types";
 
-export type AnyOfCondition = {
-    condition: "any_of";
-    terms: Condition[];
-};
-
-export function checkAnyOfCondition(condition: AnyOfCondition, element: Record<string, unknown>, value?: ActionValue): boolean {
-    return condition.terms.some((subCondition) => checkCondition(subCondition, element, value));
+export function checkAnyOfCondition(
+    condition: AnyOfCondition,
+    element: Record<string, unknown>,
+    checkConditionFn: CheckConditionFunction,
+    value?: ActionValue
+): boolean {
+    return condition.terms.some((subCondition) => checkConditionFn(subCondition, element, value));
 }

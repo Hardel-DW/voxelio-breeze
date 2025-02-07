@@ -1,4 +1,4 @@
-import type { Condition } from "@/core/engine/condition/index";
+import type { Condition } from "@/core/engine/condition/types";
 import type { ValueRenderer } from "@/core/engine/renderer/value";
 import type { Lock } from "@/core/schema/primitive/component";
 

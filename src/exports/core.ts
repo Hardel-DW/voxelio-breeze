@@ -8,7 +8,7 @@ export * from "@/core/engine/Compiler";
 export * from "@/core/engine/Manager";
 export * from "@/core/engine/Parser";
 export * from "@/core/engine/Store";
-export * from "@/core/engine/actions/index";
+export * from "@/core/engine/actions/types";
 export * from "@/core/engine/condition/index";
 export * from "@/core/engine/migrations/types";
 export * from "@/core/engine/renderer/index";

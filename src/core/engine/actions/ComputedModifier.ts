@@ -1,8 +1,5 @@
-import { type ActionValue, type BaseAction, getFieldValue } from "@/core/engine/actions/index";
-
-export interface ComputedAction extends BaseAction {
-    type: "set_value_from_computed_value" | "toggle_value_from_computed_value";
-}
+import { getFieldValue } from "@/core/engine/actions/utils";
+import type { ActionValue, ComputedAction } from "@/core/engine/actions/types";
 
 /**
  * Modifies the field of the element with a computed value passed as parameter.

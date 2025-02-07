@@ -1,9 +1,5 @@
-import { type ActionValue, type BaseAction, getFieldValue } from "@/core/engine/actions/index";
-
-export interface RemoveKeyAction extends BaseAction {
-    type: "remove_key";
-    value: ActionValue;
-}
+import { getFieldValue } from "@/core/engine/actions/utils";
+import type { RemoveKeyAction } from "@/core/engine/actions/types";
 
 /**
  * This action removes a key from the field of the element.
