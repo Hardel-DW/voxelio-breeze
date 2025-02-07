@@ -19,28 +19,28 @@
     "types": "./dist/index.d.ts",
     "exports": {
         ".": {
-            "types": "./dist/index.d.ts",
-            "default": "./dist/index.js"
+            "types": "./dist/exports/index.d.ts",
+            "default": "./dist/exports/index.js"
         },
         "./core": {
-            "types": "./dist/core.d.ts",
-            "default": "./dist/core.js"
+            "types": "./dist/exports/core.d.ts",
+            "default": "./dist/exports/core.js"
         },
         "./converter": {
-            "types": "./dist/converter.d.ts",
-            "default": "./dist/converter.js"
+            "types": "./dist/exports/converter.d.ts",
+            "default": "./dist/exports/converter.js"
         },
         "./i18n": {
-            "types": "./dist/i18n.d.ts",
-            "default": "./dist/i18n.js"
+            "types": "./dist/exports/i18n.d.ts",
+            "default": "./dist/exports/i18n.js"
         },
         "./net": {
-            "types": "./dist/net.d.ts",
-            "default": "./dist/net.js"
+            "types": "./dist/exports/net.d.ts",
+            "default": "./dist/exports/net.js"
         },
         "./collections": {
-            "types": "./dist/collections.d.ts",
-            "default": "./dist/collections.js"
+            "types": "./dist/exports/collections.d.ts",
+            "default": "./dist/exports/collections.js"
         }
     },
     "scripts": {
