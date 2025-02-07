@@ -25,7 +25,11 @@ export default defineConfig({
             }
         }
     },
-    plugins: [dts()],
+    plugins: [
+        dts({
+            exclude: ["test/**/*"]
+        })
+    ],
     resolve: {
         alias: {
             "@": resolve(__dirname, "src"),

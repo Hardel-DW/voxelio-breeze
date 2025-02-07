@@ -44,7 +44,7 @@
         }
     },
     "scripts": {
-        "build": "tsc && vite build",
+        "build": "tsc -p tsconfig.build.json && vite build",
         "biome:format": "biome format --write ./src",
         "biome:check": "biome check ./src",
         "biome:unsafefix": "biome check --write --unsafe  ./src",
@@ -71,9 +71,5 @@
     "publishConfig": {
         "access": "public"
     },
-    "files": [
-        "lib/*",
-        "dist/*",
-        "!**/*.tsbuildinfo"
-    ]
+    "files": ["lib/*", "dist/*", "!**/*.tsbuildinfo"]
 }

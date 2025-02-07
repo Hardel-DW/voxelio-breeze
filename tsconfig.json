@@ -1,6 +1,6 @@
 {
     "compilerOptions": {
-		"outDir": "dist",
+        "outDir": "dist",
         "target": "ES2020",
         "useDefineForClassFields": true,
         "module": "ESNext",
@@ -11,13 +11,13 @@
         "noImplicitAny": false,
         "esModuleInterop": true,
         "pretty": true,
-		"composite": true, 
-		"sourceMap": true,
-		"declaration": true,
-		"declarationMap": true,
-		"incremental": true,
-		"newLine": "LF",
-		"skipLibCheck": true,
+        "composite": true, 
+        "sourceMap": true,
+        "declaration": true,
+        "declarationMap": true,
+        "incremental": true,
+        "newLine": "LF",
+        "skipLibCheck": true,
         "baseUrl": ".",
         "paths": {
             "@/*": ["./src/*"],
