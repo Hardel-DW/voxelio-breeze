@@ -10,37 +10,33 @@
         "url": "https://github.com/Hardel-DW/voxel-core.git"
     },
     "homepage": "https://voxel.hardel.io",
-    "types": "./dist/exports/index.d.ts",
     "license": "MIT",
     "type": "module",
     "version": "0.4.4",
     "exports": {
         "./core": {
             "types": "./dist/exports/core.d.ts",
-            "import": "./dist/core.esm.js",
-            "default": "./dist/core.esm.js"
+            "import": "./dist/core.js"
         },
         "./collections": {
             "types": "./dist/exports/collections.d.ts",
-            "import": "./dist/collections.esm.js",
-            "default": "./dist/collections.esm.js"
+            "import": "./dist/collections.js"
         },
         "./converter": {
             "types": "./dist/exports/converter.d.ts",
-            "import": "./dist/converter.esm.js",
-            "default": "./dist/converter.esm.js"
+            "import": "./dist/converter.js"
         },
         "./net": {
             "types": "./dist/exports/net.d.ts",
-            "import": "./dist/net.esm.js"
+            "import": "./dist/net.js"
         },
         "./i18n": {
             "types": "./dist/exports/i18n.d.ts",
-            "import": "./dist/i18n.esm.js"
+            "import": "./dist/i18n.js"
         }
     },
     "scripts": {
-        "build": "rollup -c rollup.config.js",
+        "build": "rollup -c rollup.config.js && rollup -c rollup.config.dts.js",
         "biome:format": "biome format --write ./src",
         "biome:check": "biome check ./src",
         "biome:unsafefix": "biome check --write --unsafe  ./src",
@@ -61,9 +57,10 @@
         "@rollup/plugin-commonjs": "^25.0.7",
         "@rollup/plugin-node-resolve": "^15.2.3",
         "@rollup/plugin-terser": "^0.4.4",
-        "@rollup/plugin-typescript": "^11.1.6",
         "rollup": "^4.9.6",
+        "rollup-plugin-dts": "^6.1.1",
         "rollup-plugin-tsconfig-paths": "^1.5.2",
+        "rollup-plugin-typescript2": "^0.36.0",
         "tslib": "^2.6.2",
         "typescript": "^5.7.3",
         "vitest": "^3.0.5"
@@ -73,12 +70,25 @@
     },
     "typesVersions": {
         "*": {
-            "core": ["./dist/core.d.ts"],
-            "collections": ["./dist/collections.d.ts"],
-            "converter": ["./dist/converter.d.ts"],
-            "net": ["./dist/net.d.ts"],
-            "i18n": ["./dist/i18n.d.ts"]
+            "core": [
+                "./dist/core.d.ts"
+            ],
+            "collections": [
+                "./dist/collections.d.ts"
+            ],
+            "converter": [
+                "./dist/converter.d.ts"
+            ],
+            "net": [
+                "./dist/net.d.ts"
+            ],
+            "i18n": [
+                "./dist/i18n.d.ts"
+            ]
         }
     },
-    "files": ["dist", "package.json"]
+    "files": [
+        "dist",
+        "package.json"
+    ]
 }

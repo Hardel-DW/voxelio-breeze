@@ -1,41 +1,23 @@
-import typescript from "@rollup/plugin-typescript";
+import typescript from "rollup-plugin-typescript2";
 import resolve from "@rollup/plugin-node-resolve";
 import terser from "@rollup/plugin-terser";
 import tsconfigPaths from "rollup-plugin-tsconfig-paths";
 import commonjs from "@rollup/plugin-commonjs";
 
-const createConfig = (input, output) => ({
-    input,
+export default {
+    input: {
+        core: "./src/exports/core.ts",
+        collections: "./src/exports/collections.ts",
+        converter: "./src/exports/converter.ts",
+        net: "./src/exports/net.ts",
+        i18n: "./src/exports/i18n.ts"
+    },
     output: {
-        file: `dist/${output}.esm.js`,
+        dir: "dist",
         format: "esm",
-        sourcemap: true
+        sourcemap: true,
+        entryFileNames: "[name].js"
     },
     external: ["jszip", "react", "zustand", "zustand/vanilla/shallow"],
-    plugins: [
-        tsconfigPaths(),
-        resolve({
-            preferBuiltins: true
-        }),
-        commonjs(),
-        typescript({
-            tsconfig: "./tsconfig.json",
-            include: ["src/**/*"],
-            declaration: true,
-            declarationDir: "./dist",
-            outDir: "./dist",
-            rootDir: "src",
-            sourceMap: true,
-            inlineSources: true
-        }),
-        terser()
-    ]
-});
-
-export default [
-    createConfig("src/exports/core.ts", "core"),
-    createConfig("src/exports/collections.ts", "collections"),
-    createConfig("src/exports/converter.ts", "converter"),
-    createConfig("src/exports/net.ts", "net"),
-    createConfig("src/exports/i18n.ts", "i18n")
-];
+    plugins: [tsconfigPaths(), resolve(), commonjs(), typescript({ useTsconfigDeclarationDir: true }), terser()]
+};

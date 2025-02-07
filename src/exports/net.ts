@@ -1,4 +1,4 @@
-export { getRegistry } from "@/net/fetcher";
-export { getComputedTag } from "@/net/api/ComputedTag";
-export { getCategory, searchSound } from "@/net/api/Sound";
-export type { SoundTest, CategorySound } from "@/net/api/Sound";
+export * from "@/net/fetcher";
+export * from "@/net/api/ComputedTag";
+export * from "@/net/api/Sound";
+export * from "@/net/api/Sound";
