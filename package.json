@@ -1,5 +1,6 @@
 {
     "name": "@voxelio/core",
+    "type": "module",
     "author": {
         "name": "Hardel",
         "email": "teams.voxel@gmail.com",
@@ -11,32 +12,33 @@
     },
     "homepage": "https://voxel.hardel.io",
     "license": "MIT",
-    "type": "module",
     "version": "0.4.6",
+    "main": "./dist/core.js",
+    "types": "./dist/core.d.ts",
     "exports": {
-        "./core": {
-            "types": "./dist/exports/core.d.ts",
-            "import": "./dist/core.js"
-        },
-        "./collections": {
-            "types": "./dist/exports/collections.d.ts",
-            "import": "./dist/collections.js"
-        },
         "./converter": {
-            "types": "./dist/exports/converter.d.ts",
-            "import": "./dist/converter.js"
+            "import": "./dist/converter.js",
+            "types": "./dist/converter.d.ts"
         },
-        "./net": {
-            "types": "./dist/exports/net.d.ts",
-            "import": "./dist/net.js"
+        "./core": {
+            "import": "./dist/core.js",
+            "types": "./dist/core.d.ts"
         },
         "./i18n": {
-            "types": "./dist/exports/i18n.d.ts",
-            "import": "./dist/i18n.js"
+            "import": "./dist/i18n.js",
+            "types": "./dist/i18n.d.ts"
+        },
+        "./net": {
+            "import": "./dist/net.js",
+            "types": "./dist/net.d.ts"
+        },
+        "./collections": {
+            "import": "./dist/collections.js",
+            "types": "./dist/collections.d.ts"
         }
     },
     "scripts": {
-        "build": "rollup -c rollup.config.js && rollup -c rollup.config.dts.js",
+        "build": "rollup -c",
         "biome:format": "biome format --write ./src",
         "biome:check": "biome check ./src",
         "biome:unsafefix": "biome check --write --unsafe  ./src",
@@ -54,28 +56,15 @@
     },
     "devDependencies": {
         "@biomejs/biome": "^1.9.3",
-        "@rollup/plugin-commonjs": "^25.0.7",
-        "@rollup/plugin-node-resolve": "^15.2.3",
-        "@rollup/plugin-terser": "^0.4.4",
-        "rollup": "^4.9.6",
-        "rollup-plugin-dts": "^6.1.1",
-        "rollup-plugin-tsconfig-paths": "^1.5.2",
-        "rollup-plugin-typescript2": "^0.36.0",
         "tslib": "^2.6.2",
         "typescript": "^5.7.3",
-        "vitest": "^3.0.5"
+        "vitest": "^3.0.5",
+        "rollup": "^3.x.x",
+        "@rollup/plugin-alias": "^4.x.x",
+        "rollup-plugin-typescript2": "^0.34.1"
     },
     "publishConfig": {
         "access": "public"
-    },
-    "typesVersions": {
-        "*": {
-            "core": ["./dist/core.d.ts"],
-            "collections": ["./dist/collections.d.ts"],
-            "converter": ["./dist/converter.d.ts"],
-            "net": ["./dist/net.d.ts"],
-            "i18n": ["./dist/i18n.d.ts"]
-        }
     },
     "files": ["dist", "package.json"]
 }
