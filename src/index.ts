@@ -1,3 +1,5 @@
+export { voxelDatapacks } from "./voxel/VoxelDatapack";
+
 export * from "@/exports/converter";
 export * from "@/exports/collections";
 export * from "@/exports/core";
