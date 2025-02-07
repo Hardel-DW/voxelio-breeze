@@ -1,4 +1,3 @@
-export * from "../converter"; // Assurez-vous que tous les types sont exportés
 export { convertDatapack, extractMetadata } from "@/converter";
 export { ModPlatforms, type ModMetadata, DEFAULT_MOD_METADATA } from "@/converter/types";
 export { generateFabricMod } from "@/converter/fabric";
