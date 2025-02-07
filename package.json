@@ -16,23 +16,23 @@
     "exports": {
         "./core": {
             "types": "./dist/core.d.ts",
-            "default": "./dist/core.esm.js"
+            "import": "./dist/core.esm.js"
         },
         "./collections": {
             "types": "./dist/collections.d.ts",
-            "default": "./dist/collections.esm.js"
+            "import": "./dist/collections.esm.js"
         },
         "./converter": {
             "types": "./dist/converter.d.ts",
-            "default": "./dist/converter.esm.js"
+            "import": "./dist/converter.esm.js"
         },
         "./net": {
             "types": "./dist/net.d.ts",
-            "default": "./dist/net.esm.js"
+            "import": "./dist/net.esm.js"
         },
         "./i18n": {
             "types": "./dist/i18n.d.ts",
-            "default": "./dist/i18n.esm.js"
+            "import": "./dist/i18n.esm.js"
         }
     },
     "scripts": {
@@ -66,5 +66,14 @@
     },
     "publishConfig": {
         "access": "public"
+    },
+    "typesVersions": {
+        "*": {
+            "core": ["./dist/core.d.ts"],
+            "collections": ["./dist/collections.d.ts"],
+            "converter": ["./dist/converter.d.ts"],
+            "net": ["./dist/net.d.ts"],
+            "i18n": ["./dist/i18n.d.ts"]
+        }
     }
 }
