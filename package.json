@@ -10,9 +10,9 @@
         "url": "https://github.com/Hardel-DW/voxel-core.git"
     },
     "homepage": "https://voxel.hardel.io",
+    "types": "./dist/exports/index.d.ts",
     "license": "MIT",
     "type": "module",
-    "types": "./dist/exports/index.d.ts",
     "version": "0.4.4",
     "exports": {
         "./core": {
@@ -73,11 +73,11 @@
     },
     "typesVersions": {
         "*": {
-            "core": ["./dist/exports/core.d.ts"],
-            "collections": ["./dist/exports/collections.d.ts"],
-            "converter": ["./dist/exports/converter.d.ts"],
-            "net": ["./dist/exports/net.d.ts"],
-            "i18n": ["./dist/exports/i18n.d.ts"]
+            "core": ["./dist/core.d.ts"],
+            "collections": ["./dist/collections.d.ts"],
+            "converter": ["./dist/converter.d.ts"],
+            "net": ["./dist/net.d.ts"],
+            "i18n": ["./dist/i18n.d.ts"]
         }
     },
     "files": ["dist", "package.json"]
