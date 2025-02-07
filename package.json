@@ -1,6 +1,5 @@
 {
     "name": "@voxelio/core",
-    "type": "module",
     "author": {
         "name": "Hardel",
         "email": "teams.voxel@gmail.com",
@@ -13,32 +12,39 @@
     "homepage": "https://voxel.hardel.io",
     "license": "MIT",
     "version": "0.4.6",
-    "main": "./dist/core.js",
-    "types": "./dist/core.d.ts",
+    "type": "module",
+    "main": "./dist/index.js",
+    "module": "./dist/index.js",
+    "unpkg": "./dist/voxel.umd.cjs",
+    "types": "./dist/index.d.ts",
     "exports": {
-        "./converter": {
-            "import": "./dist/converter.js",
-            "types": "./dist/converter.d.ts"
+        ".": {
+            "types": "./lib/index.d.ts",
+            "default": "./lib/index.js"
         },
         "./core": {
-            "import": "./dist/core.js",
-            "types": "./dist/core.d.ts"
+            "types": "./lib/core.d.ts",
+            "default": "./lib/core.js"
+        },
+        "./converter": {
+            "types": "./lib/converter.d.ts",
+            "default": "./lib/converter.js"
         },
         "./i18n": {
-            "import": "./dist/i18n.js",
-            "types": "./dist/i18n.d.ts"
+            "types": "./lib/i18n.d.ts",
+            "default": "./lib/i18n.js"
         },
         "./net": {
-            "import": "./dist/net.js",
-            "types": "./dist/net.d.ts"
+            "types": "./lib/net.d.ts",
+            "default": "./lib/net.js"
         },
         "./collections": {
-            "import": "./dist/collections.js",
-            "types": "./dist/collections.d.ts"
+            "types": "./lib/collections.d.ts",
+            "default": "./lib/collections.js"
         }
     },
     "scripts": {
-        "build": "rollup -c",
+        "build": "tsc -b src --clean && tsc -b src && vite build",
         "biome:format": "biome format --write ./src",
         "biome:check": "biome check ./src",
         "biome:unsafefix": "biome check --write --unsafe  ./src",
@@ -51,20 +57,20 @@
         "release:major": "pnpm version major && pnpm publish"
     },
     "dependencies": {
+        "deepslate": "^0.23.5",
         "jszip": "^3.10.1",
         "zustand": "^5.0.3"
     },
     "devDependencies": {
         "@biomejs/biome": "^1.9.3",
         "tslib": "^2.6.2",
-        "typescript": "^5.7.3",
-        "vitest": "^3.0.5",
-        "rollup": "^3.x.x",
-        "@rollup/plugin-alias": "^4.x.x",
-        "rollup-plugin-typescript2": "^0.34.1"
+        "typescript": "~5.7.2",
+        "vite": "^6.1.0",
+        "vite-plugin-dts": "^4.5.0",
+        "vitest": "^3.0.5"
     },
     "publishConfig": {
         "access": "public"
     },
-    "files": ["dist", "package.json"]
+    "files": ["lib/*", "dist/*", "!**/*.tsbuildinfo"]
 }
