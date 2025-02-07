@@ -18,10 +18,14 @@ export * from "@/core/engine/migrations/logToActions";
 export * from "@/core/engine/migrations/logger";
 export * from "@/core/engine/migrations/applyActions";
 
+export * from "@/core/engine/renderer/iteration/type";
+export * from "@/core/engine/renderer/iteration/collectFromPath";
+export * from "@/core/engine/renderer/iteration/createIterations";
+export * from "@/core/engine/renderer/iteration/resolveIterationValue";
+
 export * from "@/core/engine/renderer/index";
 export * from "@/core/engine/renderer/resolve";
 export * from "@/core/engine/renderer/value";
-export * from "@/core/engine/renderer/iteration/type";
 
 export * from "@/core/engine/utils/field";
 export * from "@/core/engine/utils/hooks";
