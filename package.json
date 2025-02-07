@@ -12,11 +12,7 @@
     "homepage": "https://voxel.hardel.io",
     "license": "MIT",
     "type": "module",
-<<<<<<< HEAD
-    "version": "0.4.3",
-=======
     "version": "0.4.1",
->>>>>>> 15ad09bc08f00d11d36986ad366eb3386586ee40
     "exports": {
         "./core": {
             "types": "./dist/core.d.ts",
@@ -27,7 +23,7 @@
             "import": "./dist/collections.esm.js"
         },
         "./converter": {
-            "types": "./dist/converter.d.ts",
+            "types": "./dist/exports/converter.d.ts",
             "import": "./dist/converter.esm.js"
         },
         "./net": {
@@ -73,21 +69,11 @@
     },
     "typesVersions": {
         "*": {
-            "core": [
-                "./dist/core.d.ts"
-            ],
-            "collections": [
-                "./dist/collections.d.ts"
-            ],
-            "converter": [
-                "./dist/converter.d.ts"
-            ],
-            "net": [
-                "./dist/net.d.ts"
-            ],
-            "i18n": [
-                "./dist/i18n.d.ts"
-            ]
+            "core": ["./dist/core.d.ts"],
+            "collections": ["./dist/collections.d.ts"],
+            "converter": ["./dist/exports/converter.d.ts"],
+            "net": ["./dist/net.d.ts"],
+            "i18n": ["./dist/i18n.d.ts"]
         }
     },
     "files": ["dist", "package.json"]

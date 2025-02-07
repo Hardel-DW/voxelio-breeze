@@ -20,7 +20,10 @@ const createConfig = (input, output) => ({
         commonjs(),
         typescript({
             tsconfig: "./tsconfig.json",
-            include: ["src/**/*"]
+            include: ["src/**/*"],
+            declaration: true,
+            declarationDir: "./dist",
+            outDir: "./dist"
         }),
         terser()
     ]

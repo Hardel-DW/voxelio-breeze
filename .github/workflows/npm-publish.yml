@@ -72,3 +72,8 @@ jobs:
         run: pnpm publish --access public --no-git-checks
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Clean Git State
+        run: |
+          git clean -fdx
+          git reset --hard HEAD

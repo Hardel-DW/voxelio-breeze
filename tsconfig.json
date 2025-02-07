@@ -14,7 +14,10 @@
         "paths": {
             "@/*": ["./src/*"],
             "@test/*": ["./test/*"]
-        }
+        },
+        "declaration": true,
+        "declarationMap": true,
+        "emitDeclarationOnly": false
     },
     "include": ["src"],
     "exclude": [
