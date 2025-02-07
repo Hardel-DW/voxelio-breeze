@@ -1,5 +1,5 @@
-import { getFieldValue } from "@/core/engine/actions/utils";
 import type { ActionValue, ComputedAction } from "@/core/engine/actions/types";
+import { getFieldValue } from "@/core/engine/actions/utils";
 
 /**
  * Modifies the field of the element with a computed value passed as parameter.

@@ -1,5 +1,5 @@
-import { getFieldValue } from "@/core/engine/actions/utils";
 import type { ActionValue, AlternativeAction, UpdateDataFunction } from "@/core/engine/actions/types";
+import { getFieldValue } from "@/core/engine/actions/utils";
 
 /**
  * This action allows to choose between multiple actions based on the value.

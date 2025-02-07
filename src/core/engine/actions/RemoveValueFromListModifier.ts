@@ -1,5 +1,5 @@
-import { getFieldValue } from "@/core/engine/actions/utils";
 import type { ActionValue, RemoveValueFromListAction } from "@/core/engine/actions/types";
+import { getFieldValue } from "@/core/engine/actions/utils";
 
 /**
  * Removes a specific value from a list field if it exists

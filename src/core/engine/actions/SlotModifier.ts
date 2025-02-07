@@ -1,6 +1,6 @@
 import { getManager } from "@/core/engine/Manager";
-import { getFieldValue } from "@/core/engine/actions/utils";
 import type { SlotAction } from "@/core/engine/actions/types";
+import { getFieldValue } from "@/core/engine/actions/utils";
 import { type SlotRegistryType, isArraySlotRegistryType, isSlotRegistryType } from "@/core/engine/managers/SlotManager";
 import { isStringArray } from "@/core/engine/utils/property";
 

@@ -1,5 +1,5 @@
-import { getFieldValue } from "@/core/engine/actions/utils";
 import type { SimpleAction } from "@/core/engine/actions/types";
+import { getFieldValue } from "@/core/engine/actions/utils";
 
 /**
  * Modifies the field of the element with the hardcoded value given.

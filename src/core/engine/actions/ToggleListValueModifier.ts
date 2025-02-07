@@ -1,5 +1,5 @@
-import { getFieldValue } from "@/core/engine/actions/utils";
 import type { ActionValue, ToggleListValueAction } from "@/core/engine/actions/types";
+import { getFieldValue } from "@/core/engine/actions/utils";
 
 /**
  * Toggle the value in the list field of the element.
