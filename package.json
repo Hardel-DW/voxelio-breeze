@@ -12,7 +12,7 @@
     "homepage": "https://voxel.hardel.io",
     "license": "MIT",
     "type": "module",
-    "version": "0.4.0",
+    "version": "0.4.1",
     "exports": {
         "./core": {
             "types": "./dist/core.d.ts",
@@ -69,11 +69,21 @@
     },
     "typesVersions": {
         "*": {
-            "core": ["./dist/core.d.ts"],
-            "collections": ["./dist/collections.d.ts"],
-            "converter": ["./dist/converter.d.ts"],
-            "net": ["./dist/net.d.ts"],
-            "i18n": ["./dist/i18n.d.ts"]
+            "core": [
+                "./dist/core.d.ts"
+            ],
+            "collections": [
+                "./dist/collections.d.ts"
+            ],
+            "converter": [
+                "./dist/converter.d.ts"
+            ],
+            "net": [
+                "./dist/net.d.ts"
+            ],
+            "i18n": [
+                "./dist/i18n.d.ts"
+            ]
         }
     }
 }
