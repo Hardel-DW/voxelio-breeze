@@ -43,6 +43,3 @@ export * from "@/core/errors/DatapackError";
 export * from "@/core/engine/actions/index";
 export * from "@/core/engine/actions/utils";
 export * from "@/core/engine/actions/types";
-
-import Datapack from "@/core/Datapack";
-export { Datapack };

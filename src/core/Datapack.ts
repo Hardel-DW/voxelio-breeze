@@ -19,7 +19,7 @@ export interface PackMcmeta {
     };
 }
 
-export default class Datapack {
+export class Datapack {
     private fileName: string;
     private pack: PackMcmeta;
     private files: Record<string, Uint8Array<ArrayBufferLike>>;

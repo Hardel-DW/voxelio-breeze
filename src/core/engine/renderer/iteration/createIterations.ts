@@ -1,4 +1,4 @@
-import Datapack from "@/core/Datapack";
+import { Datapack } from "@/core/Datapack";
 import { Identifier } from "@/core/Identifier";
 import { collectFromPath } from "@/core/engine/renderer/iteration/collectFromPath";
 import type { IterationResult, IterationValue } from "@/core/engine/renderer/iteration/type";

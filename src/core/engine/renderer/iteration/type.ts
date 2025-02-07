@@ -1,21 +1,21 @@
-type IterationCollectFromPath = {
+export type IterationCollectFromPath = {
     type: "collect_from_path";
     registry: string;
     path: string;
     exclude_namespace?: string[];
 };
 
-type IterationStatic = {
+export type IterationStatic = {
     type: "static";
     values: string[];
 };
 
-type IterationObject = {
+export type IterationObject = {
     type: "object";
     values: Record<string, any>[];
 };
 
-type IterationGetRegistryElements = {
+export type IterationGetRegistryElements = {
     type: "get_registry_elements";
     registry: string;
 };
@@ -25,18 +25,18 @@ export type GetValueFromContext = {
     key: string;
 };
 
-type InternalCurrentIteration = {
+export type InternalCurrentIteration = {
     current_iteration: string;
 };
 
-type InternalFileName = {
+export type InternalFileName = {
     filename: string;
     resource: string;
     namespace: string;
     identifier: string;
 };
 
-type InternalObjectData = {
+export type InternalObjectData = {
     object_data: Record<string, any>;
 };
 

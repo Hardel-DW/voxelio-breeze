@@ -3,12 +3,9 @@ import { Logger } from "@/core/engine/migrations/logger";
 import type { DatapackInfo, FileLog, Log, LogDifference } from "@/core/engine/migrations/types";
 import type { EnchantmentProps } from "@/core/schema/enchant/EnchantmentProps";
 import type { VoxelRegistryElement } from "@/core/Element";
-import type { SequentialAction } from "@/core/engine/actions/SequentialModifier";
-import type { ToggleListValueAction } from "@/core/engine/actions/ToggleListValueModifier";
-import type { ComputedAction } from "@/core/engine/actions/ComputedModifier";
 import { createDifferenceFromAction } from "@/core/engine/migrations/logValidation";
 import { Identifier } from "@/core/Identifier";
-import type { SimpleAction } from "@/core/engine/actions/SimpleModifier";
+import type { ComputedAction, SequentialAction, SimpleAction, ToggleListValueAction } from "@/core/engine/actions/types";
 
 const createComplexMockElement = (data: Partial<EnchantmentProps> = {}): VoxelRegistryElement<EnchantmentProps> => ({
     identifier: "foo",

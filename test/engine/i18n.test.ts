@@ -1,6 +1,6 @@
 import { I18n } from "@/i18n/i18n";
-import { translations } from "@/i18n/translations";
-import type { LanguageCode, TranslationKey } from "@/i18n/types";
+import { type TranslationKey, translations } from "@/i18n/translations";
+import type { LanguageCode } from "@/i18n/types";
 import { describe, it, beforeEach, expect } from "vitest";
 
 const FRENCH_LANG = "fr-fr";

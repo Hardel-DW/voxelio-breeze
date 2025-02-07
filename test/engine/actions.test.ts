@@ -1,12 +1,14 @@
 import { updateData } from "@/core/engine/actions";
-import type { ListAction } from "@/core/engine/actions/AppendListModifier";
-import type { MultipleAction } from "@/core/engine/actions/MultipleModifier";
-import type { RemoveKeyAction } from "@/core/engine/actions/RemoveKeyModifier";
-import type { RemoveValueFromListAction } from "@/core/engine/actions/RemoveValueFromListModifier";
-import type { SequentialAction } from "@/core/engine/actions/SequentialModifier";
-import type { SimpleAction } from "@/core/engine/actions/SimpleModifier";
-import type { SlotAction } from "@/core/engine/actions/SlotModifier";
-import type { ToggleListValueAction } from "@/core/engine/actions/ToggleListValueModifier";
+import type {
+    ListAction,
+    MultipleAction,
+    RemoveKeyAction,
+    RemoveValueFromListAction,
+    SequentialAction,
+    SimpleAction,
+    SlotAction,
+    ToggleListValueAction
+} from "@/core/engine/actions/types";
 import type { EnchantmentProps } from "@/core/schema/enchant/EnchantmentProps";
 import type { VoxelRegistryElement } from "@/core/Element";
 import { describe, expect, it } from "vitest";

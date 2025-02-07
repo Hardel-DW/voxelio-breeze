@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import Datapack from "@/core/Datapack";
+import { Datapack } from "@/core/Datapack";
 
 describe("Registry System", () => {
     const mockFiles = {

@@ -1,4 +1,4 @@
-import Datapack from "@/core/Datapack";
+import { Datapack } from "@/core/Datapack";
 import type { DataDrivenElement, VoxelElement } from "@/core/Element";
 import type { DataDrivenRegistryElement } from "@/core/Element";
 import type { IdentifierObject } from "@/core/Identifier";

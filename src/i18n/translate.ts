@@ -1,7 +1,7 @@
 import type { TranslateTextType } from "@/core/schema/primitive/text";
 import type { I18n } from "@/i18n/i18n";
 
-export default function translate(instance: I18n, content: TranslateTextType | undefined, replace?: string[]) {
+export function translate(instance: I18n, content: TranslateTextType | undefined, replace?: string[]) {
     if (typeof content === "string") {
         return content;
     }

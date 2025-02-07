@@ -1,4 +1,4 @@
-import Datapack from "@/core/Datapack";
+import { Datapack } from "@/core/Datapack";
 import type { DataDrivenElement } from "@/core/Element";
 import type { DataDrivenRegistryElement } from "@/core/Element";
 

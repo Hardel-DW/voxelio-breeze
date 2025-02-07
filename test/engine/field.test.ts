@@ -1,5 +1,5 @@
 import { getConditionFields, getLockFields, getRendererFields } from "@/core/engine/utils/field";
-import type { Condition } from "@/core/engine/condition";
+import type { Condition } from "@/core/engine/condition/types";
 import type { Lock } from "@/core/schema/primitive/component";
 import { describe, expect, it } from "vitest";
 import type { ValueRenderer } from "@/core/engine/renderer/value";
