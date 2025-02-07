@@ -1,0 +1,79 @@
+name: NPM Publish
+
+on:
+  push:
+    branches:
+      - main
+      - master
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.VOXEL_DEPLOY_TOKEN }}
+
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 8
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          registry-url: "https://registry.npmjs.org"
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install --no-frozen-lockfile
+
+      - name: Type Check
+        run: pnpm run check
+
+      - name: Lint Check
+        run: pnpm run biome:check
+
+      - name: Run Tests
+        run: pnpm run test run
+
+      - name: Configure Git
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+
+      - name: Build
+        run: pnpm run build
+
+      - name: Bump version and push
+        env:
+          GITHUB_TOKEN: ${{ secrets.VOXEL_DEPLOY_TOKEN }}
+        run: |
+          git add .
+          if [[ "${{ github.event.head_commit.message }}" =~ ^major: ]]; then
+            pnpm version major --no-git-tag-version
+          elif [[ "${{ github.event.head_commit.message }}" =~ ^feat: ]]; then
+            pnpm version minor --no-git-tag-version
+          else
+            pnpm version patch --no-git-tag-version
+          fi
+          VERSION=$(node -p "require('./package.json').version")
+          git add package.json
+          git commit -m "chore: bump version to ${VERSION} [skip ci]"
+          git tag "v${VERSION}"
+          git remote set-url origin https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}
+          git push origin HEAD --tags
+
+      - name: Publish to NPM
+        run: pnpm publish --access public --no-git-checks
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Clean Git State
+        run: |
+          git clean -fdx
+          git reset --hard HEAD

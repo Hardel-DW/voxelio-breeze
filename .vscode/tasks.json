@@ -1,0 +1,77 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "type": "npm",
+            "script": "build",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": [],
+            "label": "Build Package",
+            "detail": "rollup -c rollup.config.js"
+        },
+        {
+            "type": "npm",
+            "script": "biome:format",
+            "problemMatcher": [],
+            "label": "Format Code",
+            "detail": "biome format --write ./src"
+        },
+        {
+            "type": "npm",
+            "script": "biome:unsafefix",
+            "problemMatcher": [],
+            "label": "Fix Code",
+            "detail": "biome check --write --unsafe  ./src"
+        },
+        {
+            "type": "npm",
+            "script": "biome:check",
+            "problemMatcher": [],
+            "label": "Check Code",
+
+            "detail": "biome check ./src"
+        },
+        {
+            "type": "npm",
+            "script": "check",
+            "problemMatcher": ["$tsc"],
+            "label": "TypeScript Check",
+            "detail": "tsc --noEmit"
+        },
+        {
+            "type": "npm",
+            "script": "test",
+            "group": {
+                "kind": "test",
+                "isDefault": true
+            },
+            "problemMatcher": [],
+            "label": "Run Tests",
+            "detail": "vitest"
+        },
+        {
+            "type": "npm",
+            "script": "release:patch",
+            "problemMatcher": [],
+            "label": "Release Patch Version",
+            "detail": "pnpm version patch && pnpm publish"
+        },
+        {
+            "type": "npm",
+            "script": "release:minor",
+            "problemMatcher": [],
+            "label": "Release Minor Version",
+            "detail": "pnpm version minor && pnpm publish"
+        },
+        {
+            "type": "npm",
+            "script": "release:major",
+            "problemMatcher": [],
+            "label": "Release Major Version",
+            "detail": "pnpm version major && pnpm publish"
+        }
+    ]
+} 
