@@ -23,7 +23,10 @@ const createConfig = (input, output) => ({
             include: ["src/**/*"],
             declaration: true,
             declarationDir: "./dist",
-            outDir: "./dist"
+            outDir: "./dist",
+            rootDir: "src",
+            sourceMap: true,
+            inlineSources: true
         }),
         terser()
     ]
