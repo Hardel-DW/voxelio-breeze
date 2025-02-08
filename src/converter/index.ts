@@ -1,9 +1,9 @@
 import { generateFabricMod } from "@/converter/fabric";
 import { generateForgeMods } from "@/converter/forge-neoforge";
 import { generateQuiltMod } from "@/converter/quilt";
+import { DEFAULT_MOD_METADATA, type ModMetadata, ModPlatforms } from "@/converter/types";
 import { Datapack } from "@/core/Datapack";
 import { parseZip } from "@/core/engine/utils/zip";
-import { DEFAULT_MOD_METADATA, type ModMetadata, ModPlatforms } from "@/converter/types";
 
 /**
  * Converts a datapack ZIP file to mod(s) for specified platforms
