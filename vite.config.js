@@ -9,10 +9,17 @@ export default defineConfig({
     build: {
         outDir: "dist",
         lib: {
-            formats: ["umd"],
-            entry: "src/index.ts",
-            fileName: "voxel",
-            name: "@voxelio/core"
+            entry: {
+                index: "src/index.ts",
+                core: "src/exports/core.ts",
+                converter: "src/exports/converter.ts",
+                i18n: "src/exports/i18n.ts",
+                net: "src/exports/net.ts",
+                collections: "src/exports/collections.ts",
+                schema: "src/exports/schema.ts"
+            },
+            formats: ["es"],
+            fileName: (_, entryName) => `${entryName}.js`
         },
         rollupOptions: {
             external: ["jszip", "zustand", "zustand/shallow"],
@@ -29,7 +36,8 @@ export default defineConfig({
         dts({
             entryRoot: "src",
             outputDir: "dist",
-            exclude: ["test/**/*"]
+            exclude: ["test/**/*"],
+            rollupTypes: true
         })
     ],
     resolve: {
