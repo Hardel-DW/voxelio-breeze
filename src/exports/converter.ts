@@ -1,4 +1,4 @@
-export * from "@/converter";
+export * from "@/converter/index";
 export * from "@/converter/types";
 export * from "@/converter/fabric";
 export * from "@/converter/quilt";
