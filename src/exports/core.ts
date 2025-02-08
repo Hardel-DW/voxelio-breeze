@@ -9,7 +9,6 @@ export * from "@/core/engine/Compiler";
 export * from "@/core/engine/Manager";
 export * from "@/core/engine/Parser";
 export * from "@/core/engine/Store";
-export * from "@/core/engine/condition";
 
 export * from "@/core/engine/migrations/types";
 export * from "@/core/engine/migrations/types";
@@ -47,3 +46,6 @@ export * from "@/core/errors/DatapackError";
 export * from "@/core/engine/actions/index";
 export * from "@/core/engine/actions/utils";
 export * from "@/core/engine/actions/types";
+
+export * from "@/core/engine/condition";
+export * from "@/core/engine/condition/types";
