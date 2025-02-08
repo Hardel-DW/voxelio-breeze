@@ -41,6 +41,10 @@
         "./collections": {
             "types": "./dist/exports/collections.d.ts",
             "default": "./dist/exports/collections.js"
+        },
+        "./schema": {
+            "types": "./dist/exports/schema.d.ts",
+            "default": "./dist/exports/schema.js"
         }
     },
     "scripts": {
@@ -72,9 +76,5 @@
     "publishConfig": {
         "access": "public"
     },
-    "files": [
-        "lib/*",
-        "dist/*",
-        "!**/*.tsbuildinfo"
-    ]
+    "files": ["lib/*", "dist/*", "!**/*.tsbuildinfo"]
 }
