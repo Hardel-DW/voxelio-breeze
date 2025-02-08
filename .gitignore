@@ -24,3 +24,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Build files
+tsconfig.build.tsbuildinfo
+tsconfig.tsbuildinfo
