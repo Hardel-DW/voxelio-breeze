@@ -22,12 +22,10 @@ export default defineConfig({
             fileName: (_, entryName) => `${entryName}.js`
         },
         rollupOptions: {
-            external: ["jszip", "zustand", "zustand/shallow"],
+            external: ["jszip"],
             output: {
                 globals: {
-                    jszip: "JSZip",
-                    zustand: "zustand",
-                    "zustand/shallow": "shallow"
+                    jszip: "JSZip"
                 }
             }
         }
