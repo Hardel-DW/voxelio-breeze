@@ -23,6 +23,19 @@ export class Identifier {
         return new Identifier({ namespace, registry, resource });
     }
 
+    /**
+     * The Unique key is built like this:
+     * namespace:resource$registry
+     *
+     * @param uniqueKey
+     * @returns
+     */
+    static fromUniqueKey(uniqueKey: string) {
+        const [$namespace_resource, registry] = uniqueKey.split("$");
+        const [namespace, resource] = $namespace_resource.split(":");
+        return new Identifier({ namespace, registry, resource });
+    }
+
     get(): IdentifierObject {
         return { namespace: this.namespace, registry: this.registry, resource: this.resource };
     }
