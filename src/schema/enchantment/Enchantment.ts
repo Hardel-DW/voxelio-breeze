@@ -3,7 +3,7 @@ import type { EnchantmentCost } from "@/schema/enchantment/EnchantmentCost";
 import type { TextComponentType } from "@/schema/text/TextComponentType";
 import type { SingleOrMultiple } from "@/utils";
 
-const SlotManager = ["any", "mainhand", "offhand", "hand", "head", "chest", "legs", "feet", "armor"] as const;
+const SlotManager = ["any", "mainhand", "offhand", "hand", "head", "chest", "legs", "feet", "armor", "body", "saddle"] as const;
 export type SlotRegistryType = (typeof SlotManager)[number];
 export interface Enchantment extends DataDrivenElement {
     description: TextComponentType;

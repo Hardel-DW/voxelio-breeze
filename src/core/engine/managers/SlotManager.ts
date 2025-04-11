@@ -1,6 +1,6 @@
 export type SlotRegistryType = (typeof SlotManager)[number];
 
-const SlotManager = ["any", "mainhand", "offhand", "hand", "head", "chest", "legs", "feet", "armor"] as const;
+const SlotManager = ["any", "mainhand", "offhand", "hand", "head", "chest", "legs", "feet", "armor", "body", "saddle"] as const;
 
 export const SLOT_MAPPINGS = {
     any: ["mainhand", "offhand", "head", "chest", "legs", "feet"],
@@ -11,7 +11,9 @@ export const SLOT_MAPPINGS = {
     head: ["head"],
     chest: ["chest"],
     legs: ["legs"],
-    feet: ["feet"]
+    feet: ["feet"],
+    body: ["body"],
+    saddle: ["saddle"]
 };
 
 export function isSlotRegistryType(value: string): value is SlotRegistryType {

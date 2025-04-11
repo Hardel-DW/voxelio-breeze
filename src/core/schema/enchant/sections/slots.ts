@@ -58,6 +58,50 @@ export const slots: InterfaceConfiguration = {
                                     values: ["offhand", "any", "hand"]
                                 }
                             }
+                        },
+                        {
+                            type: "Slot",
+                            title: {
+                                type: "translate",
+                                value: "tools.enchantments.section.slots.body.title"
+                            },
+                            image: "/images/features/slots/body.webp",
+                            action: {
+                                type: "set_computed_slot",
+                                field: "slots",
+                                value: "body"
+                            },
+                            renderer: {
+                                type: "conditionnal",
+                                return_condition: true,
+                                term: {
+                                    condition: "contains",
+                                    field: "slots",
+                                    values: ["body", "any"]
+                                }
+                            }
+                        },
+                        {
+                            type: "Slot",
+                            title: {
+                                type: "translate",
+                                value: "tools.enchantments.section.slots.saddle.title"
+                            },
+                            image: "/images/features/slots/saddle.webp",
+                            action: {
+                                type: "set_computed_slot",
+                                field: "slots",
+                                value: "saddle"
+                            },
+                            renderer: {
+                                type: "conditionnal",
+                                return_condition: true,
+                                term: {
+                                    condition: "contains",
+                                    field: "slots",
+                                    values: ["saddle", "any"]
+                                }
+                            }
                         }
                     ]
                 },

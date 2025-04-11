@@ -159,6 +159,8 @@ export const french = {
     "tools.enchantments.section.slots.chest.title": "Torse",
     "tools.enchantments.section.slots.legs.title": "Jambes",
     "tools.enchantments.section.slots.feet.title": "Pieds",
+    "tools.enchantments.section.slots.body.title": "Corps (Chien - Cheval)",
+    "tools.enchantments.section.slots.saddle.title": "Selle",
     "tools.enchantments.section.slots.explanation.title":
         "L'activation de l'effet de l'enchantement, détermine quand l'enchantement s'active, des exemples plus bas.",
     "tools.enchantments.section.slots.explanation.list.1":

@@ -158,6 +158,8 @@ export const english = {
     "tools.enchantments.section.slots.chest.title": "Chest",
     "tools.enchantments.section.slots.legs.title": "Legs",
     "tools.enchantments.section.slots.feet.title": "Feet",
+    "tools.enchantments.section.slots.body.title": "Body (Dog - Horse)",
+    "tools.enchantments.section.slots.saddle.title": "Saddle",
     "tools.enchantments.section.slots.explanation.title": "Here's how enchantment slots work and when their effects kick in:",
     "tools.enchantments.section.slots.explanation.list.1":
         "Take Fire Aspect for example - if you put it on your main hand or offhand weapon, it'll set enemies on fire when you hit them.",
