@@ -58,7 +58,12 @@ export const slots: InterfaceConfiguration = {
                                     values: ["offhand", "any", "hand"]
                                 }
                             }
-                        },
+                        }
+                    ]
+                },
+                {
+                    type: "Grid",
+                    children: [
                         {
                             type: "Slot",
                             title: {
