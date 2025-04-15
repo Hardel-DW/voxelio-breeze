@@ -2,7 +2,6 @@ import type { ToolRevealElementType } from "@/core/schema/primitive/component";
 
 export const dungeon: ToolRevealElementType = {
     id: "enchant.addons.dnt",
-    soon: false,
     logo: "/images/addons/logo/dnt.webp",
     image: "/images/addons/hero/dnt.png",
     href: "https://modrinth.com/datapack/dungeons-and-taverns",
