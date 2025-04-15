@@ -147,16 +147,51 @@ export const global: InterfaceConfiguration = {
                 },
                 {
                     type: "Donation",
+                    icon: "/icons/logo.svg",
                     title: {
                         type: "translate",
-                        value: "tools.enchantments.section.global.components.donate.title"
+                        value: "tools.supports.title"
                     },
                     description: {
                         type: "translate",
-                        value: "tools.enchantments.section.global.components.donate.description"
+                        value: "tools.supports.description"
                     },
-                    image: "/icons/tools/donate.svg",
-                    link: "https://www.patreon.com/voxel"
+                    subTitle: {
+                        type: "translate",
+                        value: "tools.supports.advantages"
+                    },
+                    extra: [
+                        {
+                            type: "translate",
+                            value: "tools.supports.advantages.early_access"
+                        },
+                        {
+                            type: "translate",
+                            value: "tools.supports.advantages.submit_ideas"
+                        },
+                        {
+                            type: "translate",
+                            value: "tools.supports.advantages.discord_role"
+                        },
+                        {
+                            type: "translate",
+                            value: "tools.supports.advantages.live_voxel"
+                        }
+                    ],
+                    patreon: {
+                        text: {
+                            type: "translate",
+                            value: "tools.supports.become"
+                        },
+                        link: "https://www.patreon.com/hardel"
+                    },
+                    tipText: {
+                        text: {
+                            type: "translate",
+                            value: "dialog.footer.donate"
+                        },
+                        link: "https://streamelements.com/hardoudou/tip"
+                    }
                 }
             ]
         }

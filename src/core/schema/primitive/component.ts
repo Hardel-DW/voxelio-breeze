@@ -86,7 +86,7 @@ export type ToolRevealType = BaseComponent & {
 export type ToolRevealElementType = {
     id: string;
     title: TranslateTextType;
-    soon?: boolean;
+    soon?: TranslateTextType;
     image: string;
     logo: string;
     href: string;
@@ -104,10 +104,19 @@ export type ToolSelectorType = BaseInteractiveComponent & {
 
 export type ToolDonationType = BaseComponent & {
     type: "Donation";
+    icon: string;
     title: TranslateTextType;
-    link: string;
     description: TranslateTextType;
-    image: string;
+    subTitle: TranslateTextType;
+    extra: TranslateTextType[];
+    tipText: {
+        text: TranslateTextType;
+        link: string;
+    };
+    patreon: {
+        text: TranslateTextType;
+        link: string;
+    };
 };
 
 export type ToolSwitchSlotType = BaseInteractiveComponent & {
