@@ -1,5 +1,3 @@
-import { capitalize } from "@/utils";
-
 const owner = "misode";
 const repository = "mcmeta";
 const branch = "assets";
@@ -64,7 +62,7 @@ export async function getCategory(): Promise<CategorySound[]> {
 
         for (const element of data) {
             const category = element.path;
-            const name = capitalize(element.name);
+            const name = element.name.charAt(0).toUpperCase() + element.name.slice(1);
             result.push({ name, category });
         }
 

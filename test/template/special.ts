@@ -1,4 +1,4 @@
-import type { EnchantmentProps } from "@/core/schema/enchant/EnchantmentProps";
+import type { EnchantmentProps } from "@/core/schema/EnchantmentProps";
 import type { Enchantment } from "@/schema/enchantment/Enchantment";
 import type { TagType } from "@/schema/tag/TagType";
 

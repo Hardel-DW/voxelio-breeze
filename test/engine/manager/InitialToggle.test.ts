@@ -7,7 +7,6 @@ describe("Search all initial toggle sections", () => {
         const interfaces: InterfaceConfiguration[] = [
             {
                 id: "lorem",
-                section: "Lorem ipsum",
                 components: [
                     {
                         type: "Section",
@@ -33,7 +32,6 @@ describe("Search all initial toggle sections", () => {
         const interfaces: InterfaceConfiguration[] = [
             {
                 id: "supported",
-                section: "Lorem ipsum",
                 components: [
                     {
                         type: "Section",
@@ -49,7 +47,6 @@ describe("Search all initial toggle sections", () => {
             },
             {
                 id: "supported",
-                section: "Lorem ipsum",
                 components: [
                     {
                         type: "Section",

@@ -1,7 +1,5 @@
-import type { TranslationKey } from "@/i18n/translations";
-
 export class DatapackError extends Error {
-    constructor(message: TranslationKey) {
+    constructor(message: string) {
         super(message);
         this.name = "DatapackError";
     }

@@ -1,15 +1,12 @@
 import { Datapack } from "@/core/Datapack";
+import { DatapackError } from "@/core/DatapackError";
 import type { ConfiguratorConfigFromDatapack, DataDrivenElement, VoxelElement } from "@/core/Element";
 import type { DataDrivenRegistryElement } from "@/core/Element";
 import { sortVoxelElements } from "@/core/Element";
 import { Identifier } from "@/core/Identifier";
 import type { Analysers, GetAnalyserMinecraft, GetAnalyserVoxel } from "@/core/engine/Analyser";
 import { getAnalyserForVersion } from "@/core/engine/Analyser";
-import { calculateInitialToggle } from "@/core/engine/managers/InitialToggle";
 import { Logger } from "@/core/engine/migrations/logger";
-import { DatapackError } from "@/core/errors/DatapackError";
-import type { ToolConfiguration } from "@/core/schema/primitive/index";
-import type { ToggleSectionMap } from "@/core/schema/primitive/toggle";
 export interface ParserParams<K extends DataDrivenElement> {
     element: DataDrivenRegistryElement<K>;
     tags?: string[];
@@ -23,10 +20,8 @@ export interface ParseDatapackResult<T extends VoxelElement> {
     files: Record<string, Uint8Array>;
     elements: Map<string, T>;
     version: number;
-    toggleSection: ToggleSectionMap;
     currentElementId: string;
     isModded: boolean;
-    config: ToolConfiguration;
     logger: Logger;
 }
 
@@ -35,12 +30,7 @@ export interface ParseDatapackResult<T extends VoxelElement> {
  */
 export async function parseDatapack<T extends keyof Analysers>(tool: T, file: File): Promise<ParseDatapackResult<GetAnalyserVoxel<T>>> {
     const id = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-    const date = new Intl.DateTimeFormat("fr-FR", {
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit"
-    }).format(new Date());
-
+    const date = new Intl.DateTimeFormat("fr-FR", { year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date());
     const datapack = await Datapack.parse(file);
     const namespaces = datapack.getNamespaces();
     const version = datapack.getPackFormat();
@@ -50,13 +40,12 @@ export async function parseDatapack<T extends keyof Analysers>(tool: T, file: Fi
     const logs = datapack.getVoxelLogs();
     const files = datapack.getFiles();
 
-    const { analyser, config } = getAnalyserForVersion(tool, version);
-    const toggleSection = calculateInitialToggle(config.interface);
+    const { analyser } = getAnalyserForVersion(tool, version);
 
-    const mainRegistry = datapack.getRegistry<GetAnalyserMinecraft<T>>(config.analyser);
+    const mainRegistry = datapack.getRegistry<GetAnalyserMinecraft<T>>(tool);
     const compiled = mainRegistry.map((element) => {
         const configurator = datapack.readFile<ConfiguratorConfigFromDatapack>(element.identifier, "voxel");
-        const tags = datapack.getRelatedTags(`tags/${config.analyser}`, element.identifier);
+        const tags = datapack.getRelatedTags(`tags/${tool}`, element.identifier);
 
         return {
             identifier: new Identifier(element.identifier).toUniqueKey(),
@@ -69,25 +58,7 @@ export async function parseDatapack<T extends keyof Analysers>(tool: T, file: Fi
     const currentElementId = sortVoxelElements(elements)[0];
     const logger = logs
         ? new Logger(JSON.parse(new TextDecoder().decode(logs)))
-        : new Logger({
-              id,
-              date,
-              version,
-              isModded,
-              datapack: { name, description, namespaces },
-              isMinified: true,
-              logs: []
-          });
+        : new Logger({ id, date, version, isModded, datapack: { name, description, namespaces }, isMinified: true, logs: [] });
 
-    return {
-        name,
-        files,
-        elements,
-        version,
-        toggleSection,
-        currentElementId,
-        isModded,
-        config,
-        logger
-    };
+    return { name, files, elements, version, currentElementId, isModded, logger };
 }

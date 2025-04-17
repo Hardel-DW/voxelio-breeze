@@ -1,5 +1,5 @@
 import type { DataDrivenRegistryElement } from "@/core/Element";
-import type { EnchantmentProps } from "@/core/schema/enchant/EnchantmentProps";
+import type { EnchantmentProps } from "@/core/schema/EnchantmentProps";
 import type { Enchantment, SlotRegistryType } from "@/schema/enchantment/Enchantment";
 
 const baseEnchantment = {

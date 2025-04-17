@@ -7,13 +7,11 @@ describe("Engine System", () => {
             it("should get correct analyser for minimum supported version", () => {
                 const analyser = getAnalyserForVersion("enchantment", 48);
                 expect(analyser).toBeDefined();
-                expect(analyser.config.analyser).toBe("enchantment");
             });
 
             it("should get correct analyser for current version", () => {
                 const analyser = getAnalyserForVersion("enchantment", 100);
                 expect(analyser).toBeDefined();
-                expect(analyser.config.analyser).toBe("enchantment");
             });
 
             it("should throw error for version below minimum", () => {
@@ -41,8 +39,6 @@ describe("Engine System", () => {
                     for (const entry of analysers) {
                         expect(entry.analyser).toHaveProperty("compiler");
                         expect(entry.analyser).toHaveProperty("parser");
-                        expect(entry.analyser).toHaveProperty("properties");
-                        expect(entry.config).toBeDefined();
                     }
                 }
             });

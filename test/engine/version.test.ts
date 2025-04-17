@@ -30,7 +30,7 @@ describe("Version", () => {
         });
 
         it("should return Future Version for versions above max", () => {
-            expect(getDescription(62)).toBe("Future Version");
+            expect(getDescription(150)).toBe("Future Version");
             expect(getDescription(999)).toBe("Future Version");
         });
 

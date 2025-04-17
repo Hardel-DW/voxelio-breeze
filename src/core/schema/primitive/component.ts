@@ -91,6 +91,10 @@ export type ToolRevealElementType = {
     logo: string;
     href: string;
     description: TranslateTextType;
+};
+
+export type ToolRevealElementContent = {
+    id: string;
     children: FormComponent[];
 };
 

@@ -2,7 +2,7 @@ import { Identifier } from "@/core/Identifier";
 import { enchantplusTags, vanillaTags } from "test/template/tags";
 import { DATA_DRIVEN_TEMPLATE_ENCHANTMENT } from "test/template/datadriven";
 import JSZip from "jszip";
-import { voxelDatapacks } from "@/voxel/VoxelDatapack";
+import { voxelDatapacks } from "@/VoxelDatapack";
 
 const enchantmentFiles = DATA_DRIVEN_TEMPLATE_ENCHANTMENT.reduce(
     (files, enchant) => {

@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { createZipFile, filesRecord, filesRecordWithInvalidPackMcmeta, filesRecordWithoutPackMcmeta } from "test/template/datapack";
 import { Datapack } from "@/core/Datapack";
 import type { TagType } from "@/schema/tag/TagType";
-import { DatapackError } from "@/core/errors/DatapackError";
+import { DatapackError } from "@/core/DatapackError";
 import type { Compiler } from "@/core/engine/Compiler";
 import type { LabeledElement } from "@/core/schema/primitive/label";
 import { attack_speed_element, test_attack_speed_files } from "@test/template/special";

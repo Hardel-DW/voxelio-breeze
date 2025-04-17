@@ -39,7 +39,7 @@ export * from "@/core/schema/primitive";
 export * from "@/core/schema/primitive/text";
 export * from "@/core/schema/primitive";
 
-export * from "@/core/errors/DatapackError";
+export * from "@/core/DatapackError";
 
 export * from "@/core/engine/actions/index";
 export * from "@/core/engine/actions/utils";
@@ -47,4 +47,4 @@ export * from "@/core/engine/actions/types";
 
 export * from "@/core/engine/condition";
 export * from "@/core/engine/condition/types";
-export * from "@/voxel/VoxelDatapack";
+export * from "@/VoxelDatapack";
