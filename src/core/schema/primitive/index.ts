@@ -18,3 +18,12 @@ export type InterfaceConfiguration = {
     id: string;
     components: FormComponent[];
 };
+
+export type FieldConfiguration = Record<
+    string,
+    {
+        name: TranslateTextType;
+        type: string;
+        icon?: string;
+    }
+>;

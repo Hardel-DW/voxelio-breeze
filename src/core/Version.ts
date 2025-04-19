@@ -1,4 +1,4 @@
-const PACK_VERSION = {
+export const PACK_VERSION = {
     "1": { start: "1.12", end: "1.12.2" },
     "4": { start: "1.13", end: "1.14.4" },
     "5": { start: "1.15", end: "1.16.1" },
