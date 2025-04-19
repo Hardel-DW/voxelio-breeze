@@ -29,6 +29,7 @@ export * from "@/core/engine/utils/field";
 export * from "@/core/engine/utils/property";
 export * from "@/core/engine/utils/searchElements";
 export * from "@/core/engine/utils/zip";
+export * from "@/core/engine/utils/i18n";
 
 export * from "@/core/schema/primitive/component";
 export * from "@/core/schema/primitive/properties";
