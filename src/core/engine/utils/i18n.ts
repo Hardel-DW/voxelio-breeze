@@ -1,3 +1,5 @@
+import type { TranslateTextType } from "@/core/schema/primitive/text";
+
 /**
  * This functions search recursively in an object and return all i18n keys, you can localize it with the pattern :
  * export type InternalTranslateType = {
@@ -22,4 +24,22 @@ export function getI18nKeys(obj: object): string[] {
     }
 
     return keys;
+}
+
+export function getKey(content: TranslateTextType | undefined): string {
+    if (!content) {
+        return "";
+    }
+
+    if (typeof content === "string") {
+        return content;
+    }
+
+    if (typeof content === "object") {
+        if ("type" in content && content.type === "translate") {
+            return content.value;
+        }
+    }
+
+    return content.toString();
 }
