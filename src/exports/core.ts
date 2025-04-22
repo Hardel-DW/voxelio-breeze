@@ -10,7 +10,6 @@ export * from "@/core/engine/Manager";
 export * from "@/core/engine/Parser";
 
 export * from "@/core/engine/migrations/types";
-export * from "@/core/engine/migrations/types";
 export * from "@/core/engine/migrations/logValidation";
 export * from "@/core/engine/migrations/logToActions";
 export * from "@/core/engine/migrations/logger";
@@ -30,6 +29,7 @@ export * from "@/core/engine/utils/property";
 export * from "@/core/engine/utils/searchElements";
 export * from "@/core/engine/utils/zip";
 export * from "@/core/engine/utils/i18n";
+export * from "@/core/engine/utils/InitialToggle";
 
 export * from "@/core/schema/primitive/component";
 export * from "@/core/schema/primitive/properties";
