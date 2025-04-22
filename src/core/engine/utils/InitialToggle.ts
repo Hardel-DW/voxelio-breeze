@@ -1,2 +1,3 @@
-import type { ToolSectionType } from "@/core/schema/primitive/component";
-export const getInitialToggle = (section: ToolSectionType) => (section.toggle && section.toggle.length > 0 ? section.toggle[0] : undefined);
+import type { ToggleSection } from "@/core/schema/primitive/toggle";
+
+export const getInitialToggle = (section: ToggleSection[]) => (section.length > 0 ? section[0] : undefined);
