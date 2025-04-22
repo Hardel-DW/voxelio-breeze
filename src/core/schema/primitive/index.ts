@@ -2,11 +2,22 @@ import type { Analysers } from "@/core/engine/Analyser";
 import type { FormComponent } from "@/core/schema/primitive/component";
 import type { TranslateTextType } from "@/core/schema/primitive/text";
 
+export type RoadmapKeysCollection = {
+    [registryId: string]: Roadmap;
+};
+
+export type Roadmap = {
+    field: string | null;
+    sections: ToolTab[];
+    addons: { id: string; content: string }[];
+};
+
 export type ToolTab = {
     id: string;
-    section: TranslateTextType;
+    content: string;
     disabled?: boolean;
     soon?: boolean;
+    text: TranslateTextType | undefined;
 };
 
 export type ToolConfiguration = {
@@ -23,7 +34,9 @@ export type FieldConfiguration = Record<
     string,
     {
         name: TranslateTextType;
-        type: string;
+        type: FieldType;
         icon?: string;
     }
 >;
+
+export type FieldType = "string" | "number" | "boolean" | "array" | "tags" | "effects" | "deleted";
