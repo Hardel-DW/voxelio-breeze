@@ -1,6 +1,10 @@
 import type { ToggleSectionMap } from "@/core/schema/primitive/toggle";
 
-export function resolve<T>(value: T, toggleSection: ToggleSectionMap): T {
+export function resolve<T>(value: T, toggleSection: ToggleSectionMap | undefined): T {
+    if (!toggleSection) {
+        return value;
+    }
+
     return resolveField(value, toggleSection);
 }
 
