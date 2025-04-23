@@ -26,6 +26,11 @@ export function getI18nKeys(obj: object): string[] {
     return keys;
 }
 
+/**
+ * Get the key from a TranslateTextType object
+ * @param content - The TranslateTextType object to get the key from
+ * @returns The key from the TranslateTextType object
+ */
 export function getKey(content: TranslateTextType | undefined): string {
     if (!content) {
         return "";

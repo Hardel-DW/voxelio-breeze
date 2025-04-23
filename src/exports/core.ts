@@ -21,7 +21,6 @@ export * from "@/core/engine/renderer/iteration/createIterations";
 export * from "@/core/engine/renderer/iteration/resolveIterationValue";
 
 export * from "@/core/engine/renderer/index";
-export * from "@/core/engine/renderer/resolve";
 export * from "@/core/engine/renderer/value";
 
 export * from "@/core/engine/utils/field";
@@ -29,14 +28,10 @@ export * from "@/core/engine/utils/property";
 export * from "@/core/engine/utils/searchElements";
 export * from "@/core/engine/utils/zip";
 export * from "@/core/engine/utils/i18n";
-export * from "@/core/engine/utils/InitialToggle";
 
 export * from "@/core/schema/primitive/component";
 export * from "@/core/schema/primitive/properties";
-export * from "@/core/schema/primitive/toggle";
 export * from "@/core/schema/primitive/label";
-export * from "@/core/schema/primitive/text";
-export * from "@/core/schema/primitive";
 export * from "@/core/schema/primitive/text";
 export * from "@/core/schema/primitive";
 

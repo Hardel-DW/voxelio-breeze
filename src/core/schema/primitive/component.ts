@@ -3,7 +3,6 @@ import type { Condition } from "@/core/engine/condition/types";
 import type { IterationValue, TemplateReplacer } from "@/core/engine/renderer/iteration/type";
 import type { ValueRenderer } from "@/core/engine/renderer/value";
 import type { TextRenderType, TranslateTextType } from "@/core/schema/primitive/text";
-import type { ToggleSection } from "@/core/schema/primitive/toggle";
 
 // Base type for common component properties
 export type BaseComponent = {
@@ -41,7 +40,6 @@ export type ToolSectionType = BaseComponent & {
     id: string;
     title: TranslateTextType;
     children: FormComponent[];
-    toggle?: ToggleSection[];
     button?: { text: TranslateTextType; url: string };
 };
 
