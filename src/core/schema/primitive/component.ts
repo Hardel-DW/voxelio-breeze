@@ -76,6 +76,16 @@ export type ToolTagViewerType = BaseComponent & {
     properties?: ValueRenderer;
 };
 
+export type ToolSectionSelectorType = BaseComponent & {
+    type: "SectionSelector";
+    sections: ToolSectionSelectorSection[];
+};
+
+export type ToolSectionSelectorSection = {
+    id: string;
+    title: TranslateTextType;
+};
+
 export type ToolRevealType = BaseComponent & {
     type: "Reveal";
     elements: ToolRevealElementType[];
