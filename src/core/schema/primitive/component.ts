@@ -204,6 +204,7 @@ export type FormComponent =
     | ToolGridType
     | ToolListType
     | ToolSectionType
+    | ToolSectionSelectorType
     | ToolScrollableType
     | ToolCategoryType
     | ToolIterationType;
