@@ -76,9 +76,12 @@ export type ToolTagViewerType = BaseComponent & {
     properties?: ValueRenderer;
 };
 
-export type ToolSectionSelectorType = BaseComponent & {
+type BaseDynamicSchema<T> = BaseComponent & {
+    elements: T[];
+};
+
+export type ToolSectionSelectorType = BaseDynamicSchema<ToolSectionSelectorSection> & {
     type: "SectionSelector";
-    sections: ToolSectionSelectorSection[];
 };
 
 export type ToolSectionSelectorSection = {
@@ -86,9 +89,8 @@ export type ToolSectionSelectorSection = {
     title: TranslateTextType;
 };
 
-export type ToolRevealType = BaseComponent & {
+export type ToolRevealType = BaseDynamicSchema<ToolRevealElementType> & {
     type: "Reveal";
-    elements: ToolRevealElementType[];
 };
 
 export type ToolRevealElementType = {
