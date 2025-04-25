@@ -76,7 +76,7 @@ export type ToolTagViewerType = BaseComponent & {
     properties?: ValueRenderer;
 };
 
-type BaseDynamicSchema<T> = BaseComponent & {
+export type BaseDynamicSchema<T> = BaseComponent & {
     elements: T[];
 };
 
