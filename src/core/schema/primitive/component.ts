@@ -63,19 +63,6 @@ export type ToolIterationType = BaseComponent & {
     fallback?: FormComponent;
 };
 
-export type TagViewerInclude = {
-    namespace: string;
-    registry: string;
-    path: string;
-};
-
-export type ToolTagViewerType = BaseComponent & {
-    type: "TagViewer";
-    registry: string;
-    include?: TagViewerInclude;
-    properties?: ValueRenderer;
-};
-
 export type BaseDynamicSchema<T> = BaseComponent & {
     elements: T[];
 };
@@ -140,6 +127,17 @@ export type ToolSwitchSlotType = BaseInteractiveComponent & {
     image?: string;
 };
 
+export type ToolSwitchSlotSpecialType = BaseInteractiveComponent & {
+    type: "SwitchSlotSpecial";
+    title: TranslateTextType;
+    description: TranslateTextType;
+    image?: string;
+    data: {
+        registry: string;
+        element: string;
+    };
+};
+
 export type ToolSwitchType = BaseInteractiveComponent & {
     type: "Switch";
     title: TranslateTextType;
@@ -189,6 +187,7 @@ export type ToolPropertyType = BaseInteractiveComponent & {
 type NonContainerComponent =
     | ToolDonationType
     | ToolSwitchSlotType
+    | ToolSwitchSlotSpecialType
     | ToolSwitchType
     | TextRenderType
     | ToolSlotType
@@ -196,7 +195,6 @@ type NonContainerComponent =
     | ToolRangeType
     | ToolSelectorType
     | ToolInlineType
-    | ToolTagViewerType
     | ToolPropertyType;
 
 // Finally, export the complete FormComponent type
