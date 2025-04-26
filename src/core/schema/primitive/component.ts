@@ -29,24 +29,12 @@ export type ToolGridType = BaseComponent & {
     children: FormComponent[];
 };
 
-export type ToolListType = BaseComponent & {
-    type: "Flexible";
-    direction: "horizontal" | "vertical";
-    children: FormComponent[];
-};
-
 export type ToolSectionType = BaseComponent & {
     type: "Section";
     id: string;
     title: TranslateTextType;
     children: FormComponent[];
     button?: { text: TranslateTextType; url: string };
-};
-
-export type ToolScrollableType = BaseComponent & {
-    type: "Scrollable";
-    height?: number;
-    children: FormComponent[];
 };
 
 export type ToolCategoryType = BaseComponent & {
@@ -202,9 +190,7 @@ export type FormComponent =
     | NonContainerComponent
     | ToolRevealType
     | ToolGridType
-    | ToolListType
     | ToolSectionType
     | ToolSectionSelectorType
-    | ToolScrollableType
     | ToolCategoryType
     | ToolIterationType;
