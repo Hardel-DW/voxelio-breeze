@@ -9,7 +9,7 @@ export type RoadmapKeysCollection = {
 export type Roadmap = {
     field: string | null;
     sections: ToolTab[];
-    addons: { id: string; content: string }[];
+    schema: { id: string; content: string }[];
 };
 
 export type ToolTab = {
