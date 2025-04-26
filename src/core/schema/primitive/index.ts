@@ -14,7 +14,6 @@ export type Roadmap = {
 
 export type ToolTab = {
     id: string;
-    content: string;
     disabled?: boolean;
     soon?: boolean;
     text: TranslateTextType | undefined;
