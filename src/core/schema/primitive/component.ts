@@ -78,11 +78,6 @@ export type ToolRevealElementType = {
     description: TranslateTextType;
 };
 
-export type ToolRevealElementContent = {
-    id: string;
-    children: FormComponent[];
-};
-
 // Interactions Components
 export type ToolSelectorType = BaseInteractiveComponent & {
     type: "Selector";
