@@ -3,14 +3,22 @@ import type { FormComponent } from "@/core/schema/primitive/component";
 import type { TranslateTextType } from "@/core/schema/primitive/text";
 
 export type RoadmapKeysCollection = {
-    [registryId: string]: Roadmap;
+    hash: string;
+    roadmaps: {
+        [registryId: string]: Roadmap;
+    };
 };
 
 export type Roadmap = {
-    field: string | null;
+    field: {
+        content: string;
+        hash: string;
+    };
     sections: ToolTab[];
-    schema: { id: string; content: string; hash: string }[];
+    schema: SchemaItem[];
 };
+
+export type SchemaItem = { id: string; content: string; hash: string };
 
 export type ToolTab = {
     id: string;
