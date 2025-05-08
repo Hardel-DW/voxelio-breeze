@@ -1,5 +1,3 @@
-import type { RegistryKey } from "@/collections/one_twenty_one/name.ts";
-
 const CACHE_NAME = "minecraft-collections-v1";
 
 /**
@@ -13,7 +11,7 @@ const GITHUB_RAW_URL = "https://raw.githubusercontent.com/misode/mcmeta/summary/
  * @returns {Promise<string[]>} A promise that resolves to an array of registry values.
  * @throws {Error} If the registry is not found or if the fetch operation fails.
  */
-export async function getRegistry(key: RegistryKey): Promise<string[]> {
+export async function getRegistry(key: string): Promise<string[]> {
     try {
         const data = await cachedFetch<Record<string, string[]>>(GITHUB_RAW_URL);
         if (!data[key]) {

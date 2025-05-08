@@ -30,10 +30,6 @@
             "types": "./dist/converter.d.ts",
             "import": "./dist/converter.js"
         },
-        "./collections": {
-            "types": "./dist/collections.d.ts",
-            "import": "./dist/collections.js"
-        },
         "./schema": {
             "types": "./dist/schema.d.ts",
             "import": "./dist/schema.js"
@@ -67,8 +63,5 @@
     "publishConfig": {
         "access": "public"
     },
-    "files": [
-        "dist/*",
-        "!**/*.tsbuildinfo"
-    ]
+    "files": ["dist/*", "!**/*.tsbuildinfo"]
 }
