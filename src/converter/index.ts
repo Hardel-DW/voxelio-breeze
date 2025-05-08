@@ -3,7 +3,7 @@ import { generateForgeMods } from "@/converter/forge-neoforge";
 import { generateQuiltMod } from "@/converter/quilt";
 import { DEFAULT_MOD_METADATA, type ModMetadata, ModPlatforms } from "@/converter/types";
 import { Datapack } from "@/core/Datapack";
-import { parseZip } from "@/core/engine/utils/zip";
+import { extractZip } from "@voxelio/zip";
 
 /**
  * Converts a datapack ZIP file to mod(s) for specified platforms
@@ -13,7 +13,7 @@ import { parseZip } from "@/core/engine/utils/zip";
  * @returns Promise resolving with resulting ZIP as Uint8Array
  */
 export async function convertDatapack(datapackZip: File, platforms: ModPlatforms[], metadata?: ModMetadata): Promise<Uint8Array> {
-    const files = await parseZip(new Uint8Array(await datapackZip.arrayBuffer()));
+    const files = await extractZip(new Uint8Array(await datapackZip.arrayBuffer()));
     const finalMetadata = metadata || extractMetadata(files, datapackZip.name.replace(/\.zip$/i, ""));
     const modFiles = generateModFiles(finalMetadata, platforms);
 

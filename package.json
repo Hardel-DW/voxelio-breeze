@@ -30,14 +30,6 @@
             "types": "./dist/converter.d.ts",
             "import": "./dist/converter.js"
         },
-        "./i18n": {
-            "types": "./dist/i18n.d.ts",
-            "import": "./dist/i18n.js"
-        },
-        "./net": {
-            "types": "./dist/net.d.ts",
-            "import": "./dist/net.js"
-        },
         "./collections": {
             "types": "./dist/collections.d.ts",
             "import": "./dist/collections.js"
@@ -61,7 +53,7 @@
         "release:major": "pnpm version major && pnpm publish"
     },
     "dependencies": {
-        "jszip": "^3.10.1"
+        "@voxelio/zip": "^3.0.4"
     },
     "devDependencies": {
         "@biomejs/biome": "^1.9.3",
@@ -75,8 +67,5 @@
     "publishConfig": {
         "access": "public"
     },
-    "files": [
-        "dist/*",
-        "!**/*.tsbuildinfo"
-    ]
+    "files": ["dist/*", "!**/*.tsbuildinfo"]
 }

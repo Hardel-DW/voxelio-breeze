@@ -1,8 +1,8 @@
 import { Identifier } from "@/core/Identifier";
 import { enchantplusTags, vanillaTags } from "test/template/tags";
 import { DATA_DRIVEN_TEMPLATE_ENCHANTMENT } from "test/template/datadriven";
-import JSZip from "jszip";
 import { voxelDatapacks } from "@/VoxelDatapack";
+import { downloadZip, type InputWithMeta } from "@voxelio/zip";
 
 const enchantmentFiles = DATA_DRIVEN_TEMPLATE_ENCHANTMENT.reduce(
     (files, enchant) => {
@@ -41,12 +41,7 @@ export const filesRecordWithoutPackMcmeta = {
 };
 
 export async function createZipFile(filesRecord: Record<string, Uint8Array>): Promise<File> {
-    const zip = new JSZip();
-
-    for (const [path, content] of Object.entries(filesRecord)) {
-        zip.file(path, content);
-    }
-
-    const zipContent = await zip.generateAsync({ type: "uint8array" });
-    return new File([zipContent], "datapack.zip");
+    const files: InputWithMeta[] = Object.entries(filesRecord).map(([path, content]) => ({ name: path, input: new File([content], path) }));
+    const zipContent = downloadZip(files);
+    return new File([await zipContent.arrayBuffer()], "datapack.zip");
 }

@@ -7,10 +7,10 @@ import { getMinecraftVersion } from "@/core/Version";
 import type { Analysers, GetAnalyserMinecraft } from "@/core/engine/Analyser";
 import type { Compiler } from "@/core/engine/Compiler";
 import type { Logger } from "@/core/engine/migrations/logger";
-import { parseZip } from "@/core/engine/utils/zip";
 import type { LabeledElement } from "@/core/schema/primitive/label";
 import type { TagType } from "@/schema/tag/TagType";
-import JSZip from "jszip";
+import { downloadZip, extractZip } from "@voxelio/zip";
+import type { InputWithoutMeta } from "@voxelio/zip";
 
 export interface PackMcmeta {
     pack: {
@@ -36,7 +36,7 @@ export class Datapack {
     }
 
     static async parse(file: File) {
-        return new Datapack(await parseZip(new Uint8Array(await file.arrayBuffer())), file.name);
+        return new Datapack(await extractZip(new Uint8Array(await file.arrayBuffer())), file.name);
     }
 
     /**
@@ -264,83 +264,118 @@ export class Datapack {
         params: { isMinified: boolean; logger?: Logger; include?: DataDrivenRegistryElement<DataDrivenElement>[] }
     ) {
         const { isMinified, logger, include = [] } = params;
-        const zip = new JSZip();
 
-        this.copyExistingFiles(zip, content);
-        this.addIncludedFiles(zip, include, isMinified);
-        this.processContentFiles(zip, content, isMinified);
-        this.addLogger(zip, logger, isMinified);
+        const files: InputWithoutMeta[] = [];
+        this.prepareExistingFiles(files, content);
+        this.prepareIncludedFiles(files, include, isMinified);
+        this.prepareContentFiles(files, content, isMinified);
+        this.prepareLogger(files, logger, isMinified);
 
-        return zip.generateAsync({ type: "uint8array" });
+        const response = downloadZip(files);
+        return this.responseToUint8Array(response);
     }
 
     /**
-     * Add a JSON file to the zip using the identifier to determine the path, data will be JSON.stringify.
-     * @param zip - The zip.
+     * Convert a Response to Uint8Array
+     * @param response - The Response to convert
+     * @returns A Promise resolving to a Uint8Array
+     */
+    private async responseToUint8Array(response: Response): Promise<Uint8Array> {
+        return new Uint8Array(await response.arrayBuffer());
+    }
+
+    /**
+     * Prepare a JSON file structure for adding to the zip
      * @param path - The path of the file.
      * @param data - The data of the file.
      * @param isMinified - Whether the file is minified.
      */
-    private addJsonFile(zip: JSZip, path: IdentifierObject, data: Record<string, unknown>, isMinified: boolean) {
-        zip.file(new Identifier(path).toFilePath(), JSON.stringify(data, null, isMinified ? 0 : 4));
+    private prepareJsonFile(path: string, data: Record<string, unknown>, isMinified: boolean): InputWithoutMeta {
+        const jsonString = JSON.stringify(data, null, isMinified ? 0 : 4);
+        return {
+            name: path,
+            input: new ReadableStream({
+                start(controller) {
+                    controller.enqueue(new TextEncoder().encode(jsonString));
+                    controller.close();
+                }
+            })
+        };
     }
 
     /**
-     * Copy the existing files to the zip. File marked as deleted will be skipped.
-     * @param zip - The zip.
+     * Prepare the existing files for the zip. Files marked as deleted will be skipped.
+     * @param files - The array to add files to
      * @param content - The content of the datapack.
      */
-    private copyExistingFiles(zip: JSZip, content: LabeledElement[]) {
+    private prepareExistingFiles(files: InputWithoutMeta[], content: LabeledElement[]) {
         const filesToDelete = new Set(
             content.filter((file) => file.type === "deleted").map((file) => new Identifier(file.identifier).toFilePath())
         );
 
         for (const [path, data] of Object.entries(this.files)) {
             if (!filesToDelete.has(path)) {
-                zip.file(path, data);
+                files.push({
+                    name: path,
+                    input: new ReadableStream({
+                        start(controller) {
+                            controller.enqueue(data);
+                            controller.close();
+                        }
+                    })
+                });
             }
         }
     }
 
     /**
-     * Add the included files to the zip. E.G Voxel Datapacks. No operation is made on the files.
-     * @param zip - The zip.
+     * Prepare the included files for the zip. E.G Voxel Datapacks. No operation is made on the files.
+     * @param files - The array to add files to
      * @param include - The included files.
      * @param isMinified - Whether the file is minified.
      */
-    private addIncludedFiles(zip: JSZip, include: DataDrivenRegistryElement<DataDrivenElement>[], isMinified: boolean) {
+    private prepareIncludedFiles(files: InputWithoutMeta[], include: DataDrivenRegistryElement<DataDrivenElement>[], isMinified: boolean) {
         for (const file of include) {
-            this.addJsonFile(zip, file.identifier, file.data, isMinified);
+            files.push(this.prepareJsonFile(new Identifier(file.identifier).toFilePath(), file.data, isMinified));
         }
     }
 
     /**
      * Process files, deleted tags will continue to exist but will be empty, and other files will be deleted, the rest will be added as is.
-     * @param zip - The zip.
+     * @param files - The array to add files to
      * @param content - The content of the datapack.
      * @param isMinified - Whether the file is minified.
      */
-    private processContentFiles(zip: JSZip, content: LabeledElement[], isMinified: boolean) {
+    private prepareContentFiles(files: InputWithoutMeta[], content: LabeledElement[], isMinified: boolean) {
         for (const file of content) {
             if (file.type === "deleted" && file.identifier.registry.startsWith("tags")) {
-                this.addJsonFile(zip, file.identifier, { values: [] }, isMinified);
+                files.push(this.prepareJsonFile(new Identifier(file.identifier).toFilePath(), { values: [] }, isMinified));
                 continue;
             }
 
             if (file.type === "deleted") continue;
-            this.addJsonFile(zip, file.element.identifier, file.element.data, isMinified);
+            files.push(this.prepareJsonFile(new Identifier(file.element.identifier).toFilePath(), file.element.data, isMinified));
         }
     }
 
     /**
-     * Add the logs files to the zip.
-     * @param zip - The zip.
+     * Prepare the logs files for the zip.
+     * @param files - The array to add files to
      * @param logger - The logger.
      * @param isMinified - Whether the file is minified.
      */
-    private addLogger(zip: JSZip, logger: Logger | undefined, isMinified: boolean) {
+    private prepareLogger(files: InputWithoutMeta[], logger: Logger | undefined, isMinified: boolean) {
         if (logger) {
-            zip.file("voxel/logs.json", logger.serialize(isMinified));
+            const logData = logger.serialize(isMinified);
+            files.push({
+                name: "voxel/logs.json",
+                input: new ReadableStream({
+                    start(controller) {
+                        controller.enqueue(new TextEncoder().encode(logData));
+                        controller.close();
+                    }
+                })
+            });
         }
     }
 }

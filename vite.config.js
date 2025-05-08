@@ -13,7 +13,6 @@ export default defineConfig({
                 index: "src/index.ts",
                 core: "src/exports/core.ts",
                 converter: "src/exports/converter.ts",
-                net: "src/exports/net.ts",
                 collections: "src/exports/collections.ts",
                 schema: "src/exports/schema.ts"
             },
