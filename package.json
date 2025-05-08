@@ -11,7 +11,7 @@
     },
     "homepage": "https://voxel.hardel.io",
     "license": "MIT",
-    "version": "0.8.12",
+    "version": "0.9.0",
     "type": "module",
     "main": "./dist/index.js",
     "module": "./dist/index.js",
@@ -67,5 +67,8 @@
     "publishConfig": {
         "access": "public"
     },
-    "files": ["dist/*", "!**/*.tsbuildinfo"]
+    "files": [
+        "dist/*",
+        "!**/*.tsbuildinfo"
+    ]
 }
