@@ -43,4 +43,3 @@ export * from "@/core/engine/actions/types";
 export * from "@/core/engine/condition";
 export * from "@/core/engine/condition/types";
 export * from "@/VoxelDatapack";
-export * from "@/net/fetcher";

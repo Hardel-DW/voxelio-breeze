@@ -12,7 +12,7 @@ import { extractZip } from "@voxelio/zip";
  * @param metadata - Optional metadata for the mod
  * @returns Promise resolving with resulting ZIP as Uint8Array
  */
-export async function convertDatapack(datapackZip: File, platforms: ModPlatforms[], metadata?: ModMetadata): Promise<Uint8Array> {
+export async function convertDatapack(datapackZip: File, platforms: ModPlatforms[], metadata?: ModMetadata): Promise<Response> {
     const files = await extractZip(new Uint8Array(await datapackZip.arrayBuffer()));
     const finalMetadata = metadata || extractMetadata(files, datapackZip.name.replace(/\.zip$/i, ""));
     const modFiles = generateModFiles(finalMetadata, platforms);

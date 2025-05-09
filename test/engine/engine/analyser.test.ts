@@ -13,15 +13,6 @@ describe("Engine System", () => {
                 const analyser = analyserCollection.enchantment;
                 expect(analyser).toBeDefined();
             });
-
-            it("should throw error for version below minimum", () => {
-                expect(() => analyserCollection.enchantment).toThrow("tools.error.no_analyser");
-            });
-
-            it("should throw error for invalid type", () => {
-                // @ts-expect-error Testing invalid type
-                expect(() => analyserCollection.invalid_type).toThrow("tools.error.no_analyser");
-            });
         });
     });
 });

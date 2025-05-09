@@ -192,8 +192,8 @@ describe("Datapack", () => {
                 }
             ];
 
-            const result = await datapack.generate(content, { isMinified: false });
-            expect(result).toBeInstanceOf(Uint8Array);
+            const result = datapack.generate(content, { isMinified: false });
+            expect(result).toBeInstanceOf(Response);
         });
 
         it("should handle deleted elements by keeping empty tags", async () => {
@@ -210,7 +210,7 @@ describe("Datapack", () => {
             ];
 
             const result = await datapack.generate(content, { isMinified: true });
-            expect(result).toBeInstanceOf(Uint8Array);
+            expect(result).toBeInstanceOf(Response);
         });
     });
 
@@ -228,7 +228,7 @@ describe("Datapack", () => {
                 }
             ];
 
-            const result = datapack.labelElements("enchantment", newElements);
+            const result = datapack.labelElements("enchantment", true, newElements);
 
             expect(result.some((r) => r.type === "new")).toBe(true);
             expect(result.some((r) => r.type === "deleted")).toBe(true);
@@ -291,7 +291,7 @@ describe("Datapack", () => {
                 }
             ];
 
-            const result = datapack.getCompiledTags(elements);
+            const result = datapack.getCompiledTags(elements, "enchantment");
             expect(result).toBeInstanceOf(Array);
             expect(result.length).toBe(12);
         });
@@ -432,7 +432,7 @@ describe("Datapack", () => {
             const compiledElements = attack_speed_element.map((element) =>
                 compiler(element, "enchantment", datapack.readFile(element.identifier))
             );
-            const compiledTags = datapack.getCompiledTags(compiledElements);
+            const compiledTags = datapack.getCompiledTags(compiledElements, "enchantment");
 
             expect(compiledTags.length).toBe(4);
             const non_treasure = compiledTags.find((t) => t.identifier.resource === "non_treasure");

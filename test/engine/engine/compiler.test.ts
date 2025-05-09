@@ -8,9 +8,7 @@ describe("Compiler", () => {
         it("should compile elements correctly", () => {
             const result = compileDatapack({
                 elements: VOXEL_ELEMENTS,
-                version: 48,
-                files: filesRecord,
-                tool: "enchantment"
+                files: filesRecord
             });
 
             expect(Array.isArray(result)).toBe(true);

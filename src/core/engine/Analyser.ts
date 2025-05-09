@@ -1,4 +1,3 @@
-import type { DataDrivenElement, VoxelElement } from "@/core/Element";
 import type { Compiler } from "@/core/engine/Compiler";
 import type { Parser } from "@/core/engine/Parser";
 import { DataDrivenToVoxelFormat, type EnchantmentProps, VoxelToDataDriven } from "@/core/schema/EnchantmentProps";
@@ -14,21 +13,24 @@ export type Analysers = {
     };
 };
 
-export interface Analyser<T extends VoxelElement, K extends DataDrivenElement> {
-    compiler: Compiler<T, K>;
-    parser: Parser<T, K>;
+export interface Analyser<T extends keyof Analysers> {
+    compiler: Compiler<Analysers[T]["voxel"], Analysers[T]["minecraft"]>;
+    parser: Parser<Analysers[T]["voxel"], Analysers[T]["minecraft"]>;
+    hasTag: boolean;
 }
 
 export type VersionedAnalysers = {
-    [Q in keyof Analysers]: {
-        compiler: Compiler<Analysers[Q]["voxel"], Analysers[Q]["minecraft"]>;
-        parser: Parser<Analysers[Q]["voxel"], Analysers[Q]["minecraft"]>;
-    };
+    [Q in keyof Analysers]: Analyser<Q>;
 };
 
 export const analyserCollection: VersionedAnalysers = {
     enchantment: {
         compiler: VoxelToDataDriven,
-        parser: DataDrivenToVoxelFormat
+        parser: DataDrivenToVoxelFormat,
+        hasTag: true
     }
 };
+
+export const conceptWithTag = new Map<keyof Analysers, boolean>(
+    Object.entries(analyserCollection).map(([key, analyser]) => [key as keyof Analysers, analyser.hasTag])
+);

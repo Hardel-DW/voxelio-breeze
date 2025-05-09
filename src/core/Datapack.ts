@@ -194,13 +194,12 @@ export class Datapack {
     /**
      * Get the compiled tags of the elements.
      * @param elements - The elements to compile.
-     * @param blacklist - The blacklist of values to exclude.
      * @returns The compiled tags.
      */
-    getCompiledTags(elements: ReturnType<Compiler>[]): DataDrivenRegistryElement<TagType>[] {
+    getCompiledTags(elements: ReturnType<Compiler>[], concept: keyof Analysers): DataDrivenRegistryElement<TagType>[] {
         const registryElements: DataDrivenRegistryElement<TagType>[] = createTagFromElement(elements);
         const blacklist = elements.map((e) => new Identifier(e.element.identifier).toString());
-        const ogTags = this.getRegistry<TagType>("tags/enchantment").map((e) => e.identifier);
+        const ogTags = this.getRegistry<TagType>(`tags/${concept}`).map((e) => e.identifier);
         const originalTags = this.getTags(ogTags, blacklist);
         return mergeDataDrivenRegistryElement(originalTags, registryElements);
     }
@@ -223,19 +222,26 @@ export class Datapack {
      * If it wasn't in the initial list but is new, I create it.
      * If it was there at the beginning and is still there at the end, just keep it.
      * if it wasn't there at the beginning and isn't there at the end, I do nothing.
-     * @param registry - The registry of the elements.
+     * @param concept - The concept of the elements.
+     * @param hasTag - Whether the element has a tag.
      * @param elements - The elements of the datapack.
      * @returns The elements of the datapack.
      */
-    labelElements<T extends keyof Analysers>(registry: T, elements: DataDrivenRegistryElement<DataDrivenElement>[]): LabeledElement[] {
-        const mainRegistry = this.getRegistry<GetAnalyserMinecraft<T>>(registry);
-        const tagsRegistry = this.getRegistry<TagType>(`tags/${registry}`);
-        const identifiers = [...mainRegistry, ...tagsRegistry].map((element) => element.identifier);
+    labelElements<T extends keyof Analysers>(
+        concept: keyof Analysers,
+        hasTag: boolean,
+        elements: DataDrivenRegistryElement<DataDrivenElement>[]
+    ): LabeledElement[] {
+        const mainRegistry = this.getRegistry<GetAnalyserMinecraft<T>>(concept);
+        const tagsRegistry = hasTag ? this.getRegistry<TagType>(`tags/${concept}`) : [];
+        const originalElements = [...mainRegistry, ...tagsRegistry];
+
+        const originalIdentifiers = originalElements.map((element) => element.identifier);
         const result: LabeledElement[] = [];
         const processedIds = new Set<string>();
 
-        for (const original of identifiers) {
-            const element = elements.find((element) => new Identifier(element.identifier).equalsObject(original));
+        for (const original of originalIdentifiers) {
+            const element = elements.find((el) => new Identifier(el.identifier).equalsObject(original));
             if (!element) {
                 result.push({ type: "deleted", identifier: original });
             } else {
@@ -271,17 +277,7 @@ export class Datapack {
         this.prepareContentFiles(files, content, isMinified);
         this.prepareLogger(files, logger, isMinified);
 
-        const response = downloadZip(files);
-        return this.responseToUint8Array(response);
-    }
-
-    /**
-     * Convert a Response to Uint8Array
-     * @param response - The Response to convert
-     * @returns A Promise resolving to a Uint8Array
-     */
-    private async responseToUint8Array(response: Response): Promise<Uint8Array> {
-        return new Uint8Array(await response.arrayBuffer());
+        return downloadZip(files);
     }
 
     /**
@@ -290,13 +286,17 @@ export class Datapack {
      * @param data - The data of the file.
      * @param isMinified - Whether the file is minified.
      */
-    private prepareJsonFile(path: string, data: Record<string, unknown>, isMinified: boolean): InputWithoutMeta {
-        const jsonString = JSON.stringify(data, null, isMinified ? 0 : 4);
+    private prepareFile(path: string, data: object | string | Uint8Array<ArrayBufferLike>, isMinified: boolean): InputWithoutMeta {
+        const input =
+            data instanceof Uint8Array
+                ? data
+                : new TextEncoder().encode(typeof data === "string" ? data : JSON.stringify(data, null, isMinified ? 0 : 4));
+
         return {
             name: path,
             input: new ReadableStream({
                 start(controller) {
-                    controller.enqueue(new TextEncoder().encode(jsonString));
+                    controller.enqueue(input);
                     controller.close();
                 }
             })
@@ -315,15 +315,7 @@ export class Datapack {
 
         for (const [path, data] of Object.entries(this.files)) {
             if (!filesToDelete.has(path)) {
-                files.push({
-                    name: path,
-                    input: new ReadableStream({
-                        start(controller) {
-                            controller.enqueue(data);
-                            controller.close();
-                        }
-                    })
-                });
+                files.push(this.prepareFile(path, data, false));
             }
         }
     }
@@ -336,7 +328,7 @@ export class Datapack {
      */
     private prepareIncludedFiles(files: InputWithoutMeta[], include: DataDrivenRegistryElement<DataDrivenElement>[], isMinified: boolean) {
         for (const file of include) {
-            files.push(this.prepareJsonFile(new Identifier(file.identifier).toFilePath(), file.data, isMinified));
+            files.push(this.prepareFile(new Identifier(file.identifier).toFilePath(), file.data, isMinified));
         }
     }
 
@@ -349,12 +341,12 @@ export class Datapack {
     private prepareContentFiles(files: InputWithoutMeta[], content: LabeledElement[], isMinified: boolean) {
         for (const file of content) {
             if (file.type === "deleted" && file.identifier.registry.startsWith("tags")) {
-                files.push(this.prepareJsonFile(new Identifier(file.identifier).toFilePath(), { values: [] }, isMinified));
+                files.push(this.prepareFile(new Identifier(file.identifier).toFilePath(), { values: [] }, isMinified));
                 continue;
             }
 
             if (file.type === "deleted") continue;
-            files.push(this.prepareJsonFile(new Identifier(file.element.identifier).toFilePath(), file.element.data, isMinified));
+            files.push(this.prepareFile(new Identifier(file.element.identifier).toFilePath(), file.element.data, isMinified));
         }
     }
 
@@ -367,15 +359,7 @@ export class Datapack {
     private prepareLogger(files: InputWithoutMeta[], logger: Logger | undefined, isMinified: boolean) {
         if (logger) {
             const logData = logger.serialize(isMinified);
-            files.push({
-                name: "voxel/logs.json",
-                input: new ReadableStream({
-                    start(controller) {
-                        controller.enqueue(new TextEncoder().encode(logData));
-                        controller.close();
-                    }
-                })
-            });
+            files.push(this.prepareFile("voxel/logs.json", logData, isMinified));
         }
     }
 }

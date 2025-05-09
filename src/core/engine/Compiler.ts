@@ -2,7 +2,7 @@ import { Datapack } from "@/core/Datapack";
 import type { DataDrivenElement, VoxelElement } from "@/core/Element";
 import type { DataDrivenRegistryElement } from "@/core/Element";
 import type { IdentifierObject } from "@/core/Identifier";
-import { type Analysers, type GetAnalyserVoxel, analyserCollection } from "@/core/engine/Analyser";
+import { type Analysers, type GetAnalyserVoxel, analyserCollection, conceptWithTag } from "@/core/engine/Analyser";
 import type { LabeledElement } from "@/core/schema/primitive/label";
 
 export type Compiler<T extends VoxelElement = VoxelElement, K extends DataDrivenElement = DataDrivenElement> = (
@@ -16,19 +16,21 @@ export type Compiler<T extends VoxelElement = VoxelElement, K extends DataDriven
 
 export function compileDatapack({
     elements,
-    version,
-    files,
-    tool
+    files
 }: {
     elements: GetAnalyserVoxel<keyof Analysers>[];
-    version: number;
     files: Record<string, Uint8Array>;
-    tool: keyof Analysers;
 }): Array<LabeledElement> {
     const datapack = new Datapack(files);
-    const { compiler } = analyserCollection[tool];
-    const compiledElements = elements.map((element) => compiler(element, tool, datapack.readFile(element.identifier)));
-    const compiledTags = datapack.getCompiledTags(compiledElements);
+    const allLabeledElements: LabeledElement[] = [];
 
-    return datapack.labelElements(tool, [...compiledElements.map((element) => element.element), ...compiledTags]);
+    for (const [concept, hasTag] of conceptWithTag.entries()) {
+        const { compiler } = analyserCollection[concept];
+        const compiled = elements.map((element) => compiler(element, concept, datapack.readFile(element.identifier)));
+        const compiledElement = compiled.map((element) => element.element);
+        const compiledTags = hasTag ? datapack.getCompiledTags(compiled, concept) : [];
+        allLabeledElements.push(...datapack.labelElements(concept, hasTag, [...compiledElement, ...compiledTags]));
+    }
+
+    return allLabeledElements;
 }

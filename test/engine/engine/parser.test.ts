@@ -11,7 +11,7 @@ describe("Parser", () => {
     });
 
     it("should parse a datapack", () => {
-        const result = parseDatapack("enchantment", file);
+        const result = parseDatapack(file);
         expect(result).toBeDefined();
     });
 });
