@@ -5,7 +5,7 @@ import type { DataDrivenRegistryElement } from "@/core/Element";
 import { sortVoxelElements } from "@/core/Element";
 import { Identifier } from "@/core/Identifier";
 import type { Analysers, GetAnalyserMinecraft, GetAnalyserVoxel } from "@/core/engine/Analyser";
-import { getAnalyserForVersion } from "@/core/engine/Analyser";
+import { analyserCollection } from "@/core/engine/Analyser";
 import { Logger } from "@/core/engine/migrations/logger";
 export interface ParserParams<K extends DataDrivenElement> {
     element: DataDrivenRegistryElement<K>;
@@ -40,8 +40,7 @@ export async function parseDatapack<T extends keyof Analysers>(tool: T, file: Fi
     const logs = datapack.getVoxelLogs();
     const files = datapack.getFiles();
 
-    const { analyser } = getAnalyserForVersion(tool, version);
-
+    const { parser } = analyserCollection[tool];
     const mainRegistry = datapack.getRegistry<GetAnalyserMinecraft<T>>(tool);
     const compiled = mainRegistry.map((element) => {
         const configurator = datapack.readFile<ConfiguratorConfigFromDatapack>(element.identifier, "voxel");
@@ -49,7 +48,7 @@ export async function parseDatapack<T extends keyof Analysers>(tool: T, file: Fi
 
         return {
             identifier: new Identifier(element.identifier).toUniqueKey(),
-            data: analyser.parser({ element, tags, configurator })
+            data: parser({ element, tags, configurator })
         };
     });
 

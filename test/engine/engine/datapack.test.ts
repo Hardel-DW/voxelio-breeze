@@ -6,9 +6,9 @@ import { DatapackError } from "@/core/DatapackError";
 import type { Compiler } from "@/core/engine/Compiler";
 import type { LabeledElement } from "@/core/schema/primitive/label";
 import { attack_speed_element, test_attack_speed_files } from "@test/template/special";
-import { getAnalyserForVersion } from "@/core/engine/Analyser";
 import type { DataDrivenRegistryElement } from "@/core/Element";
 import { mergeDataDrivenRegistryElement } from "@/core/Tag";
+import { analyserCollection } from "@/core/engine/Analyser";
 
 describe("Datapack", () => {
     it("should create a datapack instance from files", () => {
@@ -428,9 +428,9 @@ describe("Datapack", () => {
 
         it("Should Remove Attack Speed from Tags", () => {
             const datapack = new Datapack(test_attack_speed_files);
-            const analyser = getAnalyserForVersion("enchantment", 61).analyser;
+            const { compiler } = analyserCollection.enchantment;
             const compiledElements = attack_speed_element.map((element) =>
-                analyser.compiler(element, "enchantment", datapack.readFile(element.identifier))
+                compiler(element, "enchantment", datapack.readFile(element.identifier))
             );
             const compiledTags = datapack.getCompiledTags(compiledElements);
 

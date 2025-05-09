@@ -1,4 +1,4 @@
-import { getAnalyserForVersion } from "@/core/engine/Analyser";
+import { analyserCollection } from "@/core/engine/Analyser";
 import type { Compiler } from "@/core/engine/Compiler";
 import { Identifier } from "@/core/Identifier";
 import type { EnchantmentProps } from "@/core/schema/EnchantmentProps";
@@ -34,8 +34,8 @@ describe("Enchantment Schema", () => {
 
         describe("Should Compile", () => {
             it("should compile", () => {
-                const analyser = getAnalyserForVersion("enchantment", 61).analyser;
-                const compiled = analyser.compiler(simpleVoxelElement.data, "enchantment");
+                const { compiler } = analyserCollection.enchantment;
+                const compiled = compiler(simpleVoxelElement.data, "enchantment");
                 expect(compiled).toBeDefined();
             });
 
@@ -43,8 +43,8 @@ describe("Enchantment Schema", () => {
                 let compiled: ReturnType<Compiler<EnchantmentProps, Enchantment>>;
 
                 beforeEach(() => {
-                    const analyser = getAnalyserForVersion("enchantment", 61).analyser;
-                    compiled = analyser.compiler(simpleVoxelElement.data, "enchantment", dataDrivenEnchantment.data);
+                    const { compiler } = analyserCollection.enchantment;
+                    compiled = compiler(simpleVoxelElement.data, "enchantment", dataDrivenEnchantment.data);
                 });
 
                 it("should compile with data driven enchantment", () => {
@@ -99,8 +99,8 @@ describe("Enchantment Schema", () => {
                 let compiled: ReturnType<Compiler<EnchantmentProps, Enchantment>>;
 
                 beforeEach(() => {
-                    const analyser = getAnalyserForVersion("enchantment", 61).analyser;
-                    compiled = analyser.compiler(onlyCreativeVoxelElement.data, "enchantment");
+                    const { compiler } = analyserCollection.enchantment;
+                    compiled = compiler(onlyCreativeVoxelElement.data, "enchantment");
                 });
 
                 it("should compile with data driven enchantment", () => {
@@ -125,8 +125,8 @@ describe("Enchantment Schema", () => {
                 let compiled: ReturnType<Compiler<EnchantmentProps, Enchantment>>;
 
                 beforeEach(() => {
-                    const analyser = getAnalyserForVersion("enchantment", 61).analyser;
-                    compiled = analyser.compiler(softDeleteVoxelElement.data, "enchantment");
+                    const { compiler } = analyserCollection.enchantment;
+                    compiled = compiler(softDeleteVoxelElement.data, "enchantment");
                 });
 
                 it("should compile with data driven enchantment", () => {
@@ -146,8 +146,8 @@ describe("Enchantment Schema", () => {
         it("should compile", () => {
             const dataDrivenEnchantment = DATA_DRIVEN_TEMPLATE_ENCHANTMENT[0];
 
-            const analyser = getAnalyserForVersion("enchantment", 61).analyser;
-            const compiled = analyser.parser({ element: dataDrivenEnchantment });
+            const { parser } = analyserCollection.enchantment;
+            const compiled = parser({ element: dataDrivenEnchantment });
             expect(compiled).toBeDefined();
         });
 
@@ -159,8 +159,8 @@ describe("Enchantment Schema", () => {
                     effects: {}
                 });
 
-                const analyser = getAnalyserForVersion("enchantment", 61).analyser;
-                const compiled = analyser.parser({ element: dataDrivenEnchantment });
+                const { parser } = analyserCollection.enchantment;
+                const compiled = parser({ element: dataDrivenEnchantment });
                 expect(compiled).toBeDefined();
                 expect(compiled.mode).toBe("soft_delete");
             });
@@ -180,8 +180,8 @@ describe("Enchantment Schema", () => {
                     }
                 });
 
-                const analyser = getAnalyserForVersion("enchantment", 61).analyser;
-                const compiled = analyser.parser({ element: dataDrivenEnchantment });
+                const { parser } = analyserCollection.enchantment;
+                const compiled = parser({ element: dataDrivenEnchantment });
                 expect(compiled).toBeDefined();
                 expect(compiled.mode).toBe("only_creative");
             });
@@ -202,8 +202,8 @@ describe("Enchantment Schema", () => {
                     }
                 });
 
-                const analyser = getAnalyserForVersion("enchantment", 61).analyser;
-                const compiled = analyser.parser({ element: dataDrivenEnchantment });
+                const { parser } = analyserCollection.enchantment;
+                const compiled = parser({ element: dataDrivenEnchantment });
                 expect(compiled).toBeDefined();
                 expect(compiled.mode).toBe("only_creative");
             });
@@ -215,8 +215,8 @@ describe("Enchantment Schema", () => {
                     effects: {}
                 });
 
-                const analyser = getAnalyserForVersion("enchantment", 61).analyser;
-                const compiled = analyser.parser({ element: dataDrivenEnchantment });
+                const { parser } = analyserCollection.enchantment;
+                const compiled = parser({ element: dataDrivenEnchantment });
                 expect(compiled).toBeDefined();
                 expect(compiled.mode).toBe("soft_delete");
             });
