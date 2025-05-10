@@ -8,19 +8,13 @@ import { extractZip } from "@voxelio/zip";
 /**
  * Converts a datapack ZIP file to mod(s) for specified platforms
  * @param datapackZip - Datapack ZIP file to convert
- * @param datapackZipName - Name of the datapack ZIP file
  * @param platforms - Target platforms for conversion
  * @param metadata - Optional metadata for the mod
  * @returns Promise resolving with resulting ZIP as Uint8Array
  */
-export async function convertDatapack(
-    datapackZip: Uint8Array<ArrayBuffer>,
-    datapackZipName: string,
-    platforms: ModPlatforms[],
-    metadata?: ModMetadata
-): Promise<Response> {
-    const files = await extractZip(datapackZip);
-    const finalMetadata = metadata || extractMetadata(files, datapackZipName.replace(/\.zip$/i, ""));
+export async function convertDatapack(datapackZip: File, platforms: ModPlatforms[], metadata?: ModMetadata): Promise<Response> {
+    const files = await extractZip(new Uint8Array(await datapackZip.arrayBuffer()));
+    const finalMetadata = metadata || (await extractMetadata(datapackZip, datapackZip.name.replace(/\.zip$/i, "")));
     const modFiles = generateModFiles(finalMetadata, platforms);
 
     const allFiles = {
@@ -64,12 +58,12 @@ function generateModFiles(metadata: ModMetadata, platforms: ModPlatforms[]) {
  * @param modName - Name to use for the mod (from zip filename)
  * @returns Extracted metadata combined with default values
  */
-export function extractMetadata(files: Record<string, Uint8Array>, modName: string): ModMetadata {
+export async function extractMetadata(files: File, modName: string): Promise<ModMetadata> {
     const iconEntry = Object.keys(files).find((path) => path.match(/^[^/]+\.png$/i));
     let metadata: Partial<ModMetadata> = {};
 
     try {
-        const datapack = new Datapack(files);
+        const datapack = await Datapack.parse(files);
         metadata = {
             description: datapack.getDescription(DEFAULT_MOD_METADATA.description),
             version: datapack.getVersion()
