@@ -84,11 +84,10 @@ export class Logger {
     public handleActionDifference<T extends keyof Analysers>(
         action: Action,
         element: GetAnalyserVoxel<T>,
-        tool: T,
         value?: ActionValue,
         version: number = Number.POSITIVE_INFINITY
     ): void {
-        const difference = createDifferenceFromAction(action, element, version, tool, this, value);
+        const difference = createDifferenceFromAction(action, element, version, this, value);
         if (difference) {
             this.logDifference(new Identifier(element.identifier).toString(), element.identifier.registry || "unknown", difference);
         }

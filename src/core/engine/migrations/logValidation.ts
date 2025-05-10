@@ -66,7 +66,6 @@ export function createDifferenceFromAction<T extends keyof Analysers>(
     action: Action,
     element: GetAnalyserVoxel<T>,
     version: number,
-    tool: T,
     logger: Logger,
     value?: ActionValue
 ): LogDifference[] | LogDifference | undefined {
@@ -74,7 +73,7 @@ export function createDifferenceFromAction<T extends keyof Analysers>(
         const differences: LogDifference[] = [];
 
         for (const subAction of action.actions) {
-            const difference = createDifferenceFromAction(subAction, element, version, tool, logger, value);
+            const difference = createDifferenceFromAction(subAction, element, version, logger, value);
             if (difference) {
                 if (Array.isArray(difference)) {
                     differences.push(...difference);

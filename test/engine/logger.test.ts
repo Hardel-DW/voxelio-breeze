@@ -194,7 +194,7 @@ describe("Logger System", () => {
                 ]
             };
 
-            const difference = createDifferenceFromAction(sequentialAction, element.data, 48, "enchantment", logger);
+            const difference = createDifferenceFromAction(sequentialAction, element.data, 48, logger);
             if (!difference) {
                 throw new Error("Failed to create difference");
             }
@@ -288,7 +288,7 @@ describe("Logger System", () => {
             const logger = new Logger(existingLogWithDifferences);
             const element = createComplexMockElement();
 
-            const difference = createDifferenceFromAction(actions, element.data, logger.getVersion(), "enchantment", logger);
+            const difference = createDifferenceFromAction(actions, element.data, logger.getVersion(), logger);
             if (!difference) {
                 throw new Error("Failed to create difference");
             }
@@ -382,7 +382,7 @@ describe("Logger System", () => {
             };
 
             const logger = new Logger(existingLogWithDifferences);
-            const difference = createDifferenceFromAction(actions, element.data, logger.getVersion(), "enchantment", logger);
+            const difference = createDifferenceFromAction(actions, element.data, logger.getVersion(), logger);
             if (!difference) {
                 throw new Error("Failed to create difference");
             }
@@ -430,7 +430,7 @@ describe("Logger System", () => {
             };
 
             const logger = new Logger(existingLog());
-            const difference = createDifferenceFromAction(action, element.data, logger.getVersion(), "enchantment", logger);
+            const difference = createDifferenceFromAction(action, element.data, logger.getVersion(), logger);
             if (!difference) {
                 throw new Error("Failed to create difference");
             }
@@ -460,14 +460,7 @@ describe("Logger System", () => {
             };
 
             // Test avec une valeur optionnelle différente
-            const difference = createDifferenceFromAction(
-                action,
-                element.data,
-                logger.getVersion(),
-                "enchantment",
-                logger,
-                "#minecraft:override_tag"
-            );
+            const difference = createDifferenceFromAction(action, element.data, logger.getVersion(), logger, "#minecraft:override_tag");
             if (!difference) {
                 throw new Error("Failed to create difference");
             }
@@ -514,7 +507,7 @@ describe("Logger System", () => {
             };
 
             const optionalValue = 5;
-            const difference = createDifferenceFromAction(action, element.data, logger.getVersion(), "enchantment", logger, optionalValue);
+            const difference = createDifferenceFromAction(action, element.data, logger.getVersion(), logger, optionalValue);
             if (!difference) {
                 throw new Error("Failed to create difference");
             }
@@ -550,7 +543,7 @@ describe("Logger System", () => {
             };
 
             const optionalValue = "#minecraft:axes";
-            const difference = createDifferenceFromAction(action, element.data, logger.getVersion(), "enchantment", logger, optionalValue);
+            const difference = createDifferenceFromAction(action, element.data, logger.getVersion(), logger, optionalValue);
             if (!difference) {
                 throw new Error("Failed to create difference");
             }
@@ -587,7 +580,7 @@ describe("Logger System", () => {
 
             // Using the same value as current to trigger removal
             const optionalValue = "#voxel:enchantable/range";
-            const difference = createDifferenceFromAction(action, element.data, logger.getVersion(), "enchantment", logger, optionalValue);
+            const difference = createDifferenceFromAction(action, element.data, logger.getVersion(), logger, optionalValue);
 
             // Si la différence est undefined, c'est normal car la valeur est supprimée
             expect(difference).toBeUndefined();
@@ -609,7 +602,7 @@ describe("Logger System", () => {
 
             // Utilisons une valeur différente
             const optionalValue = "#minecraft:different_value";
-            const difference = createDifferenceFromAction(action, element.data, logger.getVersion(), "enchantment", logger, optionalValue);
+            const difference = createDifferenceFromAction(action, element.data, logger.getVersion(), logger, optionalValue);
             if (!difference) {
                 throw new Error("Failed to create difference");
             }
