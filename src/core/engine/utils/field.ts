@@ -1,6 +1,5 @@
 import type { Condition } from "@/core/engine/condition/types";
 import type { ValueRenderer } from "@/core/engine/renderer/value";
-import type { Lock } from "@/core/schema/primitive/component";
 
 export function getConditionFields(condition: Condition | undefined): string[] {
     if (!condition) return [];
@@ -39,8 +38,4 @@ export function getRendererFields(renderer: ValueRenderer): string[] {
         case "hardcoded":
             return [];
     }
-}
-
-export function getLockFields(locks: Lock[]): string[] {
-    return locks.flatMap((lock) => getConditionFields(lock.condition));
 }

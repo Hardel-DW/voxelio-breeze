@@ -1,6 +1,5 @@
-import { getConditionFields, getLockFields, getRendererFields } from "@/core/engine/utils/field";
+import { getConditionFields, getRendererFields } from "@/core/engine/utils/field";
 import type { Condition } from "@/core/engine/condition/types";
-import type { Lock } from "@/core/schema/primitive/component";
 import { describe, expect, it } from "vitest";
 import type { ValueRenderer } from "@/core/engine/renderer/value";
 
@@ -232,75 +231,5 @@ describe("getRendererFields", () => {
             }
         };
         expect(getRendererFields(renderer)).toEqual(["condition_field"]);
-    });
-});
-
-describe("getLockFields", () => {
-    it("should return empty array for empty locks array", () => {
-        expect(getLockFields([])).toEqual([]);
-    });
-
-    it("should get fields from single lock condition", () => {
-        const locks: Lock[] = [
-            {
-                text: "test_text",
-                condition: {
-                    condition: "compare_value_to_field_value",
-                    field: "lock_field",
-                    value: "test"
-                }
-            }
-        ];
-        expect(getLockFields(locks)).toEqual(["lock_field"]);
-    });
-
-    it("should combine fields from multiple locks", () => {
-        const locks: Lock[] = [
-            {
-                text: "lock1",
-                condition: {
-                    condition: "compare_value_to_field_value",
-                    field: "field1",
-                    value: "test1"
-                }
-            },
-            {
-                text: "lock2",
-                condition: {
-                    condition: "compare_value_to_field_value",
-                    field: "field2",
-                    value: "test2"
-                }
-            }
-        ];
-        expect(getLockFields(locks)).toEqual(["field1", "field2"]);
-    });
-
-    it("should handle complex lock conditions", () => {
-        const locks: Lock[] = [
-            {
-                text: "complex_lock",
-                condition: {
-                    condition: "all_of",
-                    terms: [
-                        {
-                            condition: "compare_value_to_field_value",
-                            field: "field1",
-                            value: "test1"
-                        },
-                        {
-                            condition: "object",
-                            field: "parent_field",
-                            terms: {
-                                condition: "compare_value_to_field_value",
-                                field: "field2",
-                                value: "test2"
-                            }
-                        }
-                    ]
-                }
-            }
-        ];
-        expect(getLockFields(locks)).toEqual(["field1", "parent_field"]);
     });
 });
