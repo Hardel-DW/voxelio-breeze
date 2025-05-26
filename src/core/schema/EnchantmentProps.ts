@@ -45,7 +45,7 @@ export interface EnchantmentProps extends VoxelElement {
  * @param enchantment
  * @param tags
  */
-export const DataDrivenToVoxelFormat: Parser<EnchantmentProps, Enchantment> = ({
+export const EnchantmentDataDrivenToVoxelFormat: Parser<EnchantmentProps, Enchantment> = ({
     element,
     tags = [],
     configurator
@@ -107,7 +107,7 @@ export const DataDrivenToVoxelFormat: Parser<EnchantmentProps, Enchantment> = ({
  * @param element
  * @param original
  */
-export const VoxelToDataDriven: Compiler<EnchantmentProps, Enchantment> = (
+export const VoxelToEnchantmentDataDriven: Compiler<EnchantmentProps, Enchantment> = (
     element: EnchantmentProps,
     config: keyof Analysers,
     original?: Enchantment

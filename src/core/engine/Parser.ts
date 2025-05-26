@@ -4,8 +4,9 @@ import type { ConfiguratorConfigFromDatapack, DataDrivenElement, VoxelElement, V
 import type { DataDrivenRegistryElement } from "@/core/Element";
 import { Identifier } from "@/core/Identifier";
 import type { Analysers, GetAnalyserMinecraft, GetAnalyserVoxel } from "@/core/engine/Analyser";
-import { analyserCollection, conceptWithTag } from "@/core/engine/Analyser";
+import { analyserCollection, conceptWithTag, getAllConcepts } from "@/core/engine/Analyser";
 import { Logger } from "@/core/engine/migrations/logger";
+
 export interface ParserParams<K extends DataDrivenElement> {
     element: DataDrivenRegistryElement<K>;
     tags?: string[];
@@ -39,15 +40,24 @@ export async function parseDatapack<T extends keyof Analysers>(file: File): Prom
     const files = datapack.getFiles();
 
     const elements = new Map<string, GetAnalyserVoxel<T>>();
-    for (const [key, value] of conceptWithTag.entries()) {
-        const { parser } = analyserCollection[key];
-        const mainRegistry = datapack.getRegistry<GetAnalyserMinecraft<T>>(key);
-        mainRegistry.map((element) => {
-            const configurator = datapack.readFile<ConfiguratorConfigFromDatapack>(element.identifier, "voxel");
-            const tags = value ? datapack.getRelatedTags(`tags/${key}`, element.identifier) : [];
 
-            elements.set(new Identifier(element.identifier).toUniqueKey(), parser({ element, tags, configurator }));
-        });
+    // Type-safe concept processing
+    function processConcept<K extends keyof Analysers>(conceptName: K) {
+        const analyser = analyserCollection[conceptName];
+        const registry = datapack.getRegistry<GetAnalyserMinecraft<K>>(conceptName);
+
+        for (const element of registry) {
+            const configurator = datapack.readFile<ConfiguratorConfigFromDatapack>(element.identifier, "voxel");
+            const tags = analyser.hasTag ? datapack.getRelatedTags(`tags/${conceptName}`, element.identifier) : [];
+
+            const parsed = analyser.parser({ element, tags, configurator });
+            elements.set(new Identifier(element.identifier).toUniqueKey(), parsed as GetAnalyserVoxel<T>);
+        }
+    }
+
+    // Process all concepts from analyserCollection
+    for (const conceptName of Object.keys(analyserCollection) as Array<keyof Analysers>) {
+        processConcept(conceptName);
     }
 
     if (elements.size === 0) throw new DatapackError("tools.warning.no_elements");

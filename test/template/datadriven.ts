@@ -1,6 +1,7 @@
 import type { DataDrivenRegistryElement } from "@/core/Element";
 import type { EnchantmentProps } from "@/core/schema/EnchantmentProps";
 import type { Enchantment, SlotRegistryType } from "@/schema/enchantment/Enchantment";
+import type { MinecraftLootTable } from "@/core/schema/LootTableProps";
 
 const baseEnchantment = {
     weight: 2,
@@ -328,3 +329,118 @@ export const makeAdvancedEnchantment: (props: Partial<EnchantmentProps>) => Data
         data: { ...data, ...props }
     };
 };
+
+export const DATA_DRIVEN_TEMPLATE_LOOT_TABLE: DataDrivenRegistryElement<MinecraftLootTable>[] = [
+    // Simple loot table
+    {
+        identifier: { namespace: "test", registry: "loot_table", resource: "simple" },
+        data: {
+            type: "minecraft:entity",
+            pools: [
+                {
+                    rolls: 1,
+                    bonus_rolls: 0,
+                    entries: [
+                        {
+                            type: "minecraft:item",
+                            name: "minecraft:experience_bottle",
+                            functions: [
+                                {
+                                    function: "minecraft:set_count",
+                                    count: {
+                                        min: 1,
+                                        max: 3
+                                    }
+                                }
+                            ],
+                            conditions: [
+                                {
+                                    condition: "minecraft:random_chance",
+                                    chance: 0.5
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    },
+    // Complex loot table with nested groups
+    {
+        identifier: { namespace: "test", registry: "loot_table", resource: "extreme" },
+        data: {
+            type: "minecraft:entity",
+            pools: [
+                {
+                    rolls: 5,
+                    entries: [
+                        {
+                            type: "minecraft:alternatives",
+                            children: [
+                                {
+                                    type: "minecraft:dynamic",
+                                    name: "minecraft:contents"
+                                },
+                                {
+                                    type: "minecraft:group",
+                                    children: [
+                                        {
+                                            type: "minecraft:sequence",
+                                            children: [
+                                                {
+                                                    type: "minecraft:item",
+                                                    name: "minecraft:amethyst_shard"
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ],
+            random_sequence: "minecraft:entities/wither_skeleton"
+        }
+    },
+    // Multi-pool loot table
+    {
+        identifier: { namespace: "test", registry: "loot_table", resource: "reference" },
+        data: {
+            type: "minecraft:equipment",
+            pools: [
+                {
+                    rolls: 1,
+                    bonus_rolls: 0,
+                    entries: [
+                        {
+                            type: "minecraft:loot_table",
+                            value: "yggdrasil:generic/equipment/ominous/item/sword"
+                        }
+                    ]
+                },
+                {
+                    rolls: 1,
+                    bonus_rolls: 0,
+                    entries: [
+                        {
+                            type: "minecraft:loot_table",
+                            value: "yggdrasil:generic/equipment/ominous/item/helmet"
+                        }
+                    ]
+                },
+                {
+                    rolls: 1,
+                    bonus_rolls: 0,
+                    entries: [
+                        {
+                            type: "minecraft:loot_table",
+                            value: "yggdrasil:generic/equipment/ominous/item/chestplate"
+                        }
+                    ]
+                }
+            ],
+            random_sequence: "yggdrasil:equipment"
+        }
+    }
+];

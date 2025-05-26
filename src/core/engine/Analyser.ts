@@ -1,7 +1,13 @@
 import type { Compiler } from "@/core/engine/Compiler";
 import type { Parser } from "@/core/engine/Parser";
-import { DataDrivenToVoxelFormat, type EnchantmentProps, VoxelToDataDriven } from "@/core/schema/EnchantmentProps";
+import { EnchantmentDataDrivenToVoxelFormat, type EnchantmentProps, VoxelToEnchantmentDataDriven } from "@/core/schema/EnchantmentProps";
 import type { Enchantment } from "@/schema/enchantment/Enchantment";
+import {
+    LootDataDrivenToVoxelFormat,
+    type LootTableProps,
+    type MinecraftLootTable,
+    VoxelToLootDataDriven
+} from "@/core/schema/LootTableProps";
 
 export type GetAnalyserVoxel<T extends keyof Analysers> = Analysers[T]["voxel"];
 export type GetAnalyserMinecraft<T extends keyof Analysers> = Analysers[T]["minecraft"];
@@ -10,6 +16,10 @@ export type Analysers = {
     enchantment: {
         voxel: EnchantmentProps;
         minecraft: Enchantment;
+    };
+    loot_table: {
+        voxel: LootTableProps;
+        minecraft: MinecraftLootTable;
     };
 };
 
@@ -25,8 +35,13 @@ export type VersionedAnalysers = {
 
 export const analyserCollection: VersionedAnalysers = {
     enchantment: {
-        compiler: VoxelToDataDriven,
-        parser: DataDrivenToVoxelFormat,
+        compiler: VoxelToEnchantmentDataDriven,
+        parser: EnchantmentDataDrivenToVoxelFormat,
+        hasTag: true
+    },
+    loot_table: {
+        compiler: VoxelToLootDataDriven,
+        parser: LootDataDrivenToVoxelFormat,
         hasTag: true
     }
 };
@@ -34,3 +49,10 @@ export const analyserCollection: VersionedAnalysers = {
 export const conceptWithTag = new Map<keyof Analysers, boolean>(
     Object.entries(analyserCollection).map(([key, analyser]) => [key as keyof Analysers, analyser.hasTag])
 );
+
+/**
+ * Get all concepts as a Map for iteration
+ */
+export function getAllConcepts(): Map<keyof Analysers, Analyser<keyof Analysers>> {
+    return new Map(Object.entries(analyserCollection) as Array<[keyof Analysers, Analyser<keyof Analysers>]>);
+}

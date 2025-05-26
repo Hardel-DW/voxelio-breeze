@@ -1,6 +1,7 @@
 import AlternativeModifier from "@/core/engine/actions/AlternativeModifier";
 import AppendListModifier from "@/core/engine/actions/AppendListModifier";
 import { ComputedModifier } from "@/core/engine/actions/ComputedModifier";
+import { LootTableModifier } from "@/core/engine/actions/LootTableModifiers";
 import MultipleModifier from "@/core/engine/actions/MultipleModifier";
 import RemoveKeyModifier from "@/core/engine/actions/RemoveKeyModifier";
 import RemoveValueFromListModifier from "@/core/engine/actions/RemoveValueFromListModifier";
@@ -43,6 +44,23 @@ export function updateData(
                 return AppendListModifier(action, element);
             case "alternative":
                 return AlternativeModifier(action, element, version, updateData);
+            case "add_loot_item":
+            case "remove_loot_item":
+            case "modify_loot_item":
+            case "create_loot_group":
+            case "modify_loot_group":
+            case "dissolve_loot_group":
+            case "move_item_between_pools":
+            case "move_group_between_pools":
+            case "duplicate_loot_item":
+            case "bulk_modify_items":
+            case "convert_item_to_group":
+            case "convert_group_to_item":
+            case "nest_group_in_group":
+            case "unnest_group":
+            case "balance_weights":
+            case "conditional_loot":
+                return LootTableModifier(action, element);
         }
     })();
 }
