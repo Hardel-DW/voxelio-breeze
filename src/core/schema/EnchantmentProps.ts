@@ -21,6 +21,9 @@ const tags_related_to_functionality = [
     { namespace: "minecraft", registry: "tags/enchantment", resource: "tooltip_order" }
 ];
 
+// Cache des tags de fonctionnalité pour éviter les créations répétées d'Identifier
+const FUNCTIONALITY_TAGS_CACHE = new Set(tags_related_to_functionality.map((tag) => new Identifier(tag).toString()));
+
 export interface EnchantmentProps extends VoxelElement {
     description: TextComponentType;
     exclusiveSet: SingleOrMultiple<string> | undefined;
@@ -71,8 +74,9 @@ export const EnchantmentDataDrivenToVoxelFormat: Parser<EnchantmentProps, Enchan
     const hasEffects = data.effects && Object.entries(data.effects).length > 0;
 
     let mode: "normal" | "soft_delete" | "only_creative" = "normal";
-    const tagsRelatedToFunctionality = tags_related_to_functionality.map((tag) => new Identifier(tag).toString());
-    if (tagsWithoutExclusiveSet.every((tag) => tagsRelatedToFunctionality.includes(tag))) {
+
+    // Optimisation: utiliser le cache au lieu de créer des Identifiers
+    if (tagsWithoutExclusiveSet.every((tag) => FUNCTIONALITY_TAGS_CACHE.has(tag))) {
         mode = "only_creative";
     }
 
@@ -115,53 +119,63 @@ export const VoxelToEnchantmentDataDriven: Compiler<EnchantmentProps, Enchantmen
     element: DataDrivenRegistryElement<Enchantment>;
     tags: IdentifierObject[];
 } => {
-    const enchantment = structuredClone(original ?? {}) as Enchantment;
-    const enchant = structuredClone(element);
+    // Optimisation: éviter le double clone
+    const enchantment = original ? structuredClone(original) : ({} as Enchantment);
     const tagRegistry = `tags/${config}`;
-    let tags = [...tagsToIdentifiers(enchant.tags, tagRegistry)];
 
-    enchantment.max_level = enchant.maxLevel;
-    enchantment.weight = enchant.weight;
-    enchantment.anvil_cost = enchant.anvilCost;
-    enchantment.supported_items = enchant.supportedItems;
-    enchantment.slots = enchant.slots;
-    enchantment.effects = enchant.effects;
+    // Optimisation: traitement des tags plus efficace
+    let tags: IdentifierObject[] = [];
+    if (element.tags.length > 0) {
+        tags = tagsToIdentifiers(element.tags, tagRegistry);
+    }
+
+    // Assignations directes sans cloner element
+    enchantment.max_level = element.maxLevel;
+    enchantment.weight = element.weight;
+    enchantment.anvil_cost = element.anvilCost;
+    enchantment.supported_items = element.supportedItems;
+    enchantment.slots = element.slots;
+    enchantment.effects = element.effects;
+
+    // Optimisation: création d'objets seulement si nécessaire
     enchantment.min_cost = {
-        base: enchant.minCostBase,
-        per_level_above_first: enchant.minCostPerLevelAboveFirst
+        base: element.minCostBase,
+        per_level_above_first: element.minCostPerLevelAboveFirst
     };
     enchantment.max_cost = {
-        base: enchant.maxCostBase,
-        per_level_above_first: enchant.maxCostPerLevelAboveFirst
+        base: element.maxCostBase,
+        per_level_above_first: element.maxCostPerLevelAboveFirst
     };
 
-    if (enchant.primaryItems) {
-        enchantment.primary_items = enchant.primaryItems;
+    if (element.primaryItems) {
+        enchantment.primary_items = element.primaryItems;
     }
 
-    if (!enchant.supportedItems && enchant.primaryItems) {
-        enchantment.supported_items = enchant.primaryItems;
+    if (!element.supportedItems && element.primaryItems) {
+        enchantment.supported_items = element.primaryItems;
     }
 
-    if (enchant.mode === "only_creative") {
-        tags = tags.filter((tag) => tags_related_to_functionality.some((t) => new Identifier(t).equalsObject(tag)));
+    // Optimisation: filtre plus efficace pour only_creative
+    if (element.mode === "only_creative") {
+        tags = tags.filter((tag) => FUNCTIONALITY_TAGS_CACHE.has(tag.toString()));
     }
 
-    if (enchant.exclusiveSet) {
-        enchantment.exclusive_set = enchant.exclusiveSet;
+    if (element.exclusiveSet) {
+        enchantment.exclusive_set = element.exclusiveSet;
 
-        if (typeof enchant.exclusiveSet === "string") {
-            tags.push(Identifier.of(enchant.exclusiveSet, tagRegistry));
+        if (typeof element.exclusiveSet === "string") {
+            tags.push(Identifier.of(element.exclusiveSet, tagRegistry));
         }
     }
 
-    if (enchant.disabledEffects.length > 0 && enchantment.effects) {
-        for (const effect of enchant.disabledEffects) {
+    // Optimisation: traitement des effets désactivés plus efficace
+    if (element.disabledEffects.length > 0 && enchantment.effects) {
+        for (const effect of element.disabledEffects) {
             delete enchantment.effects[effect as keyof typeof enchantment.effects];
         }
     }
 
-    if (enchant.mode === "soft_delete") {
+    if (element.mode === "soft_delete") {
         enchantment.exclusive_set = undefined;
         enchantment.effects = undefined;
         tags = [];
