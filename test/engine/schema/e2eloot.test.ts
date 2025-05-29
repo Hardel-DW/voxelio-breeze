@@ -896,7 +896,7 @@ describe("LootTable E2E Tests", () => {
 
                 // Verify compilation success
                 expect(compiled.element.data).toBeDefined();
-                expect(compiled.element.data.pools).toHaveLength(1);
+                expect(compiled.element.data.pools).toHaveLength(2); // Pool 0 + Pool 1 (item moved)
                 expect(compiled.element.identifier).toEqual(ultimateLootTable.identifier);
 
                 // Verify specific modifications are preserved
