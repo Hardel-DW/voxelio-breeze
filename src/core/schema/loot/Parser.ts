@@ -24,12 +24,12 @@ export const LootDataDrivenToVoxelFormat: LootTableParser = ({
 
     return {
         identifier: element.identifier,
-        type: clone.data.type,
+        ...(clone.data.type && { type: clone.data.type }),
         items: context.items,
         groups: context.groups,
-        randomSequence: clone.data.random_sequence,
-        functions: clone.data.functions || [],
-        pools: poolsData,
+        ...(clone.data.random_sequence && { randomSequence: clone.data.random_sequence }),
+        ...(clone.data.functions && clone.data.functions.length > 0 && { functions: clone.data.functions }),
+        ...(poolsData.length > 0 && { pools: poolsData }),
         override: configurator
     };
 };
@@ -44,9 +44,9 @@ function extractPoolsData(clone: DataDrivenRegistryElement<MinecraftLootTable>):
         poolsData.push({
             poolIndex,
             rolls: pool.rolls,
-            bonus_rolls: pool.bonus_rolls,
-            functions: pool.functions || [],
-            conditions: pool.conditions || []
+            ...(pool.bonus_rolls !== undefined && { bonus_rolls: pool.bonus_rolls }),
+            ...(pool.functions && pool.functions.length > 0 && { functions: pool.functions }),
+            ...(pool.conditions && pool.conditions.length > 0 && { conditions: pool.conditions })
         });
     });
 

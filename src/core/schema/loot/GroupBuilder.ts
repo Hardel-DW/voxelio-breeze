@@ -5,16 +5,35 @@ import { detectCompilerEntryType } from "./EntryTypeDetector";
  * Builds a Minecraft entry from a LootItem
  */
 export function buildItemEntry(item: LootItem): MinecraftLootEntry {
-    const { type, name } = detectCompilerEntryType(item.name);
+    // Use the stored entryType if available, otherwise detect from name
+    const type = item.entryType || detectCompilerEntryType(item.name).type;
 
-    return {
+    const entry: MinecraftLootEntry = {
         type,
-        ...(name && { name }),
         ...(item.weight && { weight: item.weight }),
         ...(item.quality !== undefined && { quality: item.quality }),
         ...(item.conditions && item.conditions.length > 0 && { conditions: item.conditions }),
-        ...(item.functions && item.functions.length > 0 && { functions: item.functions })
+        ...(item.functions && item.functions.length > 0 && { functions: item.functions }),
+        ...(item.expand !== undefined && { expand: item.expand })
     };
+
+    // Handle value field for loot_table entries
+    if (type === "minecraft:loot_table") {
+        if (item.value !== undefined) {
+            entry.value = item.value; // Use the embedded object
+        } else {
+            entry.value = item.name; // Use the string reference
+        }
+    } else if (type === "minecraft:empty") {
+        // Empty entries don't need a name
+    } else if (type === "minecraft:tag") {
+        // Remove # prefix for tags
+        entry.name = item.name.startsWith("#") ? item.name.substring(1) : item.name;
+    } else {
+        entry.name = item.name;
+    }
+
+    return entry;
 }
 
 /**
@@ -33,7 +52,8 @@ export function buildGroupEntry(group: LootGroup, props: LootTableProps): Minecr
     return {
         type: `minecraft:${group.type}`,
         children,
-        ...(group.conditions && group.conditions.length > 0 && { conditions: group.conditions })
+        ...(group.conditions && group.conditions.length > 0 && { conditions: group.conditions }),
+        ...(group.functions !== undefined && { functions: group.functions })
     };
 }
 

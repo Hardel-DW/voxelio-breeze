@@ -12,26 +12,37 @@ export function createLootItem(
     idPrefix = "item"
 ): LootItem {
     const itemId = `${idPrefix}_${context.itemCounter++}`;
+    const entryType = detectEntryType(entry.type);
 
-    let name = entry.name || "";
-
-    // Handle special cases for name formatting
-    if (detectEntryType(entry.type) === "minecraft:tag" && name && !name.startsWith("#")) {
-        name = `#${name}`;
-    }
-
-    if (detectEntryType(entry.type) === "minecraft:loot_table") {
-        const tableName = entry.name || entry.value;
-        name = typeof tableName === "string" ? tableName : "embedded_table";
+    let name = "";
+    let value = undefined;
+    if (entryType === "minecraft:loot_table") {
+        const tableName = entry.value ?? entry.name;
+        if (typeof tableName === "string") {
+            name = tableName;
+        } else {
+            name = "embedded_table";
+            value = tableName;
+        }
+    } else if (entryType === "minecraft:empty") {
+        name = "minecraft:empty";
+    } else {
+        name = entry.name ?? "";
+        if (entryType === "minecraft:tag" && name && !name.startsWith("#")) {
+            name = `#${name}`;
+        }
     }
 
     return {
         id: itemId,
         name,
-        weight: entry.weight,
-        quality: entry.quality,
-        conditions: entry.conditions || [],
-        functions: entry.functions || [],
+        entryType,
+        ...(value !== undefined && { value }),
+        ...(entry.weight !== undefined && { weight: entry.weight }),
+        ...(entry.quality !== undefined && { quality: entry.quality }),
+        ...(entry.conditions && entry.conditions.length > 0 && { conditions: entry.conditions }),
+        ...(entry.functions && entry.functions.length > 0 && { functions: entry.functions }),
+        ...(entry.expand !== undefined && { expand: entry.expand }),
         poolIndex,
         entryIndex
     };
@@ -53,9 +64,10 @@ export function createLootGroup(
     return {
         id: groupId,
         type: groupType,
-        name: entry.name,
+        ...(entry.name && { name: entry.name }),
         items: childItemIds,
-        conditions: entry.conditions || [],
+        ...(entry.conditions && entry.conditions.length > 0 && { conditions: entry.conditions }),
+        ...(entry.functions && entry.functions.length > 0 && { functions: entry.functions }),
         poolIndex,
         entryIndex
     };

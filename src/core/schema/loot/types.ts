@@ -21,6 +21,8 @@ export interface LootTableProps extends VoxelElement {
 export interface LootItem {
     id: string;
     name: string;
+    entryType?: EntryType; // Preserve the original entry type
+    value?: any; // For loot_table entries with embedded objects
     weight?: number;
     quality?: number;
     count?: {
@@ -29,6 +31,7 @@ export interface LootItem {
     };
     conditions?: any[]; // Store complete condition objects
     functions?: any[]; // Store complete function objects
+    expand?: boolean; // For tag entries
     poolIndex: number;
     entryIndex: number;
 }
@@ -43,6 +46,7 @@ export interface LootGroup {
     name?: string;
     items: string[];
     conditions?: any[]; // Store complete condition objects
+    functions?: any[]; // Store complete function objects
     poolIndex: number;
     entryIndex: number;
 }
@@ -92,6 +96,7 @@ export type EntryType =
     | "minecraft:dynamic"
     | "minecraft:alternatives"
     | "minecraft:group"
+    | "minecraft:empty"
     | "minecraft:sequence";
 export type GroupType = "alternatives" | "group" | "sequence";
 

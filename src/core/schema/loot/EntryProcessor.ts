@@ -29,6 +29,11 @@ export function processEntry(entry: MinecraftLootEntry, poolIndex: number, entry
             context.items.push(item);
             break;
         }
+        case "minecraft:empty": {
+            const item = createLootItem(entry, poolIndex, entryIndex, context, "empty");
+            context.items.push(item);
+            break;
+        }
         case "minecraft:alternatives":
         case "minecraft:group":
         case "minecraft:sequence": {
@@ -71,8 +76,23 @@ function processChildEntry(entry: MinecraftLootEntry, poolIndex: number, entryIn
             context.items.push(item);
             return item.id;
         }
+        case "minecraft:tag": {
+            const item = createLootItem(entry, poolIndex, entryIndex, context, "tag");
+            context.items.push(item);
+            return item.id;
+        }
+        case "minecraft:loot_table": {
+            const item = createLootItem(entry, poolIndex, entryIndex, context, "loot_table");
+            context.items.push(item);
+            return item.id;
+        }
         case "minecraft:dynamic": {
             const item = createDynamicItem(entry, poolIndex, entryIndex, context);
+            context.items.push(item);
+            return item.id;
+        }
+        case "minecraft:empty": {
+            const item = createLootItem(entry, poolIndex, entryIndex, context, "empty");
             context.items.push(item);
             return item.id;
         }

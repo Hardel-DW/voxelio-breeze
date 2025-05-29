@@ -11,6 +11,7 @@ export function detectEntryType(type: string): EntryType {
         case "minecraft:tag":
         case "minecraft:loot_table":
         case "minecraft:dynamic":
+        case "minecraft:empty":
         case "minecraft:alternatives":
         case "minecraft:group":
         case "minecraft:sequence":
@@ -59,6 +60,13 @@ export function detectCompilerEntryType(name: string): { type: EntryType; name: 
         return {
             type: "minecraft:dynamic",
             name: "contents"
+        };
+    }
+
+    if (name === "minecraft:empty") {
+        return {
+            type: "minecraft:empty",
+            name: ""
         };
     }
 
