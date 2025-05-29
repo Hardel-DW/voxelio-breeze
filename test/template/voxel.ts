@@ -1,6 +1,6 @@
-import type { VoxelRegistryElement } from "@/core/Element";
 import type { EnchantmentProps } from "@/core/schema/EnchantmentProps";
-import type { LootTableProps } from "@/core/schema/LootTableProps";
+import type { LootTableProps } from "@/core/schema/loot/types";
+import type { VoxelRegistryElement } from "@/index";
 
 const prefiledProperties = {
     maxLevel: 1,

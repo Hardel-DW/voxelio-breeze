@@ -1,7 +1,8 @@
 import type { Compiler } from "@/core/engine/Compiler";
 import { updateData } from "@/core/engine/actions";
-import { LootDataDrivenToVoxelFormat, VoxelToLootDataDriven, type LootTableProps } from "@/core/schema/LootTableProps";
-import type { MinecraftLootTable } from "@/core/schema/LootTableProps";
+import { VoxelToLootDataDriven } from "@/core/schema/loot/compiler";
+import { LootDataDrivenToVoxelFormat } from "@/core/schema/loot/parser";
+import type { LootTableProps, MinecraftLootTable } from "@/core/schema/loot/types";
 import { DATA_DRIVEN_TEMPLATE_LOOT_TABLE } from "@test/template/datadriven";
 import { VOXEL_TEMPLATE_LOOT_TABLE } from "@test/template/voxel";
 import { describe, it, expect, beforeEach } from "vitest";

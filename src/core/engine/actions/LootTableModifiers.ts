@@ -1,4 +1,4 @@
-import type { LootTableProps, LootItem, LootGroup } from "@/core/schema/LootTableProps";
+import type { LootTableProps, LootItem, LootGroup } from "@/core/schema/loot/types";
 import type { LootTableAction } from "./LootTableActions";
 
 let globalItemCounter = 0;

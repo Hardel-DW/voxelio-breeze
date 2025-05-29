@@ -2,12 +2,9 @@ import type { Compiler } from "@/core/engine/Compiler";
 import type { Parser } from "@/core/engine/Parser";
 import { EnchantmentDataDrivenToVoxelFormat, type EnchantmentProps, VoxelToEnchantmentDataDriven } from "@/core/schema/EnchantmentProps";
 import type { Enchantment } from "@/schema/enchantment/Enchantment";
-import {
-    LootDataDrivenToVoxelFormat,
-    type LootTableProps,
-    type MinecraftLootTable,
-    VoxelToLootDataDriven
-} from "@/core/schema/LootTableProps";
+import type { LootTableProps, MinecraftLootTable } from "../schema/loot/types";
+import { VoxelToLootDataDriven } from "../schema/loot/compiler";
+import { LootDataDrivenToVoxelFormat } from "../schema/loot/parser";
 
 export type GetAnalyserVoxel<T extends keyof Analysers> = Analysers[T]["voxel"];
 export type GetAnalyserMinecraft<T extends keyof Analysers> = Analysers[T]["minecraft"];
