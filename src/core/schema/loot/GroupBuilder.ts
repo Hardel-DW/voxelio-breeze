@@ -40,10 +40,22 @@ export function buildItemEntry(item: LootItem): MinecraftLootEntry {
  * Builds a Minecraft group entry recursively
  */
 export function buildGroupEntry(group: LootGroup, props: LootTableProps): MinecraftLootEntry {
+    // Optimisation: créer des caches locaux pour cette compilation
+    const itemLookupCache = new Map<string, LootItem>();
+    const groupLookupCache = new Map<string, LootGroup>();
+
+    for (const item of props.items) {
+        itemLookupCache.set(item.id, item);
+    }
+
+    for (const g of props.groups) {
+        groupLookupCache.set(g.id, g);
+    }
+
     const children: MinecraftLootEntry[] = [];
 
     for (const itemId of group.items) {
-        const childEntry = buildChildEntry(itemId, props);
+        const childEntry = buildChildEntry(itemId, itemLookupCache, groupLookupCache, props);
         if (childEntry) {
             children.push(childEntry);
         }
@@ -59,17 +71,21 @@ export function buildGroupEntry(group: LootGroup, props: LootTableProps): Minecr
 }
 
 /**
- * Builds a child entry (either item or nested group)
+ * Builds a child entry (either item or nested group) using cache
  */
-function buildChildEntry(itemId: string, props: LootTableProps): MinecraftLootEntry | null {
-    // Check if this is a nested group
-    const nestedGroup = props.groups.find((g) => g.id === itemId);
+function buildChildEntry(
+    itemId: string,
+    itemCache: Map<string, LootItem>,
+    groupCache: Map<string, LootGroup>,
+    props: LootTableProps
+): MinecraftLootEntry | null {
+    // Optimisation: utiliser le cache au lieu de find()
+    const nestedGroup = groupCache.get(itemId);
     if (nestedGroup) {
         return buildGroupEntry(nestedGroup, props);
     }
 
-    // It's a regular item
-    const item = props.items.find((i) => i.id === itemId);
+    const item = itemCache.get(itemId);
     if (!item) return null;
 
     return buildItemEntry(item);
@@ -94,8 +110,15 @@ export function collectItemsInGroups(groups: LootGroup[]): Set<string> {
  * Finds top-level groups (groups that aren't children of other groups)
  */
 export function findTopLevelGroups(groups: LootGroup[]): LootGroup[] {
-    return groups.filter((group) => {
-        const isChildGroup = groups.some((otherGroup) => otherGroup.id !== group.id && otherGroup.items.includes(group.id));
-        return !isChildGroup;
-    });
+    const allChildIds = new Set<string>();
+
+    // Première passe: collecter tous les IDs d'enfants
+    for (const group of groups) {
+        for (const itemId of group.items) {
+            allChildIds.add(itemId);
+        }
+    }
+
+    // Deuxième passe: filtrer les groupes qui ne sont pas des enfants
+    return groups.filter((group) => !allChildIds.has(group.id));
 }

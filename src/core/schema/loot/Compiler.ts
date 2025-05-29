@@ -11,15 +11,14 @@ export const VoxelToLootDataDriven: LootTableCompiler = (
     _: keyof Analysers,
     original?: MinecraftLootTable
 ): CompilerResult => {
-    const lootTable = structuredClone(original ?? {});
-    const props = structuredClone(element);
+    const lootTable = original ? structuredClone(original) : {};
 
-    const poolMap = initializePoolsMap(props, original);
+    const poolMap = initializePoolsMap(element, original);
 
-    addStandaloneItemsToPools(props, poolMap);
-    addTopLevelGroupsToPools(props, poolMap);
+    addStandaloneItemsToPools(element, poolMap);
+    addTopLevelGroupsToPools(element, poolMap);
 
-    return buildFinalLootTable(lootTable, props, poolMap);
+    return buildFinalLootTable(lootTable, element, poolMap);
 };
 
 /**
@@ -70,7 +69,6 @@ function buildFinalLootTable(lootTable: any, props: LootTableProps, poolMap: Map
         lootTable.functions = props.functions;
     }
 
-    // Restore unknown fields from mods at table level
     if (props.unknownFields) {
         Object.assign(lootTable, props.unknownFields);
     }
@@ -80,6 +78,6 @@ function buildFinalLootTable(lootTable: any, props: LootTableProps, poolMap: Map
             data: lootTable,
             identifier: props.identifier
         },
-        tags: [] // LootTables don't typically use tags like enchantments
+        tags: []
     };
 }
