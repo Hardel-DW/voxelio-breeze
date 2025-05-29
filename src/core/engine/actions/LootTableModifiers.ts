@@ -18,7 +18,8 @@ export function LootTableModifier(action: LootTableAction, element: Record<strin
                 conditions: action.item.conditions || [],
                 functions: action.item.functions || [],
                 poolIndex: action.poolIndex,
-                entryIndex: 0 // Will be recalculated
+                entryIndex: 0, // Will be recalculated
+                entryType: "minecraft:item" // Default entry type for new items
             };
             clone.items.push(newItem);
             return clone;

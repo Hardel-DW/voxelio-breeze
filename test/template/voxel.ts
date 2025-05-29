@@ -995,7 +995,8 @@ export const VOXEL_TEMPLATE_LOOT_TABLE: VoxelRegistryElement<LootTableProps>[] =
                     conditions: ["minecraft:random_chance"],
                     functions: ["minecraft:set_count"],
                     poolIndex: 0,
-                    entryIndex: 0
+                    entryIndex: 0,
+                    entryType: "minecraft:item"
                 }
             ],
             groups: []
@@ -1014,13 +1015,15 @@ export const VOXEL_TEMPLATE_LOOT_TABLE: VoxelRegistryElement<LootTableProps>[] =
                     id: "dynamic_0",
                     name: "minecraft:contents",
                     poolIndex: 0,
-                    entryIndex: 0
+                    entryIndex: 0,
+                    entryType: "minecraft:dynamic"
                 },
                 {
                     id: "item_0",
                     name: "minecraft:amethyst_shard",
                     poolIndex: 0,
-                    entryIndex: 0
+                    entryIndex: 0,
+                    entryType: "minecraft:item"
                 }
             ],
             groups: [
@@ -1061,19 +1064,22 @@ export const VOXEL_TEMPLATE_LOOT_TABLE: VoxelRegistryElement<LootTableProps>[] =
                     id: "item_0",
                     name: "yggdrasil:generic/equipment/ominous/item/sword",
                     poolIndex: 0,
-                    entryIndex: 0
+                    entryIndex: 0,
+                    entryType: "minecraft:loot_table"
                 },
                 {
                     id: "item_1",
                     name: "yggdrasil:generic/equipment/ominous/item/helmet",
                     poolIndex: 1,
-                    entryIndex: 0
+                    entryIndex: 0,
+                    entryType: "minecraft:loot_table"
                 },
                 {
                     id: "item_2",
                     name: "yggdrasil:generic/equipment/ominous/item/chestplate",
                     poolIndex: 2,
-                    entryIndex: 0
+                    entryIndex: 0,
+                    entryType: "minecraft:loot_table"
                 }
             ],
             groups: []

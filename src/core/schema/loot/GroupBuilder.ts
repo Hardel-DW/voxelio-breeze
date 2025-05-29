@@ -1,12 +1,14 @@
 import type { LootGroup, LootItem, MinecraftLootEntry, LootTableProps } from "./types";
-import { detectCompilerEntryType } from "./EntryTypeDetector";
 
 /**
  * Builds a Minecraft entry from a LootItem
  */
 export function buildItemEntry(item: LootItem): MinecraftLootEntry {
     // Use the stored entryType if available, otherwise detect from name
-    const type = item.entryType || detectCompilerEntryType(item.name).type;
+    const type = item.entryType;
+    if (!type) {
+        throw new Error(`No entryType found for item ${item.name}`);
+    }
 
     const entry: MinecraftLootEntry = {
         type,
@@ -20,14 +22,12 @@ export function buildItemEntry(item: LootItem): MinecraftLootEntry {
     // Handle value field for loot_table entries
     if (type === "minecraft:loot_table") {
         if (item.value !== undefined) {
-            entry.value = item.value; // Use the embedded object
+            entry.value = item.value;
         } else {
-            entry.value = item.name; // Use the string reference
+            entry.value = item.name;
         }
     } else if (type === "minecraft:empty") {
-        // Empty entries don't need a name
     } else if (type === "minecraft:tag") {
-        // Remove # prefix for tags
         entry.name = item.name.startsWith("#") ? item.name.substring(1) : item.name;
     } else {
         entry.name = item.name;
@@ -53,7 +53,7 @@ export function buildGroupEntry(group: LootGroup, props: LootTableProps): Minecr
         type: `minecraft:${group.type}`,
         children,
         ...(group.conditions && group.conditions.length > 0 && { conditions: group.conditions }),
-        ...(group.functions !== undefined && { functions: group.functions })
+        functions: group.functions || []
     };
 }
 

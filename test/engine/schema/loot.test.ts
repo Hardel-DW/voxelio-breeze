@@ -450,7 +450,8 @@ describe("LootTable Schema", () => {
                         poolIndex: 0,
                         entryIndex: 0,
                         conditions: ["minecraft:random_chance"],
-                        functions: ["minecraft:set_count"]
+                        functions: ["minecraft:set_count"],
+                        entryType: "minecraft:item"
                     },
                     {
                         id: "item_1",
@@ -460,7 +461,8 @@ describe("LootTable Schema", () => {
                         poolIndex: 0,
                         entryIndex: 1,
                         conditions: ["minecraft:killed_by_player"],
-                        functions: ["minecraft:enchant_randomly"]
+                        functions: ["minecraft:enchant_randomly"],
+                        entryType: "minecraft:item"
                     },
                     {
                         id: "item_2",
@@ -470,7 +472,8 @@ describe("LootTable Schema", () => {
                         poolIndex: 1,
                         entryIndex: 0,
                         conditions: [],
-                        functions: []
+                        functions: [],
+                        entryType: "minecraft:item"
                     }
                 ],
                 groups: [
