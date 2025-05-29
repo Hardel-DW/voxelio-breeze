@@ -1,6 +1,6 @@
 import type { MinecraftLootEntry, ProcessingContext } from "./types";
 import { detectEntryType } from "./EntryTypeDetector";
-import { createLootItem, createLootGroup, createDynamicItem } from "./EntryFactory";
+import { createLootItem, createLootGroup } from "./EntryFactory";
 
 /**
  * Processes a single Minecraft entry and adds it to the context
@@ -25,7 +25,7 @@ export function processEntry(entry: MinecraftLootEntry, poolIndex: number, entry
             break;
         }
         case "minecraft:dynamic": {
-            const item = createDynamicItem(entry, poolIndex, entryIndex, context);
+            const item = createLootItem(entry, poolIndex, entryIndex, context, "dynamic");
             context.items.push(item);
             break;
         }
@@ -38,6 +38,11 @@ export function processEntry(entry: MinecraftLootEntry, poolIndex: number, entry
         case "minecraft:group":
         case "minecraft:sequence": {
             processGroupEntry(entry, poolIndex, entryIndex, context);
+            break;
+        }
+        default: {
+            const item = createLootItem(entry, poolIndex, entryIndex, context, "mod");
+            context.items.push(item);
             break;
         }
     }
@@ -87,7 +92,7 @@ function processChildEntry(entry: MinecraftLootEntry, poolIndex: number, entryIn
             return item.id;
         }
         case "minecraft:dynamic": {
-            const item = createDynamicItem(entry, poolIndex, entryIndex, context);
+            const item = createLootItem(entry, poolIndex, entryIndex, context, "dynamic");
             context.items.push(item);
             return item.id;
         }
@@ -101,8 +106,11 @@ function processChildEntry(entry: MinecraftLootEntry, poolIndex: number, entryIn
         case "minecraft:sequence": {
             return processNestedGroup(entry, poolIndex, entryIndex, context);
         }
-        default:
-            return "";
+        default: {
+            const item = createLootItem(entry, poolIndex, entryIndex, context, "mod");
+            context.items.push(item);
+            return item.id;
+        }
     }
 }
 

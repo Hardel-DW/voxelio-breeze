@@ -70,6 +70,11 @@ function buildFinalLootTable(lootTable: any, props: LootTableProps, poolMap: Map
         lootTable.functions = props.functions;
     }
 
+    // Restore unknown fields from mods at table level
+    if (props.unknownFields) {
+        Object.assign(lootTable, props.unknownFields);
+    }
+
     return {
         element: {
             data: lootTable,

@@ -17,7 +17,9 @@ export function detectEntryType(type: string): EntryType {
         case "minecraft:sequence":
             return normalizedType;
         default:
-            throw new Error(`Unknown entry type: ${type}`);
+            // For mod entry types, return the original type as-is
+            // This allows mods to define custom entry types
+            return type;
     }
 }
 
@@ -25,8 +27,8 @@ export function detectEntryType(type: string): EntryType {
  * Determines if an entry type is a group type
  */
 export function isGroupType(type: string): boolean {
-    const entryType = detectEntryType(type);
-    return entryType === "minecraft:alternatives" || entryType === "minecraft:group" || entryType === "minecraft:sequence";
+    const normalizedType = type.replace("minecraft:", "");
+    return normalizedType === "alternatives" || normalizedType === "group" || normalizedType === "sequence";
 }
 
 /**

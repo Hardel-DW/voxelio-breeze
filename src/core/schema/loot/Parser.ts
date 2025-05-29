@@ -2,6 +2,7 @@ import type { LootTableProps, MinecraftLootTable, ProcessingContext, LootTablePa
 import type { ParserParams } from "@/core/engine/Parser";
 import type { DataDrivenRegistryElement } from "@/core/Element";
 import { processEntry } from "./EntryProcessor";
+import { extractUnknownFields, KNOWN_TABLE_FIELDS, KNOWN_POOL_FIELDS } from "./types";
 
 /**
  * Parse Minecraft LootTable to simplified Voxel format
@@ -22,6 +23,8 @@ export const LootDataDrivenToVoxelFormat: LootTableParser = ({
     const poolsData = extractPoolsData(clone);
     processAllPools(clone, context);
 
+    const tableUnknownFields = extractUnknownFields(clone.data, KNOWN_TABLE_FIELDS);
+
     return {
         identifier: element.identifier,
         ...(clone.data.type && { type: clone.data.type }),
@@ -30,6 +33,7 @@ export const LootDataDrivenToVoxelFormat: LootTableParser = ({
         ...(clone.data.random_sequence && { randomSequence: clone.data.random_sequence }),
         ...(clone.data.functions && clone.data.functions.length > 0 && { functions: clone.data.functions }),
         ...(poolsData.length > 0 && { pools: poolsData }),
+        ...(tableUnknownFields && { unknownFields: tableUnknownFields }),
         override: configurator
     };
 };
@@ -41,12 +45,15 @@ function extractPoolsData(clone: DataDrivenRegistryElement<MinecraftLootTable>):
     const poolsData: PoolData[] = [];
 
     clone.data.pools?.forEach((pool, poolIndex) => {
+        const poolUnknownFields = extractUnknownFields(pool, KNOWN_POOL_FIELDS);
+
         poolsData.push({
             poolIndex,
             rolls: pool.rolls,
             ...(pool.bonus_rolls !== undefined && { bonus_rolls: pool.bonus_rolls }),
             ...(pool.functions && pool.functions.length > 0 && { functions: pool.functions }),
-            ...(pool.conditions && pool.conditions.length > 0 && { conditions: pool.conditions })
+            ...(pool.conditions && pool.conditions.length > 0 && { conditions: pool.conditions }),
+            ...(poolUnknownFields && { unknownFields: poolUnknownFields })
         });
     });
 

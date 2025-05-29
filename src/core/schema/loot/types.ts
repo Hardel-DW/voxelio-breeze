@@ -12,6 +12,8 @@ export interface LootTableProps extends VoxelElement {
     randomSequence?: string;
     functions?: any[]; // Store complete function objects at table level
     pools?: PoolData[]; // Store pool-level data
+    // Preserve unknown fields from mods
+    unknownFields?: Record<string, any>;
 }
 
 /**
@@ -34,6 +36,8 @@ export interface LootItem {
     expand?: boolean; // For tag entries
     poolIndex: number;
     entryIndex: number;
+    // Preserve unknown fields from mods
+    unknownFields?: Record<string, any>;
 }
 
 /**
@@ -49,6 +53,8 @@ export interface LootGroup {
     functions?: any[]; // Store complete function objects
     poolIndex: number;
     entryIndex: number;
+    // Preserve unknown fields from mods
+    unknownFields?: Record<string, any>;
 }
 
 // Pool-level data that needs to be preserved
@@ -58,6 +64,8 @@ export interface PoolData {
     bonus_rolls?: any;
     functions?: any[];
     conditions?: any[];
+    // Preserve unknown fields from mods
+    unknownFields?: Record<string, any>;
 }
 
 // Original Minecraft LootTable format (simplified)
@@ -66,6 +74,8 @@ export interface MinecraftLootTable extends DataDrivenElement {
     pools?: MinecraftLootPool[];
     functions?: any[];
     random_sequence?: string;
+    // Allow any additional fields for mod compatibility
+    [key: string]: any;
 }
 
 export interface MinecraftLootPool {
@@ -74,6 +84,8 @@ export interface MinecraftLootPool {
     entries: MinecraftLootEntry[];
     functions?: any[];
     conditions?: any[];
+    // Allow any additional fields for mod compatibility
+    [key: string]: any;
 }
 
 export interface MinecraftLootEntry {
@@ -86,6 +98,8 @@ export interface MinecraftLootEntry {
     conditions?: any[];
     children?: MinecraftLootEntry[];
     expand?: boolean;
+    // Allow any additional fields for mod compatibility
+    [key: string]: any;
 }
 
 // Type definitions for entry types
@@ -97,7 +111,8 @@ export type EntryType =
     | "minecraft:alternatives"
     | "minecraft:group"
     | "minecraft:empty"
-    | "minecraft:sequence";
+    | "minecraft:sequence"
+    | string; // Allow custom mod entry types
 export type GroupType = "alternatives" | "group" | "sequence";
 
 // Context for processing entries
@@ -116,3 +131,27 @@ export interface CompilerResult {
     element: DataDrivenRegistryElement<MinecraftLootTable>;
     tags: IdentifierObject[];
 }
+
+/**
+ * Utility function to extract unknown fields from an object, excluding known fields
+ */
+export function extractUnknownFields(obj: Record<string, any>, knownFields: Set<string>): Record<string, any> | undefined {
+    const unknownFields: Record<string, any> = {};
+    let hasUnknownFields = false;
+
+    for (const [key, value] of Object.entries(obj)) {
+        if (!knownFields.has(key)) {
+            unknownFields[key] = value;
+            hasUnknownFields = true;
+        }
+    }
+
+    return hasUnknownFields ? unknownFields : undefined;
+}
+
+// Known fields constants for reuse
+export const KNOWN_ENTRY_FIELDS = new Set(["type", "name", "value", "weight", "quality", "conditions", "functions", "children", "expand"]);
+
+export const KNOWN_TABLE_FIELDS = new Set(["type", "pools", "functions", "random_sequence"]);
+
+export const KNOWN_POOL_FIELDS = new Set(["rolls", "bonus_rolls", "entries", "functions", "conditions"]);

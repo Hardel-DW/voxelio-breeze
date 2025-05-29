@@ -1,4 +1,5 @@
 import type { MinecraftLootPool, MinecraftLootTable, LootTableProps } from "./types";
+import { KNOWN_POOL_FIELDS } from "./types";
 
 /**
  * Initializes pools map for compilation
@@ -19,13 +20,26 @@ export function initializePoolsMap(props: LootTableProps, original?: MinecraftLo
         const originalPool = original?.pools?.[i];
         const rolls = poolData?.rolls !== undefined ? poolData.rolls : originalPool?.rolls !== undefined ? originalPool.rolls : 1;
 
-        poolMap.set(i, {
+        const pool: MinecraftLootPool = {
             rolls,
             bonus_rolls: poolData?.bonus_rolls || originalPool?.bonus_rolls,
             functions: poolData?.functions || originalPool?.functions || [],
             conditions: poolData?.conditions || originalPool?.conditions || [],
             entries: []
-        });
+        };
+
+        // Restore unknown fields from mods at pool level
+        if (poolData?.unknownFields) {
+            Object.assign(pool, poolData.unknownFields);
+        } else if (originalPool) {
+            for (const [key, value] of Object.entries(originalPool)) {
+                if (!KNOWN_POOL_FIELDS.has(key)) {
+                    (pool as any)[key] = value;
+                }
+            }
+        }
+
+        poolMap.set(i, pool);
     }
 
     return poolMap;

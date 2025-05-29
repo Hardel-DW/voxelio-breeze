@@ -15,7 +15,8 @@ export function buildItemEntry(item: LootItem): MinecraftLootEntry {
         ...(item.quality !== undefined && { quality: item.quality }),
         ...(item.conditions && item.conditions.length > 0 && { conditions: item.conditions }),
         ...(item.functions && item.functions.length > 0 && { functions: item.functions }),
-        ...(item.expand !== undefined && { expand: item.expand })
+        ...(item.expand !== undefined && { expand: item.expand }),
+        ...(item.unknownFields && item.unknownFields)
     };
 
     switch (type) {
@@ -52,7 +53,8 @@ export function buildGroupEntry(group: LootGroup, props: LootTableProps): Minecr
         type: `minecraft:${group.type}`,
         children,
         ...(group.conditions && group.conditions.length > 0 && { conditions: group.conditions }),
-        functions: group.functions || []
+        functions: group.functions || [],
+        ...(group.unknownFields && group.unknownFields)
     };
 }
 

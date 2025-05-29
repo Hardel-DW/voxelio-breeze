@@ -1,5 +1,6 @@
 import type { LootItem, LootGroup, MinecraftLootEntry, ProcessingContext } from "./types";
 import { detectEntryType, entryTypeToGroupType } from "./EntryTypeDetector";
+import { extractUnknownFields, KNOWN_ENTRY_FIELDS } from "./types";
 
 /**
  * Creates a LootItem from a Minecraft entry
@@ -33,6 +34,8 @@ export function createLootItem(
         }
     }
 
+    const unknownFields = extractUnknownFields(entry, KNOWN_ENTRY_FIELDS);
+
     return {
         id: itemId,
         name,
@@ -44,7 +47,8 @@ export function createLootItem(
         ...(entry.functions && entry.functions.length > 0 && { functions: entry.functions }),
         ...(entry.expand !== undefined && { expand: entry.expand }),
         poolIndex,
-        entryIndex
+        entryIndex,
+        ...(unknownFields && { unknownFields })
     };
 }
 
@@ -60,6 +64,7 @@ export function createLootGroup(
 ): LootGroup {
     const groupId = `group_${context.groupCounter++}`;
     const groupType = entryTypeToGroupType(entry.type);
+    const unknownFields = extractUnknownFields(entry, KNOWN_ENTRY_FIELDS);
 
     return {
         id: groupId,
@@ -69,13 +74,7 @@ export function createLootGroup(
         ...(entry.conditions && entry.conditions.length > 0 && { conditions: entry.conditions }),
         ...(entry.functions && entry.functions.length > 0 && { functions: entry.functions }),
         poolIndex,
-        entryIndex
+        entryIndex,
+        ...(unknownFields && { unknownFields })
     };
-}
-
-/**
- * Creates a dynamic item (minecraft:contents, etc.)
- */
-export function createDynamicItem(entry: MinecraftLootEntry, poolIndex: number, entryIndex: number, context: ProcessingContext): LootItem {
-    return createLootItem(entry, poolIndex, entryIndex, context, "dynamic");
 }
