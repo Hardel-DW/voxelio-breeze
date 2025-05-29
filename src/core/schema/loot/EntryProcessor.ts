@@ -42,6 +42,9 @@ export function processEntry(entry: MinecraftLootEntry, poolIndex: number, entry
  * Processes a group entry and its children
  */
 function processGroupEntry(entry: MinecraftLootEntry, poolIndex: number, entryIndex: number, context: ProcessingContext): void {
+    const group = createLootGroup(entry, poolIndex, entryIndex, context, []);
+    context.groups.push(group);
+
     const childItemIds: string[] = [];
 
     // Process children and collect their IDs
@@ -52,8 +55,8 @@ function processGroupEntry(entry: MinecraftLootEntry, poolIndex: number, entryIn
         }
     }
 
-    const group = createLootGroup(entry, poolIndex, entryIndex, context, childItemIds);
-    context.groups.push(group);
+    // Update the group with the collected child IDs
+    group.items = childItemIds;
 }
 
 /**
@@ -87,6 +90,10 @@ function processChildEntry(entry: MinecraftLootEntry, poolIndex: number, entryIn
  * Processes a nested group entry
  */
 function processNestedGroup(entry: MinecraftLootEntry, poolIndex: number, entryIndex: number, context: ProcessingContext): string {
+    // Create the parent group first to ensure it gets a lower ID
+    const group = createLootGroup(entry, poolIndex, entryIndex, context, []);
+    context.groups.push(group);
+
     const nestedChildIds: string[] = [];
 
     for (const grandChild of entry.children || []) {
@@ -96,8 +103,8 @@ function processNestedGroup(entry: MinecraftLootEntry, poolIndex: number, entryI
         }
     }
 
-    const group = createLootGroup(entry, poolIndex, entryIndex, context, nestedChildIds);
-    context.groups.push(group);
+    // Update the group with the collected child IDs
+    group.items = nestedChildIds;
 
     return group.id;
 }
