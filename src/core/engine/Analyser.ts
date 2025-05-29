@@ -3,9 +3,8 @@ import type { Parser } from "@/core/engine/Parser";
 import { EnchantmentDataDrivenToVoxelFormat, type EnchantmentProps, VoxelToEnchantmentDataDriven } from "@/core/schema/EnchantmentProps";
 import type { Enchantment } from "@/schema/enchantment/Enchantment";
 import type { LootTableProps, MinecraftLootTable } from "../schema/loot/types";
-import { VoxelToLootDataDriven } from "../schema/loot/compiler";
-import { LootDataDrivenToVoxelFormat } from "../schema/loot/parser";
-
+import { VoxelToLootDataDriven } from "../schema/loot/Compiler";
+import { LootDataDrivenToVoxelFormat } from "../schema/loot/Parser";
 export type GetAnalyserVoxel<T extends keyof Analysers> = Analysers[T]["voxel"];
 export type GetAnalyserMinecraft<T extends keyof Analysers> = Analysers[T]["minecraft"];
 

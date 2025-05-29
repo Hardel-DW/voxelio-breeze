@@ -1,5 +1,5 @@
 import type { MinecraftLootEntry, ProcessingContext } from "./types";
-import { detectEntryType, isGroupType } from "./EntryTypeDetector";
+import { detectEntryType } from "./EntryTypeDetector";
 import { createLootItem, createLootGroup, createDynamicItem } from "./EntryFactory";
 
 /**
@@ -90,7 +90,6 @@ function processChildEntry(entry: MinecraftLootEntry, poolIndex: number, entryIn
  * Processes a nested group entry
  */
 function processNestedGroup(entry: MinecraftLootEntry, poolIndex: number, entryIndex: number, context: ProcessingContext): string {
-    // Create the parent group first to ensure it gets a lower ID
     const group = createLootGroup(entry, poolIndex, entryIndex, context, []);
     context.groups.push(group);
 
