@@ -11,7 +11,6 @@ export function initializePoolsMap(props: LootTableProps, original?: MinecraftLo
     const groupPoolIndices = props.groups.map((group) => group.poolIndex);
     const poolDataIndices = props.pools?.map((p) => p.poolIndex) || [];
     const originalPoolIndices = original?.pools?.map((_, index) => index) || [];
-
     const maxPoolIndex = Math.max(...itemPoolIndices, ...groupPoolIndices, ...poolDataIndices, ...originalPoolIndices, -1);
 
     // Initialize pools

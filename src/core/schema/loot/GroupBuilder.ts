@@ -4,7 +4,6 @@ import type { LootGroup, LootItem, MinecraftLootEntry, LootTableProps } from "./
  * Builds a Minecraft entry from a LootItem
  */
 export function buildItemEntry(item: LootItem): MinecraftLootEntry {
-    // Use the stored entryType if available, otherwise detect from name
     const type = item.entryType;
     if (!type) {
         throw new Error(`No entryType found for item ${item.name}`);
@@ -19,18 +18,18 @@ export function buildItemEntry(item: LootItem): MinecraftLootEntry {
         ...(item.expand !== undefined && { expand: item.expand })
     };
 
-    // Handle value field for loot_table entries
-    if (type === "minecraft:loot_table") {
-        if (item.value !== undefined) {
-            entry.value = item.value;
-        } else {
-            entry.value = item.name;
-        }
-    } else if (type === "minecraft:empty") {
-    } else if (type === "minecraft:tag") {
-        entry.name = item.name.startsWith("#") ? item.name.substring(1) : item.name;
-    } else {
-        entry.name = item.name;
+    switch (type) {
+        case "minecraft:loot_table":
+            entry.value = item.value ?? item.name;
+            break;
+        case "minecraft:tag":
+            entry.name = item.name.startsWith("#") ? item.name.substring(1) : item.name;
+            break;
+        case "minecraft:empty":
+            break;
+        default:
+            entry.name = item.name;
+            break;
     }
 
     return entry;
@@ -69,9 +68,7 @@ function buildChildEntry(itemId: string, props: LootTableProps): MinecraftLootEn
 
     // It's a regular item
     const item = props.items.find((i) => i.id === itemId);
-    if (!item) {
-        return null;
-    }
+    if (!item) return null;
 
     return buildItemEntry(item);
 }

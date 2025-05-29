@@ -17,7 +17,7 @@ export function detectEntryType(type: string): EntryType {
         case "minecraft:sequence":
             return normalizedType;
         default:
-            return "minecraft:item";
+            throw new Error(`Unknown entry type: ${type}`);
     }
 }
 
@@ -41,6 +41,6 @@ export function entryTypeToGroupType(type: string): GroupType {
         case "sequence":
             return normalizedType;
         default:
-            return "group"; // Default fallback
+            throw new Error(`Unknown group type: ${type}`);
     }
 }
