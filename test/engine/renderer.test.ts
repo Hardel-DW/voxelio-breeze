@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { getValue, type ValueRenderer } from "@/core/engine/renderer/value";
 import type { VoxelRegistryElement } from "@/core/Element";
-import type { EnchantmentProps } from "@/core/schema/EnchantmentProps";
+import type { EnchantmentProps } from "@/core/schema/enchant/types";
 
 const createMockElement = (data: Partial<EnchantmentProps> = {}): VoxelRegistryElement<EnchantmentProps> => ({
     identifier: "foo",

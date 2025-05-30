@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import { checkCondition } from "@/core/engine/condition";
 import type { Condition } from "@/core/engine/condition/types";
 import type { VoxelRegistryElement } from "@/core/Element";
-import type { EnchantmentProps } from "@/core/schema/EnchantmentProps";
+import type { EnchantmentProps } from "@/core/schema/enchant/types";
 
 // Mock d'un élément de registre pour les tests
 const createMockElement = (data: Partial<EnchantmentProps> = {}): VoxelRegistryElement<EnchantmentProps> => ({

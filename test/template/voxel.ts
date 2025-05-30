@@ -1,4 +1,4 @@
-import type { EnchantmentProps } from "@/core/schema/EnchantmentProps";
+import type { EnchantmentProps } from "@/core/schema/enchant/types";
 import type { LootTableProps } from "@/core/schema/loot/types";
 import type { VoxelRegistryElement } from "@/index";
 

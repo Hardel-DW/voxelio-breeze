@@ -9,7 +9,7 @@ import type {
     SlotAction,
     ToggleListValueAction
 } from "@/core/engine/actions/types";
-import type { EnchantmentProps } from "@/core/schema/EnchantmentProps";
+import type { EnchantmentProps } from "@/core/schema/enchant/types";
 import type { VoxelRegistryElement } from "@/core/Element";
 import { describe, expect, it } from "vitest";
 

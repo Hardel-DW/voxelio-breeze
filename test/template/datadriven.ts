@@ -1,5 +1,5 @@
 import type { DataDrivenRegistryElement } from "@/core/Element";
-import type { EnchantmentProps } from "@/core/schema/EnchantmentProps";
+import type { EnchantmentProps } from "@/core/schema/enchant/types";
 import type { Enchantment, SlotRegistryType } from "@/schema/enchantment/Enchantment";
 import type { MinecraftLootTable } from "@/core/schema/loot/types";
 

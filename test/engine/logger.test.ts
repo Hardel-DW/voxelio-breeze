@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { Logger } from "@/core/engine/migrations/logger";
 import type { DatapackInfo, FileLog, Log, LogDifference } from "@/core/engine/migrations/types";
-import type { EnchantmentProps } from "@/core/schema/EnchantmentProps";
+import type { EnchantmentProps } from "@/core/schema/enchant/types";
 import type { VoxelRegistryElement } from "@/core/Element";
 import { createDifferenceFromAction } from "@/core/engine/migrations/logValidation";
 import { Identifier } from "@/core/Identifier";
