@@ -1,6 +1,122 @@
-import { createZipFile } from "./datapack";
+import type { MinecraftLootTable } from "@/core/schema/loot/types";
+import type { DataDrivenRegistryElement } from "@/core/Element";
 
-const completeLootTable = {
+export const DATA_DRIVEN_TEMPLATE_LOOT_TABLE: DataDrivenRegistryElement<MinecraftLootTable>[] = [
+    // Simple loot table
+    {
+        identifier: { namespace: "test", registry: "loot_table", resource: "simple" },
+        data: {
+            type: "minecraft:entity",
+            pools: [
+                {
+                    rolls: 1,
+                    bonus_rolls: 0,
+                    entries: [
+                        {
+                            type: "minecraft:item",
+                            name: "minecraft:experience_bottle",
+                            functions: [
+                                {
+                                    function: "minecraft:set_count",
+                                    count: {
+                                        min: 1,
+                                        max: 3
+                                    }
+                                }
+                            ],
+                            conditions: [
+                                {
+                                    condition: "minecraft:random_chance",
+                                    chance: 0.5
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    },
+    // Complex loot table with nested groups
+    {
+        identifier: { namespace: "test", registry: "loot_table", resource: "extreme" },
+        data: {
+            type: "minecraft:entity",
+            pools: [
+                {
+                    rolls: 5,
+                    entries: [
+                        {
+                            type: "minecraft:alternatives",
+                            children: [
+                                {
+                                    type: "minecraft:dynamic",
+                                    name: "minecraft:contents"
+                                },
+                                {
+                                    type: "minecraft:group",
+                                    children: [
+                                        {
+                                            type: "minecraft:sequence",
+                                            children: [
+                                                {
+                                                    type: "minecraft:item",
+                                                    name: "minecraft:amethyst_shard"
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ],
+            random_sequence: "minecraft:entities/wither_skeleton"
+        }
+    },
+    // Multi-pool loot table
+    {
+        identifier: { namespace: "test", registry: "loot_table", resource: "reference" },
+        data: {
+            type: "minecraft:equipment",
+            pools: [
+                {
+                    rolls: 1,
+                    bonus_rolls: 0,
+                    entries: [
+                        {
+                            type: "minecraft:loot_table",
+                            value: "yggdrasil:generic/equipment/ominous/item/sword"
+                        }
+                    ]
+                },
+                {
+                    rolls: 1,
+                    bonus_rolls: 0,
+                    entries: [
+                        {
+                            type: "minecraft:loot_table",
+                            value: "yggdrasil:generic/equipment/ominous/item/helmet"
+                        }
+                    ]
+                },
+                {
+                    rolls: 1,
+                    bonus_rolls: 0,
+                    entries: [
+                        {
+                            type: "minecraft:loot_table",
+                            value: "yggdrasil:generic/equipment/ominous/item/chestplate"
+                        }
+                    ]
+                }
+            ],
+            random_sequence: "yggdrasil:equipment"
+        }
+    }
+];
+
+export const completeLootTable = {
     pools: [
         {
             rolls: 0,
@@ -35,7 +151,7 @@ const completeLootTable = {
     random_sequence: "minecraft:entities/wither_skeleton"
 };
 
-const advancedLootTable = {
+export const advancedLootTable = {
     pools: [
         {
             rolls: 0,
@@ -95,7 +211,7 @@ const advancedLootTable = {
     random_sequence: "minecraft:entities/wither_skeleton"
 };
 
-const ultimateTestLootTable = {
+export const ultimateTestLootTable = {
     pools: [
         {
             rolls: 0,
@@ -170,7 +286,7 @@ const ultimateTestLootTable = {
     random_sequence: "minecraft:entities/wither_skeleton"
 };
 
-const finalBossOfLootTable = {
+export const finalBossOfLootTable = {
     pools: [
         {
             rolls: 1,
@@ -305,13 +421,3 @@ const finalBossOfLootTable = {
     ],
     random_sequence: "minecraft:entities/wither_skeleton"
 };
-
-export const lootTableFiles = {
-    "data/test/loot_table/test.json": new TextEncoder().encode(JSON.stringify(completeLootTable, null, 2)),
-    "data/test/loot_table/advanced.json": new TextEncoder().encode(JSON.stringify(advancedLootTable, null, 2)),
-    "data/test/loot_table/ultimate.json": new TextEncoder().encode(JSON.stringify(ultimateTestLootTable, null, 2)),
-    "data/test/loot_table/final_boss.json": new TextEncoder().encode(JSON.stringify(finalBossOfLootTable, null, 2)),
-    "pack.mcmeta": new TextEncoder().encode(JSON.stringify({ pack: { pack_format: 61, description: "lorem ipsum" } }, null, 2))
-};
-
-export const lootTableZipFile = await createZipFile(lootTableFiles);

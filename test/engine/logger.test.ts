@@ -1,49 +1,10 @@
 import { describe, it, expect } from "vitest";
 import { Logger } from "@/core/engine/migrations/logger";
 import type { DatapackInfo, FileLog, Log, LogDifference } from "@/core/engine/migrations/types";
-import type { EnchantmentProps } from "@/core/schema/enchant/types";
-import type { VoxelRegistryElement } from "@/core/Element";
 import { createDifferenceFromAction } from "@/core/engine/migrations/logValidation";
 import { Identifier } from "@/core/Identifier";
 import type { ComputedAction, SequentialAction, SimpleAction, ToggleListValueAction } from "@/core/engine/actions/types";
-
-const createComplexMockElement = (data: Partial<EnchantmentProps> = {}): VoxelRegistryElement<EnchantmentProps> => ({
-    identifier: "foo",
-    data: {
-        identifier: { namespace: "enchantplus", registry: "enchantment", resource: "bow/accuracy_shot" },
-        anvilCost: 4,
-        description: { translate: "enchantment.test.foo", fallback: "Enchantment Test" },
-        disabledEffects: [],
-        effects: {
-            "minecraft:projectile_spawned": [
-                {
-                    effect: {
-                        type: "minecraft:run_function",
-                        function: "enchantplus:actions/accuracy_shot/on_shoot"
-                    }
-                }
-            ]
-        },
-        exclusiveSet: ["minecraft:efficiency", "minecraft:unbreaking"],
-        maxLevel: 1,
-        mode: "normal",
-        minCostBase: 1,
-        minCostPerLevelAboveFirst: 1,
-        maxCostBase: 10,
-        maxCostPerLevelAboveFirst: 10,
-        primaryItems: undefined,
-        supportedItems: "#voxel:enchantable/range",
-        slots: ["mainhand", "offhand"],
-        tags: [
-            "#minecraft:non_treasure",
-            "#yggdrasil:structure/alfheim_tree/ominous_vault",
-            "#yggdrasil:structure/alfheim_tree/ominous_vault/floor",
-            "#yggdrasil:structure/asflors/common"
-        ],
-        weight: 2,
-        ...data
-    }
-});
+import { createComplexMockElement } from "@test/template/concept/enchant/VoxelDriven";
 
 const createMockLog = (logs: FileLog[]): Log => ({
     id: "test-id",

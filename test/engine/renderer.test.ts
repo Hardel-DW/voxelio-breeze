@@ -1,36 +1,11 @@
 import { describe, it, expect } from "vitest";
 import { getValue, type ValueRenderer } from "@/core/engine/renderer/value";
-import type { VoxelRegistryElement } from "@/core/Element";
-import type { EnchantmentProps } from "@/core/schema/enchant/types";
-
-const createMockElement = (data: Partial<EnchantmentProps> = {}): VoxelRegistryElement<EnchantmentProps> => ({
-    identifier: "foo",
-    data: {
-        identifier: { namespace: "namespace", resource: "enchantment", registry: "foo" },
-        description: { translate: "enchantment.test.foo" },
-        exclusiveSet: undefined,
-        supportedItems: "#minecraft:sword",
-        primaryItems: undefined,
-        maxLevel: 1,
-        weight: 1,
-        anvilCost: 1,
-        minCostBase: 1,
-        minCostPerLevelAboveFirst: 1,
-        maxCostBase: 10,
-        maxCostPerLevelAboveFirst: 10,
-        effects: undefined,
-        mode: "normal",
-        slots: ["head", "chest"],
-        tags: ["#minecraft:enchantable/bow", "#minecraft:enchantable/armor"],
-        disabledEffects: [],
-        ...data
-    }
-});
+import { createMockEnchantmentElement } from "@test/template/concept/enchant/VoxelDriven";
 
 describe("Value System", () => {
     describe("Simple Value", () => {
         it("should return hardcoded value", () => {
-            const element = createMockElement();
+            const element = createMockEnchantmentElement();
             const renderer: ValueRenderer = {
                 type: "hardcoded",
                 value: 42
@@ -40,7 +15,7 @@ describe("Value System", () => {
         });
 
         it("should return value from field", () => {
-            const element = createMockElement();
+            const element = createMockEnchantmentElement();
             const renderer: ValueRenderer = {
                 type: "from_field",
                 field: "maxLevel"
@@ -50,7 +25,7 @@ describe("Value System", () => {
         });
 
         it("should return null when condition is false", () => {
-            const element = createMockElement();
+            const element = createMockEnchantmentElement();
             const renderer: ValueRenderer = {
                 type: "conditionnal",
                 term: {
@@ -66,7 +41,7 @@ describe("Value System", () => {
 
     describe("Conditional Rendering", () => {
         it("should return true when condition is met", () => {
-            const element = createMockElement();
+            const element = createMockEnchantmentElement();
             const renderer: ValueRenderer = {
                 type: "conditionnal",
                 term: {
@@ -81,7 +56,7 @@ describe("Value System", () => {
         });
 
         it("should return false when condition is not met", () => {
-            const element = createMockElement();
+            const element = createMockEnchantmentElement();
             const renderer: ValueRenderer = {
                 type: "conditionnal",
                 term: {
@@ -96,7 +71,7 @@ describe("Value System", () => {
         });
 
         it("should return value from on_true when condition is true", () => {
-            const element = createMockElement();
+            const element = createMockEnchantmentElement();
             const renderer: ValueRenderer = {
                 type: "conditionnal",
                 term: {
@@ -114,7 +89,7 @@ describe("Value System", () => {
         });
 
         it("should return value from on_false when condition is false", () => {
-            const element = createMockElement();
+            const element = createMockEnchantmentElement();
             const renderer: ValueRenderer = {
                 type: "conditionnal",
                 term: {
@@ -132,7 +107,7 @@ describe("Value System", () => {
         });
 
         it("should throw error when no fallback is provided", () => {
-            const element = createMockElement();
+            const element = createMockEnchantmentElement();
             const renderer: ValueRenderer = {
                 type: "conditionnal",
                 term: {
@@ -148,7 +123,7 @@ describe("Value System", () => {
 
     describe("Complex Conditions", () => {
         it("should handle all_of conditions", () => {
-            const element = createMockElement();
+            const element = createMockEnchantmentElement();
             const renderer: ValueRenderer = {
                 type: "conditionnal",
                 term: {
@@ -176,7 +151,7 @@ describe("Value System", () => {
         });
 
         it("should handle any_of conditions", () => {
-            const element = createMockElement();
+            const element = createMockEnchantmentElement();
             const renderer: ValueRenderer = {
                 type: "conditionnal",
                 term: {
@@ -206,7 +181,7 @@ describe("Value System", () => {
 
     describe("Different Value Types", () => {
         it("should handle number values", () => {
-            const element = createMockElement();
+            const element = createMockEnchantmentElement();
             const renderer: ValueRenderer = {
                 type: "hardcoded",
                 value: 42
@@ -216,7 +191,7 @@ describe("Value System", () => {
         });
 
         it("should handle string values", () => {
-            const element = createMockElement();
+            const element = createMockEnchantmentElement();
             const renderer: ValueRenderer = {
                 type: "hardcoded",
                 value: "test"

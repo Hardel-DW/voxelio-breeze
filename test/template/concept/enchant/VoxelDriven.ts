@@ -1,5 +1,4 @@
 import type { EnchantmentProps } from "@/core/schema/enchant/types";
-import type { LootTableProps } from "@/core/schema/loot/types";
 import type { VoxelRegistryElement } from "@/index";
 
 const prefiledProperties = {
@@ -20,11 +19,215 @@ const prefiledProperties = {
     effects: {}
 };
 
-const prefiledLootProperties = {
-    type: "minecraft:entity",
-    randomSequence: undefined,
-    override: undefined
-};
+export const createMockEnchantmentElement = (data: Partial<EnchantmentProps> = {}): VoxelRegistryElement<EnchantmentProps> => ({
+    identifier: "foo",
+    data: {
+        identifier: { namespace: "namespace", resource: "enchantment", registry: "foo" },
+        description: { translate: "enchantment.test.foo" },
+        exclusiveSet: undefined,
+        supportedItems: "#minecraft:sword",
+        primaryItems: undefined,
+        maxLevel: 1,
+        weight: 1,
+        anvilCost: 1,
+        minCostBase: 1,
+        minCostPerLevelAboveFirst: 1,
+        maxCostBase: 10,
+        maxCostPerLevelAboveFirst: 10,
+        effects: undefined,
+        slots: ["head", "chest"],
+        tags: ["#minecraft:enchantable/bow", "#minecraft:enchantable/armor"],
+        disabledEffects: [],
+        mode: "normal",
+        ...data
+    }
+});
+
+export const createComplexMockElement = (data: Partial<EnchantmentProps> = {}): VoxelRegistryElement<EnchantmentProps> => ({
+    identifier: "foo",
+    data: {
+        identifier: { namespace: "enchantplus", registry: "enchantment", resource: "bow/accuracy_shot" },
+        anvilCost: 4,
+        description: { translate: "enchantment.test.foo", fallback: "Enchantment Test" },
+        disabledEffects: [],
+        effects: {
+            "minecraft:projectile_spawned": [
+                {
+                    effect: {
+                        type: "minecraft:run_function",
+                        function: "enchantplus:actions/accuracy_shot/on_shoot"
+                    }
+                }
+            ]
+        },
+        exclusiveSet: ["minecraft:efficiency", "minecraft:unbreaking"],
+        maxLevel: 1,
+        mode: "normal",
+        minCostBase: 1,
+        minCostPerLevelAboveFirst: 1,
+        maxCostBase: 10,
+        maxCostPerLevelAboveFirst: 10,
+        primaryItems: undefined,
+        supportedItems: "#voxel:enchantable/range",
+        slots: ["mainhand", "offhand"],
+        tags: [
+            "#minecraft:non_treasure",
+            "#yggdrasil:structure/alfheim_tree/ominous_vault",
+            "#yggdrasil:structure/alfheim_tree/ominous_vault/floor",
+            "#yggdrasil:structure/asflors/common"
+        ],
+        weight: 2,
+        ...data
+    }
+});
+
+export const VOXEL_ELEMENTS: EnchantmentProps[] = [
+    {
+        identifier: { namespace: "enchantplus", registry: "enchantment", resource: "bow/accuracy_shot" },
+        description: {
+            translate: "enchantment.enchantplus.accuracy_shot",
+            fallback: "Accuracy Shot"
+        },
+        maxLevel: 1,
+        weight: 2,
+        anvilCost: 4,
+        minCostBase: 20,
+        minCostPerLevelAboveFirst: 9,
+        maxCostBase: 65,
+        maxCostPerLevelAboveFirst: 9,
+        exclusiveSet: "",
+        primaryItems: "",
+        mode: "normal" as const,
+        disabledEffects: [],
+        effects: {},
+        supportedItems: "#voxel:enchantable/range",
+        tags: [
+            "minecraft:non_treasure",
+            "yggdrasil:structure/alfheim_tree/ominous_vault",
+            "yggdrasil:structure/alfheim_tree/random_loot",
+            "yggdrasil:structure/asflors/common"
+        ],
+
+        slots: ["mainhand", "offhand"]
+    },
+    {
+        identifier: { namespace: "enchantplus", registry: "enchantment", resource: "boots/agility" },
+        description: {
+            translate: "enchantment.enchantplus.agility",
+            fallback: "Agility"
+        },
+        maxLevel: 1,
+        weight: 2,
+        anvilCost: 4,
+        minCostBase: 20,
+        minCostPerLevelAboveFirst: 9,
+        maxCostBase: 65,
+        maxCostPerLevelAboveFirst: 9,
+        exclusiveSet: "",
+        primaryItems: "",
+        mode: "normal" as const,
+        disabledEffects: [],
+        effects: {},
+        supportedItems: "#minecraft:enchantable/foot_armor",
+        tags: ["minecraft:non_treasure"],
+        slots: ["feet"]
+    },
+    {
+        identifier: { namespace: "enchantplus", registry: "enchantment", resource: "elytra/armored" },
+        description: {
+            translate: "enchantment.enchantplus.armored",
+            fallback: "Armored"
+        },
+        maxLevel: 1,
+        weight: 1,
+        anvilCost: 4,
+        minCostBase: 20,
+        minCostPerLevelAboveFirst: 9,
+        maxCostBase: 65,
+        maxCostPerLevelAboveFirst: 9,
+        exclusiveSet: "",
+        primaryItems: "",
+        mode: "normal" as const,
+        disabledEffects: [],
+        effects: {},
+        supportedItems: "#voxel:enchantable/elytra",
+        tags: ["minecraft:non_treasure"],
+        slots: ["chest"]
+    },
+    {
+        identifier: { namespace: "enchantplus", registry: "enchantment", resource: "sword/attack_speed" },
+        description: {
+            translate: "enchantment.enchantplus.harvest",
+            fallback: "Harvest"
+        },
+        maxLevel: 1,
+        weight: 2,
+        anvilCost: 4,
+        minCostBase: 20,
+        minCostPerLevelAboveFirst: 9,
+        maxCostBase: 65,
+        maxCostPerLevelAboveFirst: 9,
+        exclusiveSet: "",
+        primaryItems: "",
+        mode: "normal" as const,
+        disabledEffects: [],
+        effects: {},
+        supportedItems: "#voxel:enchantable/hoes",
+        tags: ["minecraft:non_treasure", "foo:bar"],
+        slots: ["mainhand"]
+    },
+    {
+        identifier: { namespace: "enchantplus", registry: "enchantment", resource: "sword/poison_aspect" },
+        description: {
+            translate: "enchantment.enchantplus.poison_aspect",
+            fallback: "Poison Aspect"
+        },
+        maxLevel: 1,
+        weight: 2,
+        anvilCost: 4,
+        minCostBase: 20,
+        minCostPerLevelAboveFirst: 9,
+        maxCostBase: 65,
+        maxCostPerLevelAboveFirst: 9,
+        exclusiveSet: "#enchantplus:exclusive_set/aspect",
+        primaryItems: "#minecraft:enchantable/sword",
+        mode: "normal" as const,
+        disabledEffects: [],
+        effects: {},
+        supportedItems: "#minecraft:enchantable/weapon",
+        tags: ["minecraft:non_treasure", "enchantplus:sword/poison_aspect"],
+        slots: ["mainhand"]
+    }
+];
+
+export const attack_speed_element: EnchantmentProps[] = [
+    {
+        exclusiveSet: undefined,
+        primaryItems: undefined,
+        identifier: {
+            namespace: "enchantplus",
+            registry: "enchantment",
+            resource: "sword/attack_speed"
+        },
+        description: {
+            translate: "enchantment.enchantplus.attack_speed",
+            fallback: "Attack Speed"
+        },
+        supportedItems: "#minecraft:enchantable/sword",
+        maxLevel: 2,
+        weight: 4,
+        anvilCost: 2,
+        minCostBase: 8,
+        minCostPerLevelAboveFirst: 11,
+        maxCostBase: 21,
+        maxCostPerLevelAboveFirst: 9,
+        effects: {},
+        tags: ["#minecraft:non_treasure", "#yggdrasil:equipment/item/sword", "#yggdrasil:structure/alfheim_tree/random_loot"],
+        slots: ["mainhand"],
+        mode: "normal",
+        disabledEffects: []
+    }
+];
 
 export const VOXEL_TEMPLATE_ENCHANTMENT: VoxelRegistryElement<EnchantmentProps>[] = [
     {
@@ -58,10 +261,9 @@ export const VOXEL_TEMPLATE_ENCHANTMENT: VoxelRegistryElement<EnchantmentProps>[
                         amount: 1
                     }
                 ]
-            } as any
+            }
         }
     },
-
     {
         identifier: "00000000-0000-0000-0000-000000000001",
         data: {
@@ -974,115 +1176,6 @@ export const VOXEL_TEMPLATE_ENCHANTMENT: VoxelRegistryElement<EnchantmentProps>[
                 "#yggdrasil:structure/runic_labyrinth/library"
             ],
             slots: ["mainhand"]
-        }
-    }
-];
-
-export const VOXEL_TEMPLATE_LOOT_TABLE: VoxelRegistryElement<LootTableProps>[] = [
-    // Simple loot table
-    {
-        identifier: "10000000-0000-0000-0000-000000000000",
-        data: {
-            identifier: { namespace: "test", registry: "loot_table", resource: "simple" },
-            ...prefiledLootProperties,
-            items: [
-                {
-                    id: "item_0",
-                    name: "minecraft:experience_bottle",
-                    weight: undefined,
-                    quality: undefined,
-                    count: { min: 1, max: 3 },
-                    conditions: ["minecraft:random_chance"],
-                    functions: ["minecraft:set_count"],
-                    poolIndex: 0,
-                    entryIndex: 0,
-                    entryType: "minecraft:item"
-                }
-            ],
-            groups: []
-        }
-    },
-    // Complex loot table with groups
-    {
-        identifier: "10000000-0000-0000-0000-000000000001",
-        data: {
-            identifier: { namespace: "test", registry: "loot_table", resource: "extreme" },
-            ...prefiledLootProperties,
-            type: "minecraft:entity",
-            randomSequence: "minecraft:entities/wither_skeleton",
-            items: [
-                {
-                    id: "dynamic_0",
-                    name: "minecraft:contents",
-                    poolIndex: 0,
-                    entryIndex: 0,
-                    entryType: "minecraft:dynamic"
-                },
-                {
-                    id: "item_0",
-                    name: "minecraft:amethyst_shard",
-                    poolIndex: 0,
-                    entryIndex: 0,
-                    entryType: "minecraft:item"
-                }
-            ],
-            groups: [
-                {
-                    id: "group_0",
-                    type: "alternatives",
-                    items: ["dynamic_0", "group_1"],
-                    poolIndex: 0,
-                    entryIndex: 0
-                },
-                {
-                    id: "group_1",
-                    type: "group",
-                    items: ["group_2"],
-                    poolIndex: 0,
-                    entryIndex: 0
-                },
-                {
-                    id: "group_2",
-                    type: "sequence",
-                    items: ["item_0"],
-                    poolIndex: 0,
-                    entryIndex: 0
-                }
-            ]
-        }
-    },
-    // Multi-pool loot table
-    {
-        identifier: "10000000-0000-0000-0000-000000000002",
-        data: {
-            identifier: { namespace: "test", registry: "loot_table", resource: "reference" },
-            ...prefiledLootProperties,
-            type: "minecraft:equipment",
-            randomSequence: "yggdrasil:equipment",
-            items: [
-                {
-                    id: "item_0",
-                    name: "yggdrasil:generic/equipment/ominous/item/sword",
-                    poolIndex: 0,
-                    entryIndex: 0,
-                    entryType: "minecraft:loot_table"
-                },
-                {
-                    id: "item_1",
-                    name: "yggdrasil:generic/equipment/ominous/item/helmet",
-                    poolIndex: 1,
-                    entryIndex: 0,
-                    entryType: "minecraft:loot_table"
-                },
-                {
-                    id: "item_2",
-                    name: "yggdrasil:generic/equipment/ominous/item/chestplate",
-                    poolIndex: 2,
-                    entryIndex: 0,
-                    entryType: "minecraft:loot_table"
-                }
-            ],
-            groups: []
         }
     }
 ];

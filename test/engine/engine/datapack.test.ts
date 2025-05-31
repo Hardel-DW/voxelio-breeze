@@ -1,35 +1,36 @@
 import { describe, expect, it } from "vitest";
-import { createZipFile, filesRecord, filesRecordWithInvalidPackMcmeta, filesRecordWithoutPackMcmeta } from "test/template/datapack";
 import { Datapack } from "@/core/Datapack";
 import type { TagType } from "@/schema/tag/TagType";
 import { DatapackError } from "@/core/DatapackError";
 import type { Compiler } from "@/core/engine/Compiler";
 import type { LabeledElement } from "@/core/schema/primitive/label";
-import { attack_speed_element, test_attack_speed_files } from "@test/template/special";
+import { attack_speed_element } from "@test/template/concept/enchant/VoxelDriven";
 import type { DataDrivenRegistryElement } from "@/core/Element";
 import { mergeDataDrivenRegistryElement } from "@/core/Tag";
 import { analyserCollection } from "@/core/engine/Analyser";
+import { createZipFile, prepareFiles } from "@test/template/utils";
+import { enchantmentFile, enchantmentWithTagFiles, nonValidMcmetaZip, testMcMetaNotExists } from "@test/template/datapack";
 
 describe("Datapack", () => {
     it("should create a datapack instance from files", () => {
-        const datapack = new Datapack(filesRecord);
+        const datapack = new Datapack(enchantmentWithTagFiles);
         expect(datapack).toBeInstanceOf(Datapack);
     });
 
     it("should throw error if pack.mcmeta is missing", () => {
-        expect(() => new Datapack(filesRecordWithoutPackMcmeta)).toThrow(DatapackError);
-        expect(() => new Datapack(filesRecordWithInvalidPackMcmeta)).toThrow(DatapackError);
+        expect(() => new Datapack(testMcMetaNotExists)).toThrow(DatapackError);
+        expect(() => new Datapack(nonValidMcmetaZip)).toThrow(DatapackError);
     });
 
     it("should parse datapack from file", async () => {
-        const file = await createZipFile(filesRecord);
+        const file = await createZipFile(enchantmentWithTagFiles);
         const datapack = await Datapack.parse(file);
         expect(datapack).toBeInstanceOf(Datapack);
     });
 
     describe("getNamespaces", () => {
         it("should return unique namespaces from data folder", () => {
-            const datapack = new Datapack(filesRecord);
+            const datapack = new Datapack(enchantmentWithTagFiles);
             const namespaces = datapack.getNamespaces();
             expect(namespaces).toContain("enchantplus");
             expect(namespaces).toContain("minecraft");
@@ -39,13 +40,13 @@ describe("Datapack", () => {
 
     describe("getPackFormat", () => {
         it("should return pack format from pack.mcmeta", () => {
-            const datapack = new Datapack(filesRecord);
+            const datapack = new Datapack(enchantmentWithTagFiles);
             expect(datapack.getPackFormat()).toBe(61);
         });
 
         it("should throw error if pack format is missing", () => {
             const invalidMcmeta = {
-                ...filesRecord,
+                ...enchantmentWithTagFiles,
                 "pack.mcmeta": new TextEncoder().encode(JSON.stringify({ pack: {} }))
             };
             expect(() => new Datapack(invalidMcmeta)).toThrow("tools.error.failed_to_get_pack_format");
@@ -54,20 +55,20 @@ describe("Datapack", () => {
 
     describe("getVersion", () => {
         it("should return formatted version based on pack format", () => {
-            const datapack = new Datapack(filesRecord);
+            const datapack = new Datapack(enchantmentWithTagFiles);
             expect(datapack.getVersion()).toMatch(/^\d+\.\d+(\.\d+)?$/);
         });
     });
 
     describe("getDescription", () => {
         it("should return description from pack.mcmeta", () => {
-            const datapack = new Datapack(filesRecord);
+            const datapack = new Datapack(enchantmentWithTagFiles);
             expect(datapack.getDescription()).toBe("lorem ipsum");
         });
 
         it("should return fallback if description is missing", () => {
             const invalidMcmeta = {
-                ...filesRecord,
+                ...enchantmentWithTagFiles,
                 "pack.mcmeta": new TextEncoder().encode(JSON.stringify({ pack: { pack_format: 61 } }))
             };
             const datapack = new Datapack(invalidMcmeta);
@@ -77,19 +78,19 @@ describe("Datapack", () => {
 
     describe("getFileName", () => {
         it("should handle versioning for new files", () => {
-            const datapack = new Datapack(filesRecord, "test.zip");
+            const datapack = new Datapack(enchantmentWithTagFiles, "test.zip");
             expect(datapack.getFileName()).toBe("V0-test");
         });
 
         it("should increment version for versioned files", () => {
-            const datapack = new Datapack(filesRecord, "V1-test.zip");
+            const datapack = new Datapack(enchantmentWithTagFiles, "V1-test.zip");
             expect(datapack.getFileName()).toBe("V2-test");
         });
     });
 
     describe("getRelatedTags", () => {
         it("should find tags containing an identifier", () => {
-            const datapack = new Datapack(filesRecord);
+            const datapack = new Datapack(enchantmentWithTagFiles);
             const identifier = {
                 namespace: "enchantplus",
                 registry: "enchantment",
@@ -101,7 +102,7 @@ describe("Datapack", () => {
         });
 
         it("should return empty array for non-existent registry", () => {
-            const datapack = new Datapack(filesRecord);
+            const datapack = new Datapack(enchantmentWithTagFiles);
             const identifier = {
                 namespace: "test",
                 registry: "none",
@@ -138,7 +139,7 @@ describe("Datapack", () => {
 
     describe("getTag", () => {
         it("should return tag values for valid identifier", () => {
-            const datapack = new Datapack(filesRecord);
+            const datapack = new Datapack(enchantmentWithTagFiles);
             const identifier = {
                 namespace: "enchantplus",
                 registry: "tags/enchantment",
@@ -150,7 +151,7 @@ describe("Datapack", () => {
         });
 
         it("should return empty tag for non-existent identifier", () => {
-            const datapack = new Datapack(filesRecord);
+            const datapack = new Datapack(enchantmentWithTagFiles);
             const identifier = {
                 namespace: "test",
                 registry: "tags/test",
@@ -160,7 +161,7 @@ describe("Datapack", () => {
         });
 
         it("should filter blacklisted values", () => {
-            const datapack = new Datapack(filesRecord);
+            const datapack = new Datapack(enchantmentWithTagFiles);
             const identifier = {
                 namespace: "enchantplus",
                 registry: "tags/enchantment",
@@ -174,7 +175,7 @@ describe("Datapack", () => {
 
     describe("generate", () => {
         it("should generate a new datapack with updated content", async () => {
-            const datapack = new Datapack(filesRecord);
+            const datapack = new Datapack(enchantmentWithTagFiles);
             const content: LabeledElement[] = [
                 {
                     type: "updated",
@@ -197,7 +198,7 @@ describe("Datapack", () => {
         });
 
         it("should handle deleted elements by keeping empty tags", async () => {
-            const datapack = new Datapack(filesRecord);
+            const datapack = new Datapack(enchantmentWithTagFiles);
             const content: LabeledElement[] = [
                 {
                     type: "deleted",
@@ -216,7 +217,7 @@ describe("Datapack", () => {
 
     describe("labelElements", () => {
         it("should correctly label new, updated and deleted elements", () => {
-            const datapack = new Datapack(filesRecord);
+            const datapack = new Datapack(enchantmentWithTagFiles);
             const newElements = [
                 {
                     identifier: {
@@ -237,7 +238,7 @@ describe("Datapack", () => {
 
     describe("readFile", () => {
         it("should read and parse JSON file from datapack", () => {
-            const datapack = new Datapack(filesRecord);
+            const datapack = new Datapack(enchantmentWithTagFiles);
             const content = datapack.readFile({
                 namespace: "enchantplus",
                 registry: "enchantment",
@@ -249,7 +250,7 @@ describe("Datapack", () => {
         });
 
         it("should return undefined for non-existent file", () => {
-            const datapack = new Datapack(filesRecord);
+            const datapack = new Datapack(enchantmentWithTagFiles);
             const content = datapack.readFile({
                 namespace: "non_existent",
                 registry: "none",
@@ -262,7 +263,7 @@ describe("Datapack", () => {
 
     describe("getCompiledTags", () => {
         it("should merge original and new tag values", () => {
-            const datapack = new Datapack(filesRecord);
+            const datapack = new Datapack(enchantmentWithTagFiles);
             const elements: ReturnType<Compiler>[] = [
                 {
                     element: {
@@ -299,7 +300,7 @@ describe("Datapack", () => {
 
     describe("getTags", () => {
         it("should get multiple tags", () => {
-            const datapack = new Datapack(filesRecord);
+            const datapack = new Datapack(enchantmentWithTagFiles);
             const identifiers = [
                 {
                     namespace: "enchantplus",
@@ -325,7 +326,7 @@ describe("Datapack", () => {
         });
 
         it("should get multiple tags and handle blacklist", () => {
-            const datapack = new Datapack(filesRecord);
+            const datapack = new Datapack(enchantmentWithTagFiles);
             const identifiers = [
                 {
                     namespace: "enchantplus",
@@ -355,7 +356,7 @@ describe("Datapack", () => {
     describe("getTag with complex values", () => {
         it("should handle optional tag values", () => {
             const datapack = new Datapack({
-                ...filesRecord,
+                ...enchantmentWithTagFiles,
                 "data/enchantplus/tags/enchantment/test.json": new TextEncoder().encode(
                     JSON.stringify({
                         values: [{ id: "minecraft:test", required: false }, "minecraft:simple"]
@@ -427,7 +428,8 @@ describe("Datapack", () => {
         });
 
         it("Should Remove Attack Speed from Tags", () => {
-            const datapack = new Datapack(test_attack_speed_files);
+            const files = prepareFiles(enchantmentFile);
+            const datapack = new Datapack(files);
             const { compiler } = analyserCollection.enchantment;
             const compiledElements = attack_speed_element.map((element) =>
                 compiler(element, "enchantment", datapack.readFile(element.identifier))

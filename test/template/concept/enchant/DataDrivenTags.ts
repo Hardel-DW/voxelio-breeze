@@ -1,5 +1,5 @@
-import type { TagType } from "@/schema/tag/TagType";
 import type { DataDrivenRegistryElement } from "@/core/Element";
+import type { TagType } from "@/schema/tag/TagType";
 
 export const enchantplusTags: DataDrivenRegistryElement<TagType>[] = [
     {
@@ -46,3 +46,18 @@ export const vanillaTags: DataDrivenRegistryElement<TagType>[] = [
         data: { values: ["enchantplus:elytra/armored"] }
     }
 ];
+
+export const swordAttributeTag: TagType = {
+    values: [
+        "enchantplus:sword/attack_speed",
+        "enchantplus:sword/reach",
+        "enchantplus:sword/runic_despair",
+        "enchantplus:sword/dimensional_hit"
+    ],
+    replace: false
+};
+
+export const fireAspectTag: TagType = {
+    values: ["minecraft:fire_aspect"],
+    replace: false
+};

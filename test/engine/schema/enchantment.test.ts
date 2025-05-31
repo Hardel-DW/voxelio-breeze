@@ -3,8 +3,8 @@ import type { Compiler } from "@/core/engine/Compiler";
 import { Identifier } from "@/core/Identifier";
 import type { EnchantmentProps } from "@/core/schema/enchant/types";
 import type { Enchantment } from "@/schema/enchantment/Enchantment";
-import { DATA_DRIVEN_TEMPLATE_ENCHANTMENT, makeAdvancedEnchantment } from "@test/template/datadriven";
-import { VOXEL_TEMPLATE_ENCHANTMENT } from "@test/template/voxel";
+import { DATA_DRIVEN_TEMPLATE_ENCHANTMENT, makeAdvancedEnchantment } from "@test/template/concept/enchant/DataDriven";
+import { VOXEL_TEMPLATE_ENCHANTMENT } from "@test/template/concept/enchant/VoxelDriven";
 import { describe, it, expect, beforeEach } from "vitest";
 
 describe("Enchantment Schema", () => {

@@ -4,9 +4,9 @@ import { VoxelToLootDataDriven } from "@/core/schema/loot/Compiler";
 import { LootDataDrivenToVoxelFormat } from "@/core/schema/loot/Parser";
 import type { LootTableProps, MinecraftLootTable } from "@/core/schema/loot/types";
 import type { DataDrivenRegistryElement } from "@/core/Element";
-import { DATA_DRIVEN_TEMPLATE_LOOT_TABLE } from "@test/template/datadriven";
-import { VOXEL_TEMPLATE_LOOT_TABLE } from "@test/template/voxel";
 import { describe, it, expect, beforeEach } from "vitest";
+import { DATA_DRIVEN_TEMPLATE_LOOT_TABLE } from "@test/template/concept/loot/DataDriven";
+import { VOXEL_TEMPLATE_LOOT_TABLE } from "@test/template/concept/loot/VoxelDriven";
 
 describe("LootTable Schema", () => {
     describe("Data Driven to Voxel Element", () => {

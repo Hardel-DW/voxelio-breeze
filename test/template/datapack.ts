@@ -1,47 +1,33 @@
-import { Identifier } from "@/core/Identifier";
-import { enchantplusTags, vanillaTags } from "test/template/tags";
-import { DATA_DRIVEN_TEMPLATE_ENCHANTMENT } from "test/template/datadriven";
-import { voxelDatapacks } from "@/VoxelDatapack";
-import { downloadZip, type InputWithMeta } from "@voxelio/zip";
+import { voxelDatapacks } from "@/index";
+import { simpleEnchantment, DATA_DRIVEN_TEMPLATE_ENCHANTMENT } from "./concept/enchant/DataDriven";
+import { enchantplusTags, fireAspectTag, swordAttributeTag, vanillaTags } from "./concept/enchant/DataDrivenTags";
+import { completeLootTable, advancedLootTable, ultimateTestLootTable, finalBossOfLootTable } from "./concept/loot/DataDriven";
+import { prepareFiles, createFilesFromElements, createZipFile } from "./utils";
 
-const enchantmentFiles = DATA_DRIVEN_TEMPLATE_ENCHANTMENT.reduce(
-    (files, enchant) => {
-        const filePath = new Identifier(enchant.identifier).toFilePath();
-        files[filePath] = new TextEncoder().encode(JSON.stringify(enchant.data, null, 2));
-        return files;
-    },
-    {} as Record<string, Uint8Array>
-);
-
-// Generate tag files from all sources
-const tagFiles = [...voxelDatapacks, ...enchantplusTags, ...vanillaTags].reduce(
-    (files, tag) => {
-        const filePath = new Identifier(tag.identifier).toFilePath();
-        files[filePath] = new TextEncoder().encode(JSON.stringify(tag.data, null, 2));
-        return files;
-    },
-    {} as Record<string, Uint8Array>
-);
-
-// Create mock files
-export const filesRecord = {
-    "pack.mcmeta": new TextEncoder().encode(JSON.stringify({ pack: { pack_format: 61, description: "lorem ipsum" } }, null, 2)),
-    ...enchantmentFiles,
-    ...tagFiles
+export const lootTableFile = {
+    "data/test/loot_table/test.json": completeLootTable,
+    "data/test/loot_table/advanced.json": advancedLootTable,
+    "data/test/loot_table/ultimate.json": ultimateTestLootTable,
+    "data/test/loot_table/final_boss.json": finalBossOfLootTable
 };
 
-export const filesRecordWithInvalidPackMcmeta = {
-    ...filesRecord,
-    "pack.mcmeta": new TextEncoder().encode(JSON.stringify({ pack: {} }, null, 2))
+export const enchantmentFile = {
+    "data/enchantplus/enchantment/sword/attack_speed.json": simpleEnchantment,
+    "data/enchantplus/tags/enchantment/exclusive_set/sword_attribute.json": swordAttributeTag,
+    "data/minecraft/tags/enchantment/non_treasure.json": fireAspectTag,
+    "data/yggdrasil/tags/enchantment/equipment/item/sword.json": fireAspectTag
 };
 
-export const filesRecordWithoutPackMcmeta = {
-    ...enchantmentFiles,
-    ...tagFiles
+export const testMcMetaNotExists = {
+    "data/enchantplus/enchantment/test.json": new TextEncoder().encode(JSON.stringify({}, null, 2))
 };
 
-export async function createZipFile(filesRecord: Record<string, Uint8Array>): Promise<File> {
-    const files: InputWithMeta[] = Object.entries(filesRecord).map(([path, content]) => ({ name: path, input: new File([content], path) }));
-    const zipContent = downloadZip(files);
-    return new File([await zipContent.arrayBuffer()], "datapack.zip");
-}
+export const enchantmentWithTagFiles = createFilesFromElements([
+    ...DATA_DRIVEN_TEMPLATE_ENCHANTMENT,
+    ...voxelDatapacks,
+    ...enchantplusTags,
+    ...vanillaTags
+]);
+
+export const nonValidMcmetaZip = prepareFiles({}, -1);
+export const lootTableZip = await createZipFile(prepareFiles(lootTableFile));

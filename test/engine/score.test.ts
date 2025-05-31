@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { searchRelevantElements } from "@/core/engine/utils/searchElements";
 import { Identifier } from "@/core/Identifier";
-import { VOXEL_TEMPLATE_ENCHANTMENT } from "@test/template/voxel";
+import { VOXEL_TEMPLATE_ENCHANTMENT } from "@test/template/concept/enchant/VoxelDriven";
 
 describe("searchRelevantElements", () => {
     it("Get fury enchantment with common prompt", () => {

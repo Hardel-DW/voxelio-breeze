@@ -2,7 +2,7 @@ import { parseDatapack } from "@/core/engine/Parser";
 import { updateData } from "@/core/engine/actions";
 import { VoxelToLootDataDriven } from "@/core/schema/loot/Compiler";
 import type { LootTableProps } from "@/core/schema/loot/types";
-import { lootTableZipFile, lootTableFiles } from "@test/template/loot_data_driven";
+import { lootTableFile, lootTableZip } from "@test/template/datapack";
 import { describe, it, expect, beforeEach } from "vitest";
 
 describe("LootTable E2E Tests", () => {
@@ -15,7 +15,7 @@ describe("LootTable E2E Tests", () => {
 
         beforeEach(async () => {
             // 1. Parse the datapack from zip file
-            parsedDatapack = await parseDatapack(lootTableZipFile);
+            parsedDatapack = await parseDatapack(lootTableZip);
 
             // Extract the parsed loot tables from elements Map
             const lootTables = Array.from(parsedDatapack.elements.values()).filter(
@@ -299,7 +299,7 @@ describe("LootTable E2E Tests", () => {
 
             it("should identify data loss in simple loot table", async () => {
                 // Get the original JSON from the template
-                const originalJson = JSON.parse(new TextDecoder().decode(lootTableFiles["data/test/loot_table/test.json"]));
+                const originalJson = lootTableFile["data/test/loot_table/test.json"];
 
                 // Compile back to Minecraft format
                 const compiled = VoxelToLootDataDriven(simpleLootTable, "loot_table");
@@ -326,7 +326,7 @@ describe("LootTable E2E Tests", () => {
 
             it("should identify data loss in advanced loot table", async () => {
                 // Get the original JSON from the template
-                const originalJson = JSON.parse(new TextDecoder().decode(lootTableFiles["data/test/loot_table/advanced.json"]));
+                const originalJson = lootTableFile["data/test/loot_table/advanced.json"];
 
                 // Compile back to Minecraft format
                 const compiled = VoxelToLootDataDriven(advancedLootTable, "loot_table");
@@ -345,25 +345,26 @@ describe("LootTable E2E Tests", () => {
                 const compiledGroupEntry = compiledData.pools?.[0]?.entries.find((e) => e.type === "minecraft:group");
 
                 expect(compiledGroupEntry).toBeDefined();
+                expect(originalGroupEntry).toBeDefined();
 
                 // ✅ FIXED: group children should be preserved
                 expect(compiledGroupEntry?.children).toHaveLength(1);
-                expect(originalGroupEntry.children.length).toBe(1);
+                expect(originalGroupEntry?.children?.length).toBe(1);
 
                 // ✅ FIXED: group functions should be preserved
                 expect(compiledGroupEntry?.functions).toHaveLength(1);
-                expect(originalGroupEntry.functions.length).toBe(1);
+                expect(originalGroupEntry?.functions?.length).toBe(1);
 
                 // The original tag is lost during parsing/compilation
-                const originalTag = originalGroupEntry.children[0];
-                expect(originalTag.type).toBe("minecraft:tag");
-                expect(originalTag.name).toBe("minecraft:bundles");
-                expect(originalTag.expand).toBe(true);
+                const originalTag = originalGroupEntry?.children?.[0];
+                expect(originalTag?.type).toBe("minecraft:tag");
+                expect(originalTag?.name).toBe("minecraft:bundles");
+                expect(originalTag?.expand).toBe(true);
             });
 
             it("should identify data loss in ultimate loot table", async () => {
                 // Get the original JSON from the template
-                const originalJson = JSON.parse(new TextDecoder().decode(lootTableFiles["data/test/loot_table/ultimate.json"]));
+                const originalJson = lootTableFile["data/test/loot_table/ultimate.json"];
 
                 // Compile back to Minecraft format
                 const compiled = VoxelToLootDataDriven(ultimateLootTable, "loot_table");
@@ -394,7 +395,7 @@ describe("LootTable E2E Tests", () => {
 
             it("should identify data preservation in final boss loot table", async () => {
                 // Get the original JSON from the template
-                const originalJson = JSON.parse(new TextDecoder().decode(lootTableFiles["data/test/loot_table/final_boss.json"]));
+                const originalJson = lootTableFile["data/test/loot_table/final_boss.json"];
 
                 // Compile back to Minecraft format
                 const compiled = VoxelToLootDataDriven(finalBossLootTable, "loot_table");
@@ -428,7 +429,11 @@ describe("LootTable E2E Tests", () => {
                 // ✅ GOOD: Complex nested structures are preserved
                 const originalAlternatives = originalJson.pools[0].entries.find((e: any) => e.type === "minecraft:alternatives");
                 const compiledAlternatives = compiledData.pools?.[0]?.entries.find((e) => e.type === "minecraft:alternatives");
-                expect(compiledAlternatives?.children).toHaveLength(originalAlternatives.children.length);
+                expect(compiledAlternatives).toBeDefined();
+                expect(originalAlternatives).toBeDefined();
+                expect(originalAlternatives?.children).toBeDefined();
+                expect(compiledAlternatives?.children).toBeDefined();
+                expect(compiledAlternatives?.children).toHaveLength(originalAlternatives?.children?.length || 0);
 
                 // ✅ GOOD: Embedded loot table objects are preserved
                 const originalLootTables = originalJson.pools[0].entries.filter((e: any) => e.type === "minecraft:loot_table");
@@ -438,11 +443,18 @@ describe("LootTable E2E Tests", () => {
                 // Verify embedded object loot table is preserved
                 const embeddedLootTable = compiledLootTables?.find((e) => typeof e.value === "object");
                 const originalEmbedded = originalLootTables.find((e: any) => typeof e.value === "object");
-                expect(embeddedLootTable?.value).toEqual(originalEmbedded.value);
+                expect(embeddedLootTable).toBeDefined();
+                expect(embeddedLootTable?.value).toBeDefined();
+                expect(originalEmbedded).toBeDefined();
+                expect(originalEmbedded?.value).toBeDefined();
+
+                expect(embeddedLootTable?.value).toEqual(originalEmbedded?.value);
 
                 // ✅ GOOD: Pool functions and conditions are preserved
-                expect(compiledData.pools?.[0]?.functions).toHaveLength(originalJson.pools[0].functions.length);
-                expect(compiledData.pools?.[0]?.conditions).toHaveLength(originalJson.pools[0].conditions.length);
+                expect(compiledData.pools?.[0]?.functions).toBeDefined();
+                expect(compiledData.pools?.[0]?.conditions).toBeDefined();
+                expect(compiledData.pools?.[0]?.functions).toHaveLength(originalJson?.pools?.[0]?.functions?.length || 0);
+                expect(compiledData.pools?.[0]?.conditions).toHaveLength(originalJson?.pools?.[0]?.conditions?.length || 0);
 
                 // ✅ GOOD: Second pool is preserved
                 expect(compiledData.pools?.[1]?.rolls).toBe(originalJson.pools[1].rolls);

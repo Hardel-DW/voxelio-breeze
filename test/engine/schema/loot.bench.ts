@@ -3,8 +3,8 @@ import { VoxelToLootDataDriven } from "@/core/schema/loot/Compiler";
 import { LootDataDrivenToVoxelFormat } from "@/core/schema/loot/Parser";
 import type { MinecraftLootTable } from "@/core/schema/loot/types";
 import type { DataDrivenRegistryElement } from "@/core/Element";
-import { DATA_DRIVEN_TEMPLATE_LOOT_TABLE } from "@test/template/datadriven";
-import { VOXEL_TEMPLATE_LOOT_TABLE } from "@test/template/voxel";
+import { DATA_DRIVEN_TEMPLATE_LOOT_TABLE } from "@test/template/concept/loot/DataDriven";
+import { VOXEL_TEMPLATE_LOOT_TABLE } from "@test/template/concept/loot/VoxelDriven";
 
 describe("LootTable Performance", () => {
     const simpleLootTable = DATA_DRIVEN_TEMPLATE_LOOT_TABLE[0];

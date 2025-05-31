@@ -9,77 +9,13 @@ import type {
     SlotAction,
     ToggleListValueAction
 } from "@/core/engine/actions/types";
-import type { EnchantmentProps } from "@/core/schema/enchant/types";
-import type { VoxelRegistryElement } from "@/core/Element";
 import { describe, expect, it } from "vitest";
-
-// Mock d'un élément de registre pour les tests
-const createMockElement = (data: Partial<EnchantmentProps> = {}): VoxelRegistryElement<EnchantmentProps> => ({
-    identifier: "random_identifier",
-    data: {
-        identifier: { namespace: "namespace", registry: "enchantment", resource: "foo" },
-        description: { translate: "enchantment.test.foo", fallback: "Enchantment Test" },
-        exclusiveSet: undefined,
-        supportedItems: "#minecraft:sword",
-        primaryItems: undefined,
-        maxLevel: 1,
-        weight: 1,
-        anvilCost: 1,
-        minCostBase: 1,
-        minCostPerLevelAboveFirst: 1,
-        maxCostBase: 10,
-        maxCostPerLevelAboveFirst: 10,
-        effects: undefined,
-        slots: [],
-        tags: [],
-        mode: "normal",
-        disabledEffects: [],
-        ...data
-    }
-});
-
-const createComplexMockElement = (data: Partial<EnchantmentProps> = {}): VoxelRegistryElement<EnchantmentProps> => ({
-    identifier: "foo",
-    data: {
-        identifier: { namespace: "enchantplus", registry: "enchantment", resource: "bow/accuracy_shot" },
-        anvilCost: 4,
-        description: { translate: "enchantment.test.foo", fallback: "Enchantment Test" },
-        disabledEffects: [],
-        effects: {
-            "minecraft:projectile_spawned": [
-                {
-                    effect: {
-                        type: "minecraft:run_function",
-                        function: "enchantplus:actions/accuracy_shot/on_shoot"
-                    }
-                }
-            ]
-        },
-        exclusiveSet: "#minecraft:exclusive_set/armor",
-        maxLevel: 1,
-        minCostBase: 1,
-        mode: "normal",
-        minCostPerLevelAboveFirst: 1,
-        maxCostBase: 10,
-        maxCostPerLevelAboveFirst: 10,
-        primaryItems: undefined,
-        supportedItems: "#voxel:enchantable/range",
-        slots: ["mainhand", "offhand"],
-        tags: [
-            "#minecraft:non_treasure",
-            "#yggdrasil:structure/alfheim_tree/ominous_vault",
-            "#yggdrasil:structure/alfheim_tree/ominous_vault/floor",
-            "#yggdrasil:structure/asflors/common"
-        ],
-        weight: 2,
-        ...data
-    }
-});
+import { createComplexMockElement, createMockEnchantmentElement } from "@test/template/concept/enchant/VoxelDriven";
 
 describe("Action System", () => {
     describe("SimpleModifier", () => {
         it("should set a value", () => {
-            const element = createMockElement();
+            const element = createMockEnchantmentElement();
             const action: SimpleAction = {
                 type: "set_value",
                 field: "minCostBase",
@@ -92,7 +28,7 @@ describe("Action System", () => {
         });
 
         it("should toggle a value", () => {
-            const element = createMockElement({ minCostBase: 5 });
+            const element = createMockEnchantmentElement({ minCostBase: 5 });
             const action: SimpleAction = {
                 type: "toggle_value",
                 field: "minCostBase",
@@ -107,7 +43,7 @@ describe("Action System", () => {
 
     describe("ListModifier", () => {
         it("should append to a list", () => {
-            const element = createMockElement({ slots: ["head"] });
+            const element = createMockEnchantmentElement({ slots: ["head"] });
             const action: ListAction = {
                 type: "list_operation",
                 mode: "append",
@@ -121,7 +57,7 @@ describe("Action System", () => {
         });
 
         it("should prepend to a list", () => {
-            const element = createMockElement({ slots: ["head"] });
+            const element = createMockEnchantmentElement({ slots: ["head"] });
             const action: ListAction = {
                 type: "list_operation",
                 mode: "prepend",
@@ -138,7 +74,7 @@ describe("Action System", () => {
 
     describe("MultipleModifier", () => {
         it("should toggle multiple values in a list", () => {
-            const element = createMockElement({ slots: ["head", "chest"] });
+            const element = createMockEnchantmentElement({ slots: ["head", "chest"] });
             const action: MultipleAction = {
                 type: "toggle_multiple_values",
                 field: "slots",
@@ -153,7 +89,7 @@ describe("Action System", () => {
 
     describe("SequentialModifier", () => {
         it("should execute multiple actions in sequence", () => {
-            const element = createMockElement({ min_cost: 1 });
+            const element = createMockEnchantmentElement({ min_cost: 1 });
             const action: SequentialAction = {
                 type: "sequential",
                 actions: [
@@ -180,7 +116,7 @@ describe("Action System", () => {
 
     describe("RemoveKeyModifier", () => {
         it("should remove a key from an object", () => {
-            const element = createMockElement({
+            const element = createMockEnchantmentElement({
                 effects: {
                     "minecraft:damage_protection": [
                         {
@@ -225,7 +161,7 @@ describe("Action System", () => {
 
     describe("ToggleListValueModifier", () => {
         it("should toggle a value in a list", () => {
-            const element = createMockElement({ slots: ["head", "chest"] });
+            const element = createMockEnchantmentElement({ slots: ["head", "chest"] });
             const action: ToggleListValueAction = {
                 type: "toggle_value_in_list",
                 field: "slots",
@@ -239,7 +175,7 @@ describe("Action System", () => {
         });
 
         it("should remove field if list becomes empty with remove_if_empty mode", () => {
-            const element = createMockElement({ slots: ["head"] });
+            const element = createMockEnchantmentElement({ slots: ["head"] });
             const action: ToggleListValueAction = {
                 type: "toggle_value_in_list",
                 field: "slots",
@@ -254,7 +190,7 @@ describe("Action System", () => {
         });
 
         it("should convert primitive value to array with override mode", () => {
-            const element = createMockElement({
+            const element = createMockEnchantmentElement({
                 exclusiveSet: "#minecraft:exclusive_set/armor"
             });
 
@@ -273,7 +209,7 @@ describe("Action System", () => {
         });
 
         it("should support multiple modes", () => {
-            const element = createMockElement({
+            const element = createMockEnchantmentElement({
                 exclusiveSet: "#minecraft:exclusive_set/armor"
             });
             const action: ToggleListValueAction = {
@@ -290,7 +226,7 @@ describe("Action System", () => {
         });
 
         it("should handle undefined field with override mode", () => {
-            const element = createMockElement({
+            const element = createMockEnchantmentElement({
                 exclusiveSet: undefined
             });
             const action: ToggleListValueAction = {
@@ -310,7 +246,7 @@ describe("Action System", () => {
 
     describe("RemoveValueFromListModifier", () => {
         it("should remove a value from a list", () => {
-            const element = createMockElement({ slots: ["head", "chest", "legs"] });
+            const element = createMockEnchantmentElement({ slots: ["head", "chest", "legs"] });
             const action: RemoveValueFromListAction = {
                 type: "remove_value_from_list",
                 field: "slots",
@@ -324,7 +260,7 @@ describe("Action System", () => {
         });
 
         it("should remove field if list becomes empty with remove_if_empty mode", () => {
-            const element = createMockElement({ slots: ["head"] });
+            const element = createMockEnchantmentElement({ slots: ["head"] });
             const action: RemoveValueFromListAction = {
                 type: "remove_value_from_list",
                 field: "slots",
@@ -339,7 +275,7 @@ describe("Action System", () => {
         });
 
         it("should handle value from props parameter", () => {
-            const element = createMockElement({ slots: ["head", "chest"] });
+            const element = createMockEnchantmentElement({ slots: ["head", "chest"] });
             const action: RemoveValueFromListAction = {
                 type: "remove_value_from_list",
                 field: "slots"
@@ -352,7 +288,7 @@ describe("Action System", () => {
         });
 
         it("should throw error when both value and props are undefined", () => {
-            const element = createMockElement({ slots: ["head", "chest"] });
+            const element = createMockEnchantmentElement({ slots: ["head", "chest"] });
             const action: RemoveValueFromListAction = {
                 type: "remove_value_from_list",
                 field: "slots"
@@ -362,7 +298,7 @@ describe("Action System", () => {
         });
 
         it("should handle non-existent value gracefully", () => {
-            const element = createMockElement({ slots: ["head", "chest"] });
+            const element = createMockEnchantmentElement({ slots: ["head", "chest"] });
             const action: RemoveValueFromListAction = {
                 type: "remove_value_from_list",
                 field: "slots",
@@ -378,7 +314,7 @@ describe("Action System", () => {
 
     describe("SlotModifier", () => {
         it("should add a slot when not present", () => {
-            const element = createMockElement({
+            const element = createMockEnchantmentElement({
                 slots: ["head", "chest"]
             });
             const action: SlotAction = {
@@ -394,7 +330,7 @@ describe("Action System", () => {
         });
 
         it("should remove a slot when already present", () => {
-            const element = createMockElement({
+            const element = createMockEnchantmentElement({
                 slots: ["head", "chest", "legs"]
             });
             const action: SlotAction = {
@@ -410,7 +346,7 @@ describe("Action System", () => {
         });
 
         it("should handle empty slots array", () => {
-            const element = createMockElement({
+            const element = createMockEnchantmentElement({
                 slots: []
             });
             const action: SlotAction = {
@@ -426,7 +362,7 @@ describe("Action System", () => {
         });
 
         it("should throw error for invalid slot value", () => {
-            const element = createMockElement({
+            const element = createMockEnchantmentElement({
                 slots: ["head"]
             });
             const action: SlotAction = {
@@ -470,7 +406,7 @@ describe("Action System", () => {
 
 describe("Action System - Identifier Validation", () => {
     it("should maintain Identifier instance through SimpleModifier", () => {
-        const element = createMockElement();
+        const element = createMockEnchantmentElement();
         const action: SimpleAction = {
             type: "set_value",
             field: "minCostBase",
@@ -483,7 +419,7 @@ describe("Action System - Identifier Validation", () => {
     });
 
     it("should maintain Identifier instance through ToggleListValueModifier", () => {
-        const element = createMockElement({ slots: ["head"] });
+        const element = createMockEnchantmentElement({ slots: ["head"] });
         const action: ToggleListValueAction = {
             type: "toggle_value_in_list",
             field: "slots",
@@ -496,7 +432,7 @@ describe("Action System - Identifier Validation", () => {
     });
 
     it("should maintain Identifier instance through SequentialModifier", () => {
-        const element = createMockElement();
+        const element = createMockEnchantmentElement();
         const action: SequentialAction = {
             type: "sequential",
             actions: [
@@ -532,7 +468,7 @@ describe("Action System - Identifier Validation", () => {
     });
 
     it("should maintain Identifier instance through MultipleModifier", () => {
-        const element = createMockElement({ slots: ["head", "chest"] });
+        const element = createMockEnchantmentElement({ slots: ["head", "chest"] });
         const action: MultipleAction = {
             type: "toggle_multiple_values",
             field: "slots",
@@ -545,7 +481,7 @@ describe("Action System - Identifier Validation", () => {
     });
 
     it("should maintain Identifier instance through RemoveValueFromListModifier", () => {
-        const element = createMockElement({ slots: ["head", "chest"] });
+        const element = createMockEnchantmentElement({ slots: ["head", "chest"] });
         const action: RemoveValueFromListAction = {
             type: "remove_value_from_list",
             field: "slots",
@@ -558,7 +494,7 @@ describe("Action System - Identifier Validation", () => {
     });
 
     it("should maintain Identifier instance through AppendListModifier", () => {
-        const element = createMockElement({ slots: ["head"] });
+        const element = createMockEnchantmentElement({ slots: ["head"] });
         const action: ListAction = {
             type: "list_operation",
             mode: "append",
