@@ -1,18 +1,18 @@
 import type { ParserParams } from "@/core/engine/Parser";
 import type {
-    RecipeProps,
+    CraftingTransmuteData,
     MinecraftRecipe,
-    RecipeParser,
     RecipeIngredient,
+    RecipeParser,
+    RecipeProps,
     RecipeResult,
     RecipeTypeSpecific,
     ShapedCraftingData,
     SmeltingData,
     SmithingTransformData,
-    SmithingTrimData,
-    CraftingTransmuteData
+    SmithingTrimData
 } from "./types";
-import { extractUnknownFields, KNOWN_RECIPE_FIELDS, normalizeIngredient } from "./types";
+import { KNOWN_RECIPE_FIELDS, extractUnknownFields, normalizeIngredient } from "./types";
 
 /**
  * Parse Minecraft Recipe to simplified Voxel format

@@ -1,13 +1,13 @@
-import type {
-    LootTableProps,
-    MinecraftLootTable,
-    LootTableCompiler,
-    CompilerResult,
-    LootItem,
-    LootGroup,
-    MinecraftLootEntry
-} from "./types";
 import type { Analysers } from "@/core/engine/Analyser";
+import type {
+    CompilerResult,
+    LootGroup,
+    LootItem,
+    LootTableCompiler,
+    LootTableProps,
+    MinecraftLootEntry,
+    MinecraftLootTable
+} from "./types";
 import { KNOWN_POOL_FIELDS } from "./types";
 
 /**

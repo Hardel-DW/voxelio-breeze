@@ -1,10 +1,10 @@
-import { Identifier, type IdentifierObject } from "@/core/Identifier";
-import type { Compiler } from "@/core/engine/Compiler";
-import type { Analysers } from "@/core/engine/Analyser";
 import type { DataDrivenRegistryElement } from "@/core/Element";
-import { FUNCTIONALITY_TAGS_CACHE, type EnchantmentProps } from "./types";
-import type { Enchantment } from "@/schema/enchantment/Enchantment";
+import { Identifier, type IdentifierObject } from "@/core/Identifier";
 import { tagsToIdentifiers } from "@/core/Tag";
+import type { Analysers } from "@/core/engine/Analyser";
+import type { Compiler } from "@/core/engine/Compiler";
+import type { Enchantment } from "@/schema/enchantment/Enchantment";
+import { type EnchantmentProps, FUNCTIONALITY_TAGS_CACHE } from "./types";
 
 /**
  * Transform only one enchantment from Voxel Format into a Minecraft JSON Data Driven Enchantment.

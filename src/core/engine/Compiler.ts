@@ -2,7 +2,7 @@ import { Datapack } from "@/core/Datapack";
 import type { DataDrivenElement, VoxelElement } from "@/core/Element";
 import type { DataDrivenRegistryElement } from "@/core/Element";
 import type { IdentifierObject } from "@/core/Identifier";
-import { type Analysers, type GetAnalyserVoxel, type GetAnalyserMinecraft, analyserCollection } from "@/core/engine/Analyser";
+import { type Analysers, type GetAnalyserMinecraft, type GetAnalyserVoxel, analyserCollection } from "@/core/engine/Analyser";
 import type { LabeledElement } from "@/core/schema/primitive/label";
 
 export type Compiler<T extends VoxelElement = VoxelElement, K extends DataDrivenElement = DataDrivenElement> = (

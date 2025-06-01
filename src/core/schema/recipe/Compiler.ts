@@ -1,16 +1,16 @@
+import type { Analysers } from "@/core/engine/Analyser";
 import type {
-    RecipeProps,
+    CompilerResult,
+    CraftingTransmuteData,
     MinecraftRecipe,
     RecipeCompiler,
-    CompilerResult,
     RecipeIngredient,
+    RecipeProps,
     ShapedCraftingData,
     SmeltingData,
     SmithingTransformData,
-    SmithingTrimData,
-    CraftingTransmuteData
+    SmithingTrimData
 } from "./types";
-import type { Analysers } from "@/core/engine/Analyser";
 import { denormalizeIngredient } from "./types";
 
 /**

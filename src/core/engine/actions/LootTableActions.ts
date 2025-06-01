@@ -1,4 +1,4 @@
-import type { BaseAction, ActionValue } from "./types";
+import type { ActionValue, BaseAction } from "./types";
 
 // Actions spécifiques aux LootTables
 export interface AddLootItemAction extends BaseAction {

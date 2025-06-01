@@ -1,15 +1,15 @@
 import type { Compiler } from "@/core/engine/Compiler";
 import type { Parser } from "@/core/engine/Parser";
-import type { Enchantment } from "@/schema/enchantment/Enchantment";
-import type { LootTableProps, MinecraftLootTable } from "../schema/loot/types";
-import { VoxelToLootDataDriven } from "../schema/loot/Compiler";
-import { LootDataDrivenToVoxelFormat } from "../schema/loot/Parser";
-import type { EnchantmentProps } from "@/core/schema/enchant/types";
 import { VoxelToEnchantmentDataDriven } from "@/core/schema/enchant/Compiler";
 import { EnchantmentDataDrivenToVoxelFormat } from "@/core/schema/enchant/Parser";
-import type { RecipeProps, MinecraftRecipe } from "@/core/schema/recipe/types";
+import type { EnchantmentProps } from "@/core/schema/enchant/types";
 import { VoxelToRecipeDataDriven } from "@/core/schema/recipe/Compiler";
 import { RecipeDataDrivenToVoxelFormat } from "@/core/schema/recipe/Parser";
+import type { MinecraftRecipe, RecipeProps } from "@/core/schema/recipe/types";
+import type { Enchantment } from "@/schema/enchantment/Enchantment";
+import { VoxelToLootDataDriven } from "../schema/loot/Compiler";
+import { LootDataDrivenToVoxelFormat } from "../schema/loot/Parser";
+import type { LootTableProps, MinecraftLootTable } from "../schema/loot/types";
 
 export type GetAnalyserVoxel<T extends keyof Analysers> = Analysers[T]["voxel"];
 export type GetAnalyserMinecraft<T extends keyof Analysers> = Analysers[T]["minecraft"];
