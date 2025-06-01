@@ -1,5 +1,5 @@
-import type { RecipeProps } from "@/core/schema/recipe/types";
 import type { Action, BaseAction } from "@/core/engine/actions/types";
+import type { RecipeProps } from "@/core/schema/recipe/types";
 
 // Recipe-specific action types
 export interface AddIngredientAction extends BaseAction {

@@ -9,7 +9,7 @@ import type {
     SmithingTransformData,
     SmithingTrimData
 } from "./types";
-import { denormalizeIngredient, slotToPosition, getOccupiedSlots } from "./types";
+import { denormalizeIngredient, getOccupiedSlots, slotToPosition } from "./types";
 
 /**
  * Compile Voxel recipe format back to Minecraft Recipe format using slot-based system
