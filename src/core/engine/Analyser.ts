@@ -7,6 +7,10 @@ import { LootDataDrivenToVoxelFormat } from "../schema/loot/Parser";
 import type { EnchantmentProps } from "@/core/schema/enchant/types";
 import { VoxelToEnchantmentDataDriven } from "@/core/schema/enchant/Compiler";
 import { EnchantmentDataDrivenToVoxelFormat } from "@/core/schema/enchant/Parser";
+import type { RecipeProps, MinecraftRecipe } from "@/core/schema/recipe/types";
+import { VoxelToRecipeDataDriven } from "@/core/schema/recipe/Compiler";
+import { RecipeDataDrivenToVoxelFormat } from "@/core/schema/recipe/Parser";
+
 export type GetAnalyserVoxel<T extends keyof Analysers> = Analysers[T]["voxel"];
 export type GetAnalyserMinecraft<T extends keyof Analysers> = Analysers[T]["minecraft"];
 
@@ -18,6 +22,10 @@ export type Analysers = {
     loot_table: {
         voxel: LootTableProps;
         minecraft: MinecraftLootTable;
+    };
+    recipe: {
+        voxel: RecipeProps;
+        minecraft: MinecraftRecipe;
     };
 };
 
@@ -40,7 +48,12 @@ export const analyserCollection: VersionedAnalysers = {
     loot_table: {
         compiler: VoxelToLootDataDriven,
         parser: LootDataDrivenToVoxelFormat,
-        hasTag: true
+        hasTag: false
+    },
+    recipe: {
+        compiler: VoxelToRecipeDataDriven,
+        parser: RecipeDataDrivenToVoxelFormat,
+        hasTag: false
     }
 };
 

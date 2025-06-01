@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voxel Breeze - Convertisseur de Format</title>
+    <!-- Styles simples sans coloration syntaxique -->
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #1a1a1a;
+            color: #e0e0e0;
+            padding: 10px;
+            margin: 0;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .container {
+            max-width: 95vw;
+            margin: 0 auto;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 15px;
+            color: #4CAF50;
+            font-size: 2em;
+            flex-shrink: 0;
+        }
+
+        .converter {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            gap: 15px;
+            flex: 1;
+            min-height: 0;
+        }
+
+        .panel {
+            background: #2d2d2d;
+            border-radius: 8px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            min-height: 0;
+        }
+
+        .panel h2 {
+            margin-bottom: 15px;
+            color: #81C784;
+            border-bottom: 2px solid #4CAF50;
+            padding-bottom: 10px;
+        }
+
+        textarea {
+            flex: 1;
+            background: #1e1e1e;
+            border: 1px solid #444;
+            border-radius: 4px;
+            color: #e0e0e0;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            padding: 15px;
+            resize: none;
+            outline: none;
+        }
+
+        textarea:focus {
+            border-color: #4CAF50;
+            box-shadow: 0 0 5px rgba(76, 175, 80, 0.3);
+        }
+
+        textarea::placeholder {
+            color: #666;
+        }
+
+
+
+        .controls {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 15px;
+            min-width: 220px;
+            max-width: 250px;
+        }
+
+        .schema-selector {
+            background: #2d2d2d;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .schema-selector h3 {
+            margin-bottom: 15px;
+            color: #81C784;
+            text-align: center;
+        }
+
+        select {
+            width: 100%;
+            padding: 10px;
+            background: #1e1e1e;
+            border: 1px solid #444;
+            border-radius: 4px;
+            color: #e0e0e0;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+
+        button {
+            padding: 15px 25px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 5px 0;
+        }
+
+        button:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(76, 175, 80, 0.3);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .arrow {
+            font-size: 24px;
+            margin: 0 10px;
+        }
+
+        .status {
+            text-align: center;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+
+        .status.success {
+            background: rgba(76, 175, 80, 0.2);
+            color: #4CAF50;
+            border: 1px solid #4CAF50;
+        }
+
+        .status.error {
+            background: rgba(244, 67, 54, 0.2);
+            color: #f44336;
+            border: 1px solid #f44336;
+        }
+
+        @media (max-width: 1200px) {
+            .converter {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            
+            .controls {
+                flex-direction: row;
+                justify-content: center;
+                min-width: auto;
+                max-width: none;
+                gap: 10px;
+            }
+            
+            .schema-selector {
+                margin-bottom: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Voxel Breeze - Convertisseur de Format</h1>
+        
+        <div class="converter">
+            <!-- Panel gauche - DataDriven -->
+            <div class="panel">
+                <h2>📄 Format DataDriven (Minecraft)</h2>
+                <textarea id="dataDriven" placeholder="Collez votre JSON DataDriven ici..." spellcheck="false"></textarea>
+            </div>
+
+            <!-- Contrôles centraux -->
+            <div class="controls">
+                <div class="schema-selector">
+                    <h3>Type de Schema</h3>
+                    <select id="schemaType">
+                        <option value="recipe">Recipe</option>
+                        <option value="loot_table">Loot Table</option>
+                        <option value="enchantment">Enchantment</option>
+                    </select>
+                </div>
+
+                <button onclick="convertToVoxel()">
+                    DataDriven <span class="arrow">→</span> Voxel
+                </button>
+                
+                <button onclick="convertToDataDriven()">
+                    Voxel <span class="arrow">→</span> DataDriven
+                </button>
+
+                <button onclick="loadPlaceholder()" style="background: #2196F3;">
+                    📝 Charger exemple
+                </button>
+                
+                <button onclick="clearAll()" style="background: #f44336;">
+                    🗑️ Effacer tout
+                </button>
+
+                <div id="status"></div>
+            </div>
+
+            <!-- Panel droit - VoxelDriven -->
+            <div class="panel">
+                <h2>⚡ Format VoxelDriven (Propriétaire)</h2>
+                <textarea id="voxelDriven" placeholder="Le format VoxelDriven apparaîtra ici..." spellcheck="false"></textarea>
+            </div>
+        </div>
+    </div>
+
+
+    
+    <script type="module">
+        // Import des analyseurs Voxel Breeze (build local)
+        import { analyserCollection } from '../dist/core.js';
+        
+        // Placeholder pour un exemple simple
+        const placeholderExample = {
+            "type": "minecraft:crafting_shapeless",
+            "category": "building",
+            "group": "planks",
+            "ingredients": ["#minecraft:acacia_logs"],
+            "result": {
+                "count": 4,
+                "id": "minecraft:acacia_planks"
+            }
+        };
+
+        // Fonction pour obtenir le contenu d'un textarea
+        function getContent(elementId) {
+            const element = document.getElementById(elementId);
+            if (!element) return '';
+            
+            const content = element.value.trim();
+            console.log(`getContent(${elementId}):`, content);
+            return content;
+        }
+
+        // Fonction pour parser du JSON ou des objets JS
+        function parseJSONOrJS(content) {
+            try {
+                return JSON.parse(content);
+            } catch (e) {
+                try {
+                    const wrappedContent = content.startsWith('{') && !content.startsWith('({') 
+                        ? `(${content})` 
+                        : content;
+                    return eval(wrappedContent);
+                } catch (e2) {
+                    throw new Error(`Format invalide - ni JSON ni objet JavaScript valide: ${e.message}`);
+                }
+            }
+        }
+
+        // Fonction pour définir le contenu d'un textarea
+        function setContent(elementId, content) {
+            const element = document.getElementById(elementId);
+            if (element) {
+                element.value = content;
+            }
+        }
+
+        // Fonction simple pour formatter le JSON
+        function formatJSON(elementId) {
+            const content = getContent(elementId);
+            if (content) {
+                try {
+                    const parsed = parseJSONOrJS(content);
+                    const formatted = JSON.stringify(parsed, null, 2);
+                    setContent(elementId, formatted);
+                    showStatus('✅ JSON formaté !');
+                } catch (e) {
+                    showStatus('❌ Format invalide', true);
+                }
+            }
+        }
+
+        function showStatus(message, isError = false) {
+            const status = document.getElementById('status');
+            status.textContent = message;
+            status.className = `status ${isError ? 'error' : 'success'}`;
+            setTimeout(() => {
+                status.textContent = '';
+                status.className = 'status';
+            }, 3000);
+        }
+
+        function loadPlaceholder() {
+            setContent('dataDriven', JSON.stringify(placeholderExample, null, 2));
+            showStatus('Placeholder chargé !');
+        }
+
+        function convertToVoxel() {
+            const dataDrivenText = getContent('dataDriven');
+            const schemaType = document.getElementById('schemaType').value;
+            
+            console.log('convertToVoxel - dataDrivenText:', dataDrivenText);
+            console.log('convertToVoxel - schemaType:', schemaType);
+            
+            if (!dataDrivenText) {
+                showStatus('Veuillez entrer du JSON ou objet JS DataDriven', true);
+                return;
+            }
+
+            try {
+                const dataDrivenJson = parseJSONOrJS(dataDrivenText);
+                console.log('convertToVoxel - parsed object:', dataDrivenJson);
+                
+                // Utilisation du vrai parser Voxel Breeze
+                const analyser = analyserCollection[schemaType];
+                console.log('convertToVoxel - analyser:', analyser);
+                
+                if (!analyser) {
+                    throw new Error(`Schema type "${schemaType}" non supporté`);
+                }
+                
+                const voxelFormat = analyser.parser({ element: { 
+                    identifier: { namespace: "test", registry: schemaType, resource: "converted" },
+                    data: dataDrivenJson 
+                }});
+
+                console.log('convertToVoxel - voxelFormat:', voxelFormat);
+                setContent('voxelDriven', JSON.stringify(voxelFormat, null, 2));
+                showStatus('✅ Conversion vers Voxel réussie !');
+                
+            } catch (error) {
+                showStatus(`❌ Erreur de conversion: ${error.message}`, true);
+                console.error('Erreur détaillée:', error);
+            }
+        }
+
+        function convertToDataDriven() {
+            const voxelText = getContent('voxelDriven');
+            const schemaType = document.getElementById('schemaType').value;
+            
+            if (!voxelText) {
+                showStatus('Veuillez entrer du JSON ou objet JS VoxelDriven', true);
+                return;
+            }
+
+            try {
+                const voxelJson = parseJSONOrJS(voxelText);
+                
+                // Utilisation du vrai compiler Voxel Breeze
+                const analyser = analyserCollection[schemaType];
+                if (!analyser) {
+                    throw new Error(`Schema type "${schemaType}" non supporté`);
+                }
+                
+                const dataDrivenFormat = analyser.compiler(voxelJson, schemaType);
+
+                setContent('dataDriven', JSON.stringify(dataDrivenFormat, null, 2));
+                showStatus('✅ Conversion vers DataDriven réussie !');
+                
+            } catch (error) {
+                showStatus(`❌ Erreur de conversion: ${error.message}`, true);
+                console.error('Erreur détaillée:', error);
+            }
+        }
+
+        function clearAll() {
+            const dataDrivenElement = document.getElementById('dataDriven');
+            const voxelDrivenElement = document.getElementById('voxelDriven');
+            
+            dataDrivenElement.value = '';
+            voxelDrivenElement.value = '';
+            
+            showStatus('🗑️ Tout effacé !');
+        }
+
+        // Rendre les fonctions globales pour l'accès depuis le HTML
+        window.showStatus = showStatus;
+        window.loadPlaceholder = loadPlaceholder;
+        window.convertToVoxel = convertToVoxel;
+        window.convertToDataDriven = convertToDataDriven;
+        window.clearAll = clearAll;
+
+        // Ajout d'un bouton pour formatter le JSON
+        function addFormatButtons() {
+            // Pas besoin d'event listeners complexes pour l'instant
+            console.log('Interface basique prête');
+        }
+
+        // Chargement d'un placeholder par défaut
+        window.onload = function() {
+            console.log('Page loaded, interface basique...');
+            addFormatButtons();
+            // loadPlaceholder(); // Retiré pour commencer avec des champs vides
+        };
+    </script>
+</body>
+</html> 
