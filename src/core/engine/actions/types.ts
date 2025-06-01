@@ -1,5 +1,6 @@
 import type { IdentifierObject } from "@/core/Identifier";
 import type { LootTableAction } from "./LootTableActions";
+import type { RecipeAction } from "./RecipeAction";
 
 export type ActionValue = string | number | boolean | IdentifierObject | GetValueField;
 type GetValueField = {
@@ -85,7 +86,8 @@ export type Action =
     | ComputedAction
     | RemoveValueFromListAction
     | AlternativeAction
-    | LootTableAction;
+    | LootTableAction
+    | RecipeAction;
 
 export type UpdateDataFunction = (
     action: Action,

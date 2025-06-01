@@ -4,17 +4,15 @@ import type {
     CraftingTransmuteData,
     MinecraftRecipe,
     RecipeCompiler,
-    RecipeIngredient,
     RecipeProps,
-    ShapedCraftingData,
     SmeltingData,
     SmithingTransformData,
     SmithingTrimData
 } from "./types";
-import { denormalizeIngredient } from "./types";
+import { denormalizeIngredient, slotToPosition, getOccupiedSlots } from "./types";
 
 /**
- * Compile Voxel recipe format back to Minecraft Recipe format
+ * Compile Voxel recipe format back to Minecraft Recipe format using slot-based system
  */
 export const VoxelToRecipeDataDriven: RecipeCompiler = (
     element: RecipeProps,
@@ -22,9 +20,6 @@ export const VoxelToRecipeDataDriven: RecipeCompiler = (
     original?: MinecraftRecipe
 ): CompilerResult => {
     const recipe = original ? structuredClone(original) : ({} as MinecraftRecipe);
-
-    // Build ingredient lookup map
-    const ingredientMap = new Map(element.ingredients.map((ing) => [ing.id, ing]));
 
     // Set common fields
     recipe.type = element.type;
@@ -82,31 +77,62 @@ export const VoxelToRecipeDataDriven: RecipeCompiler = (
     };
 
     function compileShapedCrafting() {
-        const shapedData = element.typeSpecific as ShapedCraftingData;
-        if (!shapedData) return;
+        const gridSize = element.gridSize || { width: 3, height: 3 };
 
-        recipe.pattern = shapedData.pattern;
-        recipe.key = {};
+        // If we have an original recipe, try to recreate its pattern structure
+        if (original?.pattern && original?.key) {
+            const originalPattern = Array.isArray(original.pattern) ? original.pattern : [original.pattern];
+            const canReuseOriginal = checkCanReuseOriginalPattern(originalPattern, original.key, gridSize);
 
-        // Build key from ingredients with slots
-        for (const ingredient of element.ingredients) {
-            if (ingredient.slot && ingredient.slot !== " ") {
-                // Use original format if available, otherwise denormalize
-                if (original?.key?.[ingredient.slot]) {
-                    recipe.key[ingredient.slot] = original.key[ingredient.slot];
-                } else {
-                    recipe.key[ingredient.slot] = denormalizeIngredient(ingredient.items);
-                }
+            if (canReuseOriginal) {
+                recipe.pattern = originalPattern;
+                recipe.key = original.key;
+                return;
             }
         }
+
+        // Fallback to generating new pattern
+        const pattern: string[] = [];
+        const key: Record<string, any> = {};
+        let symbolCounter = 65; // Start with 'A'
+
+        // Create pattern and key from slots
+        for (let row = 0; row < gridSize.height; row++) {
+            let patternRow = "";
+            for (let col = 0; col < gridSize.width; col++) {
+                const slotIndex = (row * gridSize.width + col).toString();
+                const items = element.slots[slotIndex];
+
+                if (items && items.length > 0) {
+                    // Find existing symbol for these items or create new one
+                    let symbol = findExistingSymbol(items, key);
+                    if (!symbol) {
+                        symbol = String.fromCharCode(symbolCounter++);
+                        key[symbol] = denormalizeIngredient(items);
+                    }
+                    patternRow += symbol;
+                } else {
+                    patternRow += " ";
+                }
+            }
+            pattern.push(patternRow);
+        }
+
+        recipe.pattern = pattern;
+        recipe.key = key;
     }
 
     function compileShapelessCrafting() {
+        const occupiedSlots = getOccupiedSlots(element.slots);
+
         // Use original format if available
         if (original?.ingredients) {
             recipe.ingredients = original.ingredients;
         } else {
-            recipe.ingredients = element.ingredients.map((ing) => denormalizeIngredient(ing.items)).filter((ing) => ing !== undefined);
+            recipe.ingredients = occupiedSlots
+                .map((slot) => element.slots[slot])
+                .map((items) => denormalizeIngredient(items))
+                .filter((ing) => ing !== undefined);
         }
     }
 
@@ -114,23 +140,24 @@ export const VoxelToRecipeDataDriven: RecipeCompiler = (
         const transmuteData = element.typeSpecific as CraftingTransmuteData;
         if (!transmuteData) return;
 
-        const inputIngredient = ingredientMap.get(transmuteData.inputSlot);
-        const materialIngredient = ingredientMap.get(transmuteData.materialSlot);
+        const inputItems = element.slots[transmuteData.inputSlot];
+        const materialItems = element.slots[transmuteData.materialSlot];
 
-        if (inputIngredient) {
-            recipe.input = original?.input || denormalizeIngredient(inputIngredient.items);
+        if (inputItems) {
+            recipe.input = original?.input || denormalizeIngredient(inputItems);
         }
-        if (materialIngredient) {
-            recipe.material = original?.material || denormalizeIngredient(materialIngredient.items);
+        if (materialItems) {
+            recipe.material = original?.material || denormalizeIngredient(materialItems);
         }
     }
 
     function compileSmelting() {
         const smeltingData = element.typeSpecific as SmeltingData;
 
-        // Set ingredient (should be only one for smelting)
-        if (element.ingredients.length > 0) {
-            recipe.ingredient = original?.ingredient || denormalizeIngredient(element.ingredients[0].items);
+        // Set ingredient from slot 0
+        const ingredientItems = element.slots["0"];
+        if (ingredientItems) {
+            recipe.ingredient = original?.ingredient || denormalizeIngredient(ingredientItems);
         }
 
         if (smeltingData?.experience !== undefined) {
@@ -142,9 +169,10 @@ export const VoxelToRecipeDataDriven: RecipeCompiler = (
     }
 
     function compileStonecutting() {
-        // Set ingredient (should be only one for stonecutting)
-        if (element.ingredients.length > 0) {
-            recipe.ingredient = original?.ingredient || denormalizeIngredient(element.ingredients[0].items);
+        // Set ingredient from slot 0
+        const ingredientItems = element.slots["0"];
+        if (ingredientItems) {
+            recipe.ingredient = original?.ingredient || denormalizeIngredient(ingredientItems);
         }
 
         // Legacy count field for older versions
@@ -157,18 +185,18 @@ export const VoxelToRecipeDataDriven: RecipeCompiler = (
         const smithingData = element.typeSpecific as SmithingTransformData;
         if (!smithingData) return;
 
-        const baseIngredient = ingredientMap.get(smithingData.baseSlot);
-        const additionIngredient = ingredientMap.get(smithingData.additionSlot);
-        const templateIngredient = ingredientMap.get(smithingData.templateSlot);
+        const templateItems = element.slots[smithingData.templateSlot];
+        const baseItems = element.slots[smithingData.baseSlot];
+        const additionItems = element.slots[smithingData.additionSlot];
 
-        if (baseIngredient) {
-            recipe.base = original?.base || denormalizeIngredient(baseIngredient.items);
+        if (templateItems) {
+            recipe.template = original?.template || denormalizeIngredient(templateItems);
         }
-        if (additionIngredient) {
-            recipe.addition = original?.addition || denormalizeIngredient(additionIngredient.items);
+        if (baseItems) {
+            recipe.base = original?.base || denormalizeIngredient(baseItems);
         }
-        if (templateIngredient) {
-            recipe.template = original?.template || denormalizeIngredient(templateIngredient.items);
+        if (additionItems) {
+            recipe.addition = original?.addition || denormalizeIngredient(additionItems);
         }
     }
 
@@ -176,33 +204,39 @@ export const VoxelToRecipeDataDriven: RecipeCompiler = (
         const trimData = element.typeSpecific as SmithingTrimData;
         if (!trimData) return;
 
-        const baseIngredient = ingredientMap.get(trimData.baseSlot);
-        const additionIngredient = ingredientMap.get(trimData.additionSlot);
-        const templateIngredient = ingredientMap.get(trimData.templateSlot);
+        const templateItems = element.slots[trimData.templateSlot];
+        const baseItems = element.slots[trimData.baseSlot];
+        const additionItems = element.slots[trimData.additionSlot];
 
-        if (baseIngredient) {
-            recipe.base = original?.base || denormalizeIngredient(baseIngredient.items);
+        if (templateItems) {
+            recipe.template = original?.template || denormalizeIngredient(templateItems);
         }
-        if (additionIngredient) {
-            recipe.addition = original?.addition || denormalizeIngredient(additionIngredient.items);
+        if (baseItems) {
+            recipe.base = original?.base || denormalizeIngredient(baseItems);
         }
-        if (templateIngredient) {
-            recipe.template = original?.template || denormalizeIngredient(templateIngredient.items);
+        if (additionItems) {
+            recipe.addition = original?.addition || denormalizeIngredient(additionItems);
         }
         if (trimData.pattern) {
-            recipe.pattern = trimData.pattern;
+            recipe.pattern_trim = trimData.pattern;
         }
     }
 
     function compileGenericRecipe() {
         // For unknown recipe types, try to set common fields
-        if (element.ingredients.length > 0) {
+        const occupiedSlots = getOccupiedSlots(element.slots);
+
+        if (occupiedSlots.length > 0) {
             // If there's only one ingredient, use singular form
-            if (element.ingredients.length === 1) {
-                recipe.ingredient = denormalizeIngredient(element.ingredients[0].items);
+            if (occupiedSlots.length === 1) {
+                const items = element.slots[occupiedSlots[0]];
+                recipe.ingredient = denormalizeIngredient(items);
             } else {
                 // Multiple ingredients, use array form
-                recipe.ingredients = element.ingredients.map((ing) => denormalizeIngredient(ing.items)).filter((ing) => ing !== undefined);
+                recipe.ingredients = occupiedSlots
+                    .map((slot) => element.slots[slot])
+                    .map((items) => denormalizeIngredient(items))
+                    .filter((ing) => ing !== undefined);
             }
         }
     }
@@ -242,5 +276,53 @@ export const VoxelToRecipeDataDriven: RecipeCompiler = (
 
         // Simple string format
         return result.item;
+    }
+
+    // Helper function to check if we can reuse the original pattern
+    function checkCanReuseOriginalPattern(
+        originalPattern: string[],
+        originalKey: Record<string, any>,
+        gridSize: { width: number; height: number }
+    ): boolean {
+        // Check if grid dimensions match
+        if (originalPattern.length !== gridSize.height) return false;
+        if (originalPattern.some((row) => row.length !== gridSize.width)) return false;
+
+        // Check if all slots match the original pattern
+        for (let row = 0; row < gridSize.height; row++) {
+            for (let col = 0; col < gridSize.width; col++) {
+                const slotIndex = (row * gridSize.width + col).toString();
+                const items = element.slots[slotIndex];
+                const symbol = originalPattern[row][col];
+
+                if (symbol === " ") {
+                    // Empty slot should have no items
+                    if (items && items.length > 0) return false;
+                } else {
+                    // Non-empty slot should match the key
+                    if (!items || items.length === 0) return false;
+                    const expectedIngredient = originalKey[symbol];
+                    const actualIngredient = denormalizeIngredient(items);
+                    if (JSON.stringify(expectedIngredient) !== JSON.stringify(actualIngredient)) {
+                        return false;
+                    }
+                }
+            }
+        }
+
+        return true;
+    }
+
+    // Helper function to find existing symbol for items in key
+    function findExistingSymbol(items: string[], key: Record<string, any>): string | null {
+        const normalizedTarget = denormalizeIngredient(items);
+
+        for (const [symbol, ingredient] of Object.entries(key)) {
+            // Compare the denormalized forms
+            if (JSON.stringify(normalizedTarget) === JSON.stringify(ingredient)) {
+                return symbol;
+            }
+        }
+        return null;
     }
 };

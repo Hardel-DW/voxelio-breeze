@@ -12,6 +12,8 @@ simplifiés pour une meilleure gestion UI.
   sur tous les types de données
 - [**Actions LootTable**](./actions-loottable.md) - Actions spécifiques aux
   tables de loot
+- [**Actions Recipe**](./actions-recipe.md) - Actions spécifiques aux recettes
+  avec système slot-based
 
 ### Parsers & Compilers
 
@@ -44,18 +46,18 @@ import { EnchantmentDataDrivenToVoxelFormat } from "@/core/schema/EnchantmentPro
 
 // 1. Parser un enchantement Minecraft
 const voxelEnchant = EnchantmentDataDrivenToVoxelFormat({
-    element: minecraftEnchant,
+  element: minecraftEnchant,
 });
 
 // 2. Modifier avec une action
 const modifiedEnchant = updateData(
-    {
-        type: "set_value",
-        field: "maxLevel",
-        value: 5,
-    },
-    voxelEnchant,
-    1,
+  {
+    type: "set_value",
+    field: "maxLevel",
+    value: 5,
+  },
+  voxelEnchant,
+  1,
 );
 
 // 3. Compiler vers Minecraft

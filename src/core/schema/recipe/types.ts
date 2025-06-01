@@ -4,24 +4,19 @@ import type { IdentifierObject } from "@/core/Identifier";
 import type { Compiler } from "@/core/engine/Compiler";
 import type { Parser } from "@/core/engine/Parser";
 
-// Simplified recipe structure for UI
+// Recipe structure with unified slot-based system
 export interface RecipeProps extends VoxelElement {
     type: RecipeType;
     group?: string;
     category?: string;
     showNotification?: boolean;
-    ingredients: RecipeIngredient[];
+
+    // Unified slot-based system
+    slots: Record<string, string[]>; // "0" -> ["minecraft:diamond"], "1" -> ["#minecraft:logs"]
+    gridSize?: { width: number; height: number }; // For shaped crafting only
+
     result: RecipeResult;
     typeSpecific?: RecipeTypeSpecific;
-    unknownFields?: Record<string, any>;
-}
-
-export interface RecipeIngredient {
-    id: string;
-    slot?: string;
-    position?: { row: number; col: number };
-    items: string[];
-    count?: number;
     unknownFields?: Record<string, any>;
 }
 
@@ -33,13 +28,7 @@ export interface RecipeResult {
 }
 
 // Type-specific data for different recipe types
-export type RecipeTypeSpecific = ShapedCraftingData | SmeltingData | SmithingTransformData | SmithingTrimData | CraftingTransmuteData;
-
-export interface ShapedCraftingData {
-    pattern: string[]; // e.g., ["AAB", "A B", "CCC"]
-    width: number;
-    height: number;
-}
+export type RecipeTypeSpecific = SmeltingData | SmithingTransformData | SmithingTrimData | CraftingTransmuteData;
 
 export interface SmeltingData {
     experience?: number;
@@ -47,15 +36,15 @@ export interface SmeltingData {
 }
 
 export interface SmithingTransformData {
-    baseSlot: string; // Reference to ingredient ID
+    templateSlot: string; // Reference to slot ID
+    baseSlot: string;
     additionSlot: string;
-    templateSlot: string;
 }
 
 export interface SmithingTrimData {
+    templateSlot: string;
     baseSlot: string;
     additionSlot: string;
-    templateSlot: string;
     pattern?: string; // For 1.21.5+
 }
 
@@ -195,20 +184,61 @@ export function denormalizeIngredient(items: string[]): any {
     return items.map((item) => (item.startsWith("#") ? { tag: item.slice(1) } : { item }));
 }
 
-// Alternative simpler structure for shaped crafting specifically
-export interface ShapedCraftingProps extends VoxelElement {
-    type: "minecraft:crafting_shaped";
-    group?: string;
-    category?: string;
-    showNotification?: boolean;
-
-    // Simplified for shaped crafting
-    pattern: string[];
-    ingredients: Record<string, string[]>; // Direct key -> items mapping
-    result: RecipeResult;
-
-    unknownFields?: Record<string, any>;
+// Grid utility functions for slot-based system
+/**
+ * Convert grid position to slot index
+ * @param row Row position (0-indexed)
+ * @param col Column position (0-indexed)
+ * @param width Grid width
+ * @returns Slot index as string
+ */
+export function positionToSlot(row: number, col: number, width: number): string {
+    return (row * width + col).toString();
 }
 
-// Union type for different recipe approaches
-export type RecipePropsVariant = RecipeProps | ShapedCraftingProps;
+/**
+ * Convert slot index to grid position
+ * @param slot Slot index as string
+ * @param width Grid width
+ * @returns Grid position
+ */
+export function slotToPosition(slot: string, width: number): { row: number; col: number } {
+    const index = Number.parseInt(slot, 10);
+    return {
+        row: Math.floor(index / width),
+        col: index % width
+    };
+}
+
+/**
+ * Get all occupied slots from a slots object
+ * @param slots Slots record
+ * @returns Array of slot indices
+ */
+export function getOccupiedSlots(slots: Record<string, string[]>): string[] {
+    return Object.entries(slots)
+        .filter(([, items]) => items.length > 0)
+        .map(([slot]) => slot);
+}
+
+/**
+ * Optimize grid size to minimum required dimensions
+ * @param slots Slots record
+ * @param defaultWidth Default grid width
+ * @returns Optimized grid size
+ */
+export function optimizeGridSize(slots: Record<string, string[]>, defaultWidth = 3): { width: number; height: number } {
+    const occupiedSlots = getOccupiedSlots(slots);
+    if (occupiedSlots.length === 0) {
+        return { width: 1, height: 1 };
+    }
+
+    const positions = occupiedSlots.map((slot) => slotToPosition(slot, defaultWidth));
+    const maxRow = Math.max(...positions.map((p) => p.row));
+    const maxCol = Math.max(...positions.map((p) => p.col));
+
+    return {
+        width: maxCol + 1,
+        height: maxRow + 1
+    };
+}

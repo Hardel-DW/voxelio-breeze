@@ -2,25 +2,23 @@ import type { ParserParams } from "@/core/engine/Parser";
 import type {
     CraftingTransmuteData,
     MinecraftRecipe,
-    RecipeIngredient,
     RecipeParser,
     RecipeProps,
     RecipeResult,
     RecipeTypeSpecific,
-    ShapedCraftingData,
     SmeltingData,
     SmithingTransformData,
     SmithingTrimData
 } from "./types";
-import { KNOWN_RECIPE_FIELDS, extractUnknownFields, normalizeIngredient } from "./types";
+import { KNOWN_RECIPE_FIELDS, extractUnknownFields, normalizeIngredient, positionToSlot } from "./types";
 
 /**
- * Parse Minecraft Recipe to simplified Voxel format
+ * Parse Minecraft Recipe to simplified Voxel format with slot-based system
  */
 export const RecipeDataDrivenToVoxelFormat: RecipeParser = ({ element, configurator }: ParserParams<MinecraftRecipe>): RecipeProps => {
     const data = element.data;
-    let ingredientCounter = 0;
-    const ingredients: RecipeIngredient[] = [];
+    const slots: Record<string, string[]> = {};
+    let gridSize: { width: number; height: number } | undefined;
     let typeSpecific: RecipeTypeSpecific | undefined;
 
     // Parse based on recipe type
@@ -79,7 +77,8 @@ export const RecipeDataDrivenToVoxelFormat: RecipeParser = ({ element, configura
         group: data.group,
         category: data.category,
         showNotification: data.show_notification,
-        ingredients,
+        slots,
+        gridSize,
         result,
         typeSpecific,
         unknownFields: extractUnknownFields(data, KNOWN_RECIPE_FIELDS),
@@ -89,68 +88,57 @@ export const RecipeDataDrivenToVoxelFormat: RecipeParser = ({ element, configura
     function parseShapedCrafting() {
         if (!data.pattern || !data.key) return;
 
-        const pattern = data.pattern;
+        const pattern = Array.isArray(data.pattern) ? data.pattern : [data.pattern];
         const key = data.key;
 
-        // Create ingredients from key
-        for (const [symbol, ingredient] of Object.entries(key)) {
-            if (symbol === " ") continue; // Skip spaces
+        // Calculate grid dimensions
+        const height = pattern.length;
+        const width = Math.max(...pattern.map((row) => row.length));
+        gridSize = { width, height };
 
-            ingredients.push({
-                id: `ingredient_${ingredientCounter++}`,
-                slot: symbol,
-                items: normalizeIngredient(ingredient)
-            });
+        // Convert pattern + key to slots
+        for (let row = 0; row < height; row++) {
+            const patternRow = pattern[row] || "";
+            for (let col = 0; col < width; col++) {
+                const symbol = patternRow[col];
+                if (symbol && symbol !== " " && key[symbol]) {
+                    const slotIndex = positionToSlot(row, col, width);
+                    slots[slotIndex] = normalizeIngredient(key[symbol]);
+                }
+            }
         }
-
-        typeSpecific = {
-            pattern,
-            width: Math.max(...(Array.isArray(pattern) ? pattern.map((row) => row.length) : [pattern.length])),
-            height: pattern.length
-        } as ShapedCraftingData;
     }
 
     function parseShapelessCrafting() {
         if (!data.ingredients) return;
 
+        // For shapeless, just assign slots sequentially
+        let slotIndex = 0;
         for (const ingredient of data.ingredients) {
-            ingredients.push({
-                id: `ingredient_${ingredientCounter++}`,
-                items: normalizeIngredient(ingredient)
-            });
+            slots[slotIndex.toString()] = normalizeIngredient(ingredient);
+            slotIndex++;
         }
     }
 
     function parseCraftingTransmute() {
-        const inputId = `ingredient_${ingredientCounter++}`;
-        const materialId = `ingredient_${ingredientCounter++}`;
-
+        // Transmute uses fixed slots: 0 = input, 1 = material
         if (data.input) {
-            ingredients.push({
-                id: inputId,
-                items: normalizeIngredient(data.input)
-            });
+            slots["0"] = normalizeIngredient(data.input);
         }
-
         if (data.material) {
-            ingredients.push({
-                id: materialId,
-                items: normalizeIngredient(data.material)
-            });
+            slots["1"] = normalizeIngredient(data.material);
         }
 
         typeSpecific = {
-            inputSlot: inputId,
-            materialSlot: materialId
+            inputSlot: "0",
+            materialSlot: "1"
         } as CraftingTransmuteData;
     }
 
     function parseSmelting() {
+        // Smelting uses slot 0 for ingredient
         if (data.ingredient) {
-            ingredients.push({
-                id: `ingredient_${ingredientCounter++}`,
-                items: normalizeIngredient(data.ingredient)
-            });
+            slots["0"] = normalizeIngredient(data.ingredient);
         }
 
         typeSpecific = {
@@ -160,97 +148,64 @@ export const RecipeDataDrivenToVoxelFormat: RecipeParser = ({ element, configura
     }
 
     function parseStonecutting() {
+        // Stonecutting uses slot 0 for ingredient
         if (data.ingredient) {
-            ingredients.push({
-                id: `ingredient_${ingredientCounter++}`,
-                items: normalizeIngredient(data.ingredient)
-            });
+            slots["0"] = normalizeIngredient(data.ingredient);
         }
     }
 
     function parseSmithingTransform() {
-        const baseId = `ingredient_${ingredientCounter++}`;
-        const additionId = `ingredient_${ingredientCounter++}`;
-        const templateId = `ingredient_${ingredientCounter++}`;
-
-        if (data.base) {
-            ingredients.push({
-                id: baseId,
-                items: normalizeIngredient(data.base)
-            });
-        }
-
-        if (data.addition) {
-            ingredients.push({
-                id: additionId,
-                items: normalizeIngredient(data.addition)
-            });
-        }
-
+        // Smithing uses fixed slots: 0 = template, 1 = base, 2 = addition
         if (data.template) {
-            ingredients.push({
-                id: templateId,
-                items: normalizeIngredient(data.template)
-            });
+            slots["0"] = normalizeIngredient(data.template);
+        }
+        if (data.base) {
+            slots["1"] = normalizeIngredient(data.base);
+        }
+        if (data.addition) {
+            slots["2"] = normalizeIngredient(data.addition);
         }
 
         typeSpecific = {
-            baseSlot: baseId,
-            additionSlot: additionId,
-            templateSlot: templateId
+            templateSlot: "0",
+            baseSlot: "1",
+            additionSlot: "2"
         } as SmithingTransformData;
     }
 
     function parseSmithingTrim() {
-        const baseId = `ingredient_${ingredientCounter++}`;
-        const additionId = `ingredient_${ingredientCounter++}`;
-        const templateId = `ingredient_${ingredientCounter++}`;
-
-        if (data.base) {
-            ingredients.push({
-                id: baseId,
-                items: normalizeIngredient(data.base)
-            });
-        }
-
-        if (data.addition) {
-            ingredients.push({
-                id: additionId,
-                items: normalizeIngredient(data.addition)
-            });
-        }
-
+        // Smithing trim uses same layout as transform
         if (data.template) {
-            ingredients.push({
-                id: templateId,
-                items: normalizeIngredient(data.template)
-            });
+            slots["0"] = normalizeIngredient(data.template);
+        }
+        if (data.base) {
+            slots["1"] = normalizeIngredient(data.base);
+        }
+        if (data.addition) {
+            slots["2"] = normalizeIngredient(data.addition);
         }
 
         typeSpecific = {
-            baseSlot: baseId,
-            additionSlot: additionId,
-            templateSlot: templateId,
+            templateSlot: "0",
+            baseSlot: "1",
+            additionSlot: "2",
             pattern: data.pattern_trim
         } as SmithingTrimData;
     }
 
     function parseGenericRecipe() {
         // Try to extract ingredients from common fields
+        let slotIndex = 0;
+
         if (data.ingredients) {
             for (const ingredient of data.ingredients) {
-                ingredients.push({
-                    id: `ingredient_${ingredientCounter++}`,
-                    items: normalizeIngredient(ingredient)
-                });
+                slots[slotIndex.toString()] = normalizeIngredient(ingredient);
+                slotIndex++;
             }
         }
 
         if (data.ingredient) {
-            ingredients.push({
-                id: `ingredient_${ingredientCounter++}`,
-                items: normalizeIngredient(data.ingredient)
-            });
+            slots[slotIndex.toString()] = normalizeIngredient(data.ingredient);
         }
     }
 

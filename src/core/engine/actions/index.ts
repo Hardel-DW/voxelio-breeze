@@ -3,6 +3,7 @@ import AppendListModifier from "@/core/engine/actions/AppendListModifier";
 import { ComputedModifier } from "@/core/engine/actions/ComputedModifier";
 import { LootTableModifier } from "@/core/engine/actions/LootTableModifiers";
 import MultipleModifier from "@/core/engine/actions/MultipleModifier";
+import { RecipeModifier } from "@/core/engine/actions/RecipeAction";
 import RemoveKeyModifier from "@/core/engine/actions/RemoveKeyModifier";
 import RemoveValueFromListModifier from "@/core/engine/actions/RemoveValueFromListModifier";
 import SequentialModifier from "@/core/engine/actions/SequentialModifier";
@@ -61,6 +62,12 @@ export function updateData(
             case "balance_weights":
             case "conditional_loot":
                 return LootTableModifier(action, element);
+            case "add_ingredient":
+            case "remove_ingredient":
+            case "convert_recipe_type":
+            case "swap_slots":
+            case "clear_slot":
+                return RecipeModifier(action, element);
         }
     })();
 }

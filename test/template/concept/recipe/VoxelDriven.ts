@@ -8,12 +8,9 @@ export const shapelessVoxel: DataDrivenRegistryElement<RecipeProps> = {
         type: "minecraft:crafting_shapeless",
         group: "planks",
         category: "building",
-        ingredients: [
-            {
-                id: "ingredient_0",
-                items: ["#minecraft:acacia_logs"]
-            }
-        ],
+        slots: {
+            "0": ["#minecraft:acacia_logs"]
+        },
         result: {
             item: "minecraft:acacia_planks",
             count: 4
@@ -28,21 +25,15 @@ export const shapedVoxel: DataDrivenRegistryElement<RecipeProps> = {
         type: "minecraft:crafting_shaped",
         group: "wooden_slab",
         category: "building",
-        ingredients: [
-            {
-                id: "ingredient_0",
-                slot: "#",
-                items: ["minecraft:acacia_planks"]
-            }
-        ],
+        slots: {
+            "0": ["minecraft:acacia_planks"],
+            "1": ["minecraft:acacia_planks"],
+            "2": ["minecraft:acacia_planks"]
+        },
+        gridSize: { width: 3, height: 1 },
         result: {
             item: "minecraft:acacia_slab",
             count: 6
-        },
-        typeSpecific: {
-            pattern: ["###"],
-            width: 3,
-            height: 1
         }
     }
 };
@@ -54,13 +45,15 @@ export const shapedWithEmptyLineVoxel: DataDrivenRegistryElement<RecipeProps> = 
         type: "minecraft:crafting_shaped",
         category: "building",
         showNotification: true,
-        ingredients: [
-            {
-                id: "ingredient_0",
-                slot: "X",
-                items: ["minecraft:chicken"]
-            }
-        ],
+        slots: {
+            "0": ["minecraft:chicken"],
+            "1": ["minecraft:chicken"],
+            "2": ["minecraft:chicken"],
+            "6": ["minecraft:chicken"],
+            "7": ["minecraft:chicken"],
+            "8": ["minecraft:chicken"]
+        },
+        gridSize: { width: 3, height: 3 },
         result: {
             item: "minecraft:acacia_button",
             count: 1,
@@ -68,11 +61,6 @@ export const shapedWithEmptyLineVoxel: DataDrivenRegistryElement<RecipeProps> = 
                 "minecraft:damage": 10,
                 "!minecraft:block_entity_data": {}
             }
-        },
-        typeSpecific: {
-            pattern: ["XXX", "   ", "XXX"],
-            width: 3,
-            height: 3
         }
     }
 };
@@ -82,12 +70,9 @@ export const stonecuttingVoxel: DataDrivenRegistryElement<RecipeProps> = {
     data: {
         identifier: { namespace: "test", registry: "recipe", resource: "stonecutting" },
         type: "minecraft:stonecutting",
-        ingredients: [
-            {
-                id: "ingredient_0",
-                items: ["minecraft:andesite"]
-            }
-        ],
+        slots: {
+            "0": ["minecraft:andesite"]
+        },
         result: {
             item: "minecraft:andesite_slab",
             count: 2
@@ -102,12 +87,9 @@ export const blastingVoxel: DataDrivenRegistryElement<RecipeProps> = {
         type: "minecraft:blasting",
         group: "iron_ingot",
         category: "misc",
-        ingredients: [
-            {
-                id: "ingredient_0",
-                items: ["minecraft:iron_ore"]
-            }
-        ],
+        slots: {
+            "0": ["minecraft:iron_ore"]
+        },
         result: {
             item: "minecraft:iron_ingot"
         },
@@ -125,12 +107,9 @@ export const smeltingVoxel: DataDrivenRegistryElement<RecipeProps> = {
         type: "minecraft:smelting",
         group: "iron_ingot",
         category: "misc",
-        ingredients: [
-            {
-                id: "ingredient_0",
-                items: ["minecraft:deepslate_iron_ore"]
-            }
-        ],
+        slots: {
+            "0": ["minecraft:deepslate_iron_ore"]
+        },
         result: {
             item: "minecraft:iron_ingot"
         },
@@ -147,12 +126,9 @@ export const smokingVoxel: DataDrivenRegistryElement<RecipeProps> = {
         identifier: { namespace: "test", registry: "recipe", resource: "smoking" },
         type: "minecraft:smoking",
         category: "food",
-        ingredients: [
-            {
-                id: "ingredient_0",
-                items: ["minecraft:potato"]
-            }
-        ],
+        slots: {
+            "0": ["minecraft:potato"]
+        },
         result: {
             item: "minecraft:baked_potato"
         },
@@ -169,12 +145,9 @@ export const campfireCookingVoxel: DataDrivenRegistryElement<RecipeProps> = {
         identifier: { namespace: "test", registry: "recipe", resource: "campfire_cooking" },
         type: "minecraft:campfire_cooking",
         category: "food",
-        ingredients: [
-            {
-                id: "ingredient_0",
-                items: ["minecraft:potato"]
-            }
-        ],
+        slots: {
+            "0": ["minecraft:potato"]
+        },
         result: {
             item: "minecraft:baked_potato"
         },
@@ -190,27 +163,18 @@ export const smithingTrimVoxel: DataDrivenRegistryElement<RecipeProps> = {
     data: {
         identifier: { namespace: "test", registry: "recipe", resource: "smithing_trim" },
         type: "minecraft:smithing_trim",
-        ingredients: [
-            {
-                id: "ingredient_0",
-                items: ["#minecraft:trimmable_armor"]
-            },
-            {
-                id: "ingredient_1",
-                items: ["#minecraft:trim_materials"]
-            },
-            {
-                id: "ingredient_2",
-                items: ["minecraft:bolt_armor_trim_smithing_template"]
-            }
-        ],
+        slots: {
+            "0": ["minecraft:bolt_armor_trim_smithing_template"], // template
+            "1": ["#minecraft:trimmable_armor"], // base
+            "2": ["#minecraft:trim_materials"] // addition
+        },
         result: {
             item: "minecraft:air" // Smithing trim doesn't produce a result item
         },
         typeSpecific: {
-            baseSlot: "ingredient_0",
-            additionSlot: "ingredient_1",
-            templateSlot: "ingredient_2",
+            templateSlot: "0",
+            baseSlot: "1",
+            additionSlot: "2",
             pattern: "minecraft:bolt"
         }
     }
@@ -222,22 +186,16 @@ export const transmuteVoxel: DataDrivenRegistryElement<RecipeProps> = {
         identifier: { namespace: "test", registry: "recipe", resource: "transmute" },
         type: "minecraft:crafting_transmute",
         category: "misc",
-        ingredients: [
-            {
-                id: "ingredient_0",
-                items: ["#minecraft:acacia_logs"]
-            },
-            {
-                id: "ingredient_1",
-                items: ["minecraft:acacia_door", "minecraft:acacia_fence_gate"]
-            }
-        ],
+        slots: {
+            "0": ["#minecraft:acacia_logs"], // input
+            "1": ["minecraft:acacia_door", "minecraft:acacia_fence_gate"] // material
+        },
         result: {
             item: "minecraft:acacia_boat"
         },
         typeSpecific: {
-            inputSlot: "ingredient_0",
-            materialSlot: "ingredient_1"
+            inputSlot: "0",
+            materialSlot: "1"
         }
     }
 };
@@ -247,28 +205,19 @@ export const transformVoxel: DataDrivenRegistryElement<RecipeProps> = {
     data: {
         identifier: { namespace: "test", registry: "recipe", resource: "transform" },
         type: "minecraft:smithing_transform",
-        ingredients: [
-            {
-                id: "ingredient_0",
-                items: ["#minecraft:trimmable_armor"]
-            },
-            {
-                id: "ingredient_1",
-                items: ["#minecraft:trim_materials"]
-            },
-            {
-                id: "ingredient_2",
-                items: ["minecraft:wayfinder_armor_trim_smithing_template"]
-            }
-        ],
+        slots: {
+            "0": ["minecraft:wayfinder_armor_trim_smithing_template"], // template
+            "1": ["#minecraft:trimmable_armor"], // base
+            "2": ["#minecraft:trim_materials"] // addition
+        },
         result: {
             item: "minecraft:acacia_button",
             count: 1
         },
         typeSpecific: {
-            baseSlot: "ingredient_0",
-            additionSlot: "ingredient_1",
-            templateSlot: "ingredient_2"
+            templateSlot: "0",
+            baseSlot: "1",
+            additionSlot: "2"
         }
     }
 };
