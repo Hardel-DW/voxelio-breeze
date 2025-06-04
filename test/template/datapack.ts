@@ -19,6 +19,14 @@ export const enchantmentFile = {
     "data/yggdrasil/tags/enchantment/equipment/item/sword.json": fireAspectTag
 };
 
+export const registryFile = {
+    "data/enchantplus/enchantment/armor/fury.json": { foo: "bar" },
+    "data/minecraft/enchantment/attack_speed.json": { foo: "bar" },
+    "data/minecraft/enchantment_provider/villager.json": { foo: "bar" },
+    "data/enchantplus/tags/enchantment/armor.json": { values: ["enchantplus:fury"] },
+    "data/minecraft/tags/enchantment/weapon.json": { values: ["minecraft:attack_speed"] }
+};
+
 export const testMcMetaNotExists = {
     "data/enchantplus/enchantment/test.json": new TextEncoder().encode(JSON.stringify({}, null, 2))
 };

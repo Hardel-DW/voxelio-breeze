@@ -1,0 +1,37 @@
+import { createHandlers, type AllExpectedHandlerKeys, type ValidateHandlerRegistry } from "../../types";
+
+// Core domain action types
+export interface CoreActions {
+    set_value: {
+        path: string;
+        value: unknown;
+    };
+    toggle_value: {
+        path: string;
+        value: unknown;
+    };
+    set_undefined: {
+        path: string;
+    };
+    invert_boolean: {
+        path: string;
+    };
+    sequential: {
+        actions: Array<any>;
+    };
+    alternative: {
+        condition: unknown;
+        ifTrue: any;
+        ifFalse?: any;
+    };
+}
+
+// Export typed actions for this domain
+export type CoreAction = {
+    [K in keyof CoreActions]: CoreActions[K] & { type: `core.${K}` };
+}[keyof CoreActions];
+
+// Use generic validation system
+export type CoreHandlerKeys = AllExpectedHandlerKeys<"core", CoreActions>;
+export const createCoreHandlers = <T extends Record<CoreHandlerKeys, any>>(handlers: ValidateHandlerRegistry<T, CoreHandlerKeys>): T =>
+    createHandlers(handlers);
