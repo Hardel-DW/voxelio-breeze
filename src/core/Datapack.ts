@@ -1,13 +1,11 @@
 import { DatapackError } from "@/core/DatapackError";
-import type { DataDrivenElement } from "@/core/Element";
-import type { DataDrivenRegistryElement } from "@/core/Element";
+import type { DataDrivenElement, DataDrivenRegistryElement, LabeledElement } from "@/core/Element";
 import { Identifier, type IdentifierObject } from "@/core/Identifier";
 import { createTagFromElement, isPresentInTag, mergeDataDrivenRegistryElement } from "@/core/Tag";
 import { getMinecraftVersion } from "@/core/Version";
 import type { Analysers, GetAnalyserMinecraft } from "@/core/engine/Analyser";
 import type { Compiler } from "@/core/engine/Compiler";
 import type { Logger } from "@/core/engine/migrations/logger";
-import type { LabeledElement } from "@/core/schema/primitive/label";
 import type { TagType } from "@/schema/tag/TagType";
 import { downloadZip, extractZip } from "@voxelio/zip";
 import type { InputWithoutMeta } from "@voxelio/zip";

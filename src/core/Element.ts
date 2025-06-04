@@ -1,6 +1,5 @@
 import type { IdentifierObject } from "@/core/Identifier";
 import type { Analysers, GetAnalyserVoxel } from "@/core/engine/Analyser";
-import type { LabeledElement } from "@/core/schema/primitive/label";
 
 export type DataDrivenElement = Record<string, unknown>;
 export interface VoxelElement extends Record<string, unknown> {
@@ -54,4 +53,16 @@ export function sortVoxelElements(elements: Map<string, VoxelElement>): string[]
  */
 export function getLabeledIdentifier(comp: LabeledElement): IdentifierObject {
     return comp.type === "deleted" ? comp.identifier : comp.element.identifier;
+}
+
+export type LabeledElement = NewOrUpdated | Deleted;
+
+interface NewOrUpdated {
+    type: "new" | "updated";
+    element: DataDrivenRegistryElement<DataDrivenElement>;
+}
+
+interface Deleted {
+    type: "deleted";
+    identifier: IdentifierObject;
 }

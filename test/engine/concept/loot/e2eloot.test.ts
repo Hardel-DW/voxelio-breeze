@@ -2,8 +2,16 @@ import { parseDatapack } from "@/core/engine/Parser";
 import { updateData } from "@/core/engine/actions";
 import { VoxelToLootDataDriven } from "@/core/schema/loot/Compiler";
 import type { LootTableProps } from "@/core/schema/loot/types";
+import type { LootTableAction } from "@/core/engine/actions/domains/loot_table/types";
 import { lootTableFile, lootTableZip } from "@test/template/datapack";
 import { describe, it, expect, beforeEach } from "vitest";
+
+// Helper function to update loot table data with proper typing
+async function updateLootTable(action: any, lootTable: LootTableProps, packVersion = 48): Promise<LootTableProps> {
+    const result = await updateData(action, lootTable, packVersion);
+    expect(result).toBeDefined();
+    return result as LootTableProps;
+}
 
 describe("LootTable E2E Tests", () => {
     describe("Complete workflow: Parse → Actions → Compile", () => {
@@ -475,11 +483,10 @@ describe("LootTable E2E Tests", () => {
                 expect(item.poolIndex).toBe(0);
             });
 
-            it("should add items through actions", () => {
+            it("should add items through actions", async () => {
                 // Add a diamond to pool 0
-                const addDiamondAction = {
-                    type: "add_loot_item" as const,
-                    field: "items" as const,
+                const addDiamondAction: LootTableAction = {
+                    type: "loot_table.add_loot_item",
                     poolIndex: 0,
                     item: {
                         name: "minecraft:diamond",
@@ -488,16 +495,15 @@ describe("LootTable E2E Tests", () => {
                     }
                 };
 
-                const result1 = updateData(addDiamondAction, simpleLootTable, 1) as LootTableProps;
+                const result1 = await updateLootTable(addDiamondAction, simpleLootTable);
                 expect(result1.items).toHaveLength(2);
                 expect(result1.items[1].name).toBe("minecraft:diamond");
                 expect(result1.items[1].weight).toBe(1);
                 expect(result1.items[1].quality).toBe(10);
 
                 // Add an emerald to pool 1 (new pool)
-                const addEmeraldAction = {
-                    type: "add_loot_item" as const,
-                    field: "items" as const,
+                const addEmeraldAction: LootTableAction = {
+                    type: "loot_table.add_loot_item",
                     poolIndex: 1,
                     item: {
                         name: "minecraft:emerald",
@@ -506,32 +512,29 @@ describe("LootTable E2E Tests", () => {
                     }
                 };
 
-                const result2 = updateData(addEmeraldAction, result1, 1) as LootTableProps;
+                const result2 = await updateLootTable(addEmeraldAction, result1);
                 expect(result2.items).toHaveLength(3);
                 expect(result2.items[2].name).toBe("minecraft:emerald");
                 expect(result2.items[2].poolIndex).toBe(1);
             });
 
-            it("should create groups and compile correctly", () => {
+            it("should create groups and compile correctly", async () => {
                 // Add multiple items
                 let result = simpleLootTable;
 
-                const addActions = [
+                const addActions: LootTableAction[] = [
                     {
-                        type: "add_loot_item" as const,
-                        field: "items" as const,
+                        type: "loot_table.add_loot_item",
                         poolIndex: 0,
                         item: { name: "minecraft:diamond", weight: 1, quality: 10 }
                     },
                     {
-                        type: "add_loot_item" as const,
-                        field: "items" as const,
+                        type: "loot_table.add_loot_item",
                         poolIndex: 0,
                         item: { name: "minecraft:emerald", weight: 5, quality: 5 }
                     },
                     {
-                        type: "add_loot_item" as const,
-                        field: "items" as const,
+                        type: "loot_table.add_loot_item",
                         poolIndex: 0,
                         item: { name: "minecraft:gold_ingot", weight: 10, quality: 1 }
                     }
@@ -539,21 +542,20 @@ describe("LootTable E2E Tests", () => {
 
                 // Apply all add actions
                 for (const action of addActions) {
-                    result = updateData(action, result, 1) as LootTableProps;
+                    result = await updateLootTable(action, result);
                 }
 
                 expect(result.items).toHaveLength(4); // Original + 3 new items
 
                 // Create an alternatives group with rare items (diamond + emerald)
-                const createRareGroupAction = {
-                    type: "create_loot_group" as const,
-                    field: "groups" as const,
-                    groupType: "alternatives" as const,
+                const createRareGroupAction: LootTableAction = {
+                    type: "loot_table.create_loot_group",
+                    groupType: "alternatives",
                     itemIds: ["item_1", "item_2"], // diamond and emerald
                     poolIndex: 0
                 };
 
-                result = updateData(createRareGroupAction, result, 1) as LootTableProps;
+                result = await updateLootTable(createRareGroupAction, result);
                 expect(result.groups).toHaveLength(1);
                 expect(result.groups[0].type).toBe("alternatives");
                 expect(result.groups[0].items).toEqual(["item_1", "item_2"]);
@@ -595,13 +597,12 @@ describe("LootTable E2E Tests", () => {
                 expect(advancedLootTable.items[1].name).toBe("#minecraft:bundles"); // Tag item
             });
 
-            it("should modify groups and move items between pools", () => {
+            it("should modify groups and move items between pools", async () => {
                 let result = advancedLootTable;
 
                 // Add a new item to pool 1
-                const addItemAction = {
-                    type: "add_loot_item" as const,
-                    field: "items" as const,
+                const addItemAction: LootTableAction = {
+                    type: "loot_table.add_loot_item",
                     poolIndex: 1,
                     item: {
                         name: "minecraft:netherite_ingot",
@@ -610,7 +611,7 @@ describe("LootTable E2E Tests", () => {
                     }
                 };
 
-                result = updateData(addItemAction, result, 1) as LootTableProps;
+                result = await updateLootTable(addItemAction, result);
                 expect(result.items).toHaveLength(3); // acacia_sapling + tag + netherite_ingot
             });
         });
@@ -630,29 +631,27 @@ describe("LootTable E2E Tests", () => {
                 expect(lootTableItem).toBeDefined();
             });
 
-            it("should handle complex group operations", () => {
+            it("should handle complex group operations", async () => {
                 let result = ultimateLootTable;
 
                 // Dissolve one of the nested groups
-                const dissolveGroupAction = {
-                    type: "dissolve_loot_group" as const,
-                    field: "groups" as const,
+                const dissolveGroupAction: LootTableAction = {
+                    type: "loot_table.dissolve_loot_group",
                     groupId: "group_1" // One of the nested groups
                 };
 
-                result = updateData(dissolveGroupAction, result, 1) as LootTableProps;
+                result = await updateLootTable(dissolveGroupAction, result);
                 expect(result.groups).toHaveLength(2); // One group dissolved
 
                 // Create a new sequence group with remaining items
-                const createSequenceAction = {
-                    type: "create_loot_group" as const,
-                    field: "groups" as const,
-                    groupType: "sequence" as const,
+                const createSequenceAction: LootTableAction = {
+                    type: "loot_table.create_loot_group",
+                    groupType: "sequence",
                     itemIds: ["item_0", "item_1"], // acacia_sapling and loot_table
                     poolIndex: 0
                 };
 
-                result = updateData(createSequenceAction, result, 1) as LootTableProps;
+                result = await updateLootTable(createSequenceAction, result);
                 expect(result.groups).toHaveLength(3);
 
                 const sequenceGroup = result.groups.find((g) => g.type === "sequence");
@@ -660,14 +659,13 @@ describe("LootTable E2E Tests", () => {
                 expect(sequenceGroup?.items).toEqual(["item_0", "item_1"]);
 
                 // Duplicate an item to another pool
-                const duplicateAction = {
-                    type: "duplicate_loot_item" as const,
-                    field: "items" as const,
+                const duplicateAction: LootTableAction = {
+                    type: "loot_table.duplicate_loot_item",
                     itemId: "item_0", // acacia_sapling
                     targetPoolIndex: 1
                 };
 
-                result = updateData(duplicateAction, result, 1) as LootTableProps;
+                result = await updateLootTable(duplicateAction, result);
                 expect(result.items).toHaveLength(6); // Original 5 + 1 duplicate
 
                 const duplicatedItem = result.items.find((item) => item.name === "minecraft:acacia_sapling" && item.poolIndex === 1);
@@ -736,15 +734,14 @@ describe("LootTable E2E Tests", () => {
                 expect(lootTableItems.length).toBeGreaterThan(0);
             });
 
-            it("should handle complex actions on final boss loot table", () => {
+            it("should handle complex actions on final boss loot table", async () => {
                 let result = finalBossLootTable;
                 const originalItemCount = result.items.length;
                 const originalGroupCount = result.groups.length;
 
                 // Add a new legendary item to pool 0
-                const addLegendaryAction = {
-                    type: "add_loot_item" as const,
-                    field: "items" as const,
+                const addLegendaryAction: LootTableAction = {
+                    type: "loot_table.add_loot_item",
                     poolIndex: 0,
                     item: {
                         name: "minecraft:netherite_sword",
@@ -753,30 +750,28 @@ describe("LootTable E2E Tests", () => {
                     }
                 };
 
-                result = updateData(addLegendaryAction, result, 1) as LootTableProps;
+                result = await updateLootTable(addLegendaryAction, result);
                 expect(result.items).toHaveLength(originalItemCount + 1);
 
                 // Create a new alternatives group with rare items
-                const createRareGroupAction = {
-                    type: "create_loot_group" as const,
-                    field: "groups" as const,
-                    groupType: "alternatives" as const,
+                const createRareGroupAction: LootTableAction = {
+                    type: "loot_table.create_loot_group",
+                    groupType: "alternatives",
                     itemIds: [result.items[result.items.length - 1].id], // The netherite sword
                     poolIndex: 0
                 };
 
-                result = updateData(createRareGroupAction, result, 1) as LootTableProps;
+                result = await updateLootTable(createRareGroupAction, result);
                 expect(result.groups).toHaveLength(originalGroupCount + 1);
 
                 // Move an item between pools
-                const moveItemAction = {
-                    type: "move_item_between_pools" as const,
-                    field: "items" as const,
+                const moveItemAction: LootTableAction = {
+                    type: "loot_table.move_item_between_pools",
                     itemId: result.items[0].id, // First item
                     targetPoolIndex: 1
                 };
 
-                result = updateData(moveItemAction, result, 1) as LootTableProps;
+                result = await updateLootTable(moveItemAction, result);
                 const movedItem = result.items.find((item) => item.poolIndex === 1 && item.id === result.items[0].id);
                 expect(movedItem).toBeDefined();
 
@@ -804,7 +799,7 @@ describe("LootTable E2E Tests", () => {
                 });
             });
 
-            it("should preserve complex nested structures through actions", () => {
+            it("should preserve complex nested structures through actions", async () => {
                 let result = finalBossLootTable;
 
                 // Find any group (not necessarily sequence)
@@ -814,13 +809,12 @@ describe("LootTable E2E Tests", () => {
                     // Store the original items before dissolving
                     const originalItems = [...complexGroup.items];
 
-                    const dissolveAction = {
-                        type: "dissolve_loot_group" as const,
-                        field: "groups" as const,
+                    const dissolveAction: LootTableAction = {
+                        type: "loot_table.dissolve_loot_group",
                         groupId: complexGroup.id
                     };
 
-                    result = updateData(dissolveAction, result, 1) as LootTableProps;
+                    result = await updateLootTable(dissolveAction, result);
 
                     // The items from the dissolved group should still exist
                     for (const itemId of originalItems) {
@@ -854,41 +848,37 @@ describe("LootTable E2E Tests", () => {
         });
 
         describe("Round-trip integrity", () => {
-            it("should maintain data integrity through full workflow", () => {
+            it("should maintain data integrity through full workflow", async () => {
                 // Start with ultimate loot table (most complex)
                 let result = ultimateLootTable;
                 const originalItemCount = result.items.length;
                 const originalGroupCount = result.groups.length;
 
                 // Apply a series of actions
-                const actions = [
+                const actions: LootTableAction[] = [
                     // Add items
                     {
-                        type: "add_loot_item" as const,
-                        field: "items" as const,
+                        type: "loot_table.add_loot_item",
                         poolIndex: 0,
                         item: { name: "minecraft:diamond_block", weight: 1, quality: 15 }
                     },
                     // Modify existing item
                     {
-                        type: "modify_loot_item" as const,
-                        field: "items" as const,
+                        type: "loot_table.modify_loot_item",
                         itemId: "item_0",
-                        property: "weight" as const,
+                        property: "weight",
                         value: 100
                     },
                     // Create new group
                     {
-                        type: "create_loot_group" as const,
-                        field: "groups" as const,
-                        groupType: "alternatives" as const,
+                        type: "loot_table.create_loot_group",
+                        groupType: "alternatives",
                         itemIds: ["item_0", "item_4"], // original + new item
                         poolIndex: 0
                     },
                     // Move item between pools
                     {
-                        type: "move_item_between_pools" as const,
-                        field: "items" as const,
+                        type: "loot_table.move_item_between_pools",
                         itemId: "item_1", // loot_table item
                         targetPoolIndex: 1
                     }
@@ -896,7 +886,7 @@ describe("LootTable E2E Tests", () => {
 
                 // Apply all actions
                 for (const action of actions) {
-                    result = updateData(action, result, 1) as LootTableProps;
+                    result = await updateLootTable(action, result);
                 }
 
                 // Verify intermediate state
@@ -930,51 +920,47 @@ describe("LootTable E2E Tests", () => {
         });
 
         describe("Error handling and edge cases", () => {
-            it("should handle invalid actions gracefully", () => {
+            it("should handle invalid actions gracefully", async () => {
                 // Try to remove non-existent item
-                const invalidRemoveAction = {
-                    type: "remove_loot_item" as const,
-                    field: "items" as const,
+                const invalidRemoveAction: LootTableAction = {
+                    type: "loot_table.remove_loot_item",
                     itemId: "non_existent_item"
                 };
 
-                const result1 = updateData(invalidRemoveAction, simpleLootTable, 1) as LootTableProps;
+                const result1 = await updateLootTable(invalidRemoveAction, simpleLootTable);
                 expect(result1.items).toHaveLength(simpleLootTable.items.length); // No change
 
                 // Try to modify non-existent item
-                const invalidModifyAction = {
-                    type: "modify_loot_item" as const,
-                    field: "items" as const,
+                const invalidModifyAction: LootTableAction = {
+                    type: "loot_table.modify_loot_item",
                     itemId: "non_existent_item",
-                    property: "weight" as const,
+                    property: "weight",
                     value: 50
                 };
 
-                const result2 = updateData(invalidModifyAction, simpleLootTable, 1) as LootTableProps;
+                const result2 = await updateLootTable(invalidModifyAction, simpleLootTable);
                 expect(result2.items).toEqual(simpleLootTable.items); // No change
 
                 // Try to create group with non-existent items - this might actually create an empty group
-                const invalidGroupAction = {
-                    type: "create_loot_group" as const,
-                    field: "groups" as const,
-                    groupType: "alternatives" as const,
+                const invalidGroupAction: LootTableAction = {
+                    type: "loot_table.create_loot_group",
+                    groupType: "alternatives",
                     itemIds: ["non_existent_1", "non_existent_2"],
                     poolIndex: 0
                 };
 
-                const result3 = updateData(invalidGroupAction, simpleLootTable, 1) as LootTableProps;
+                const result3 = await updateLootTable(invalidGroupAction, simpleLootTable);
                 expect(result3).toBeDefined();
             });
 
-            it("should handle empty groups correctly", () => {
+            it("should handle empty groups correctly", async () => {
                 let result = advancedLootTable;
-                const dissolveGroupAction = {
-                    type: "dissolve_loot_group" as const,
-                    field: "groups" as const,
+                const dissolveGroupAction: LootTableAction = {
+                    type: "loot_table.dissolve_loot_group",
                     groupId: "group_0"
                 };
 
-                result = updateData(dissolveGroupAction, result, 1) as LootTableProps;
+                result = await updateLootTable(dissolveGroupAction, result);
 
                 // The group should be removed
                 expect(result.groups).toHaveLength(0);

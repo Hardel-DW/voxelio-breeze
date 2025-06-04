@@ -1,6 +1,63 @@
 import type { DataDrivenRegistryElement } from "@/core/Element";
 import type { RecipeProps } from "@/core/schema/recipe/types";
 
+// Helper function to create mock recipe elements
+export function createMockRecipe(overrides: Partial<RecipeProps> = {}): RecipeProps {
+    return {
+        identifier: { namespace: "test", registry: "recipe", resource: "test_recipe" },
+        type: "minecraft:crafting_shaped",
+        slots: {
+            "0": ["minecraft:diamond"],
+            "1": ["minecraft:stick"],
+            "4": ["minecraft:stick"]
+        },
+        gridSize: { width: 3, height: 3 },
+        result: {
+            item: "minecraft:diamond_sword",
+            count: 1
+        },
+        ...overrides
+    };
+}
+
+export function createShapelessRecipe(overrides: Partial<RecipeProps> = {}): RecipeProps {
+    return {
+        identifier: { namespace: "test", registry: "recipe", resource: "shapeless_recipe" },
+        type: "minecraft:crafting_shapeless",
+        slots: {
+            "0": ["#minecraft:acacia_logs"]
+        },
+        result: {
+            item: "minecraft:acacia_planks",
+            count: 4
+        },
+        group: "planks",
+        category: "building",
+        ...overrides
+    };
+}
+
+export function createSmeltingRecipe(overrides: Partial<RecipeProps> = {}): RecipeProps {
+    return {
+        identifier: { namespace: "test", registry: "recipe", resource: "smelting_recipe" },
+        type: "minecraft:smelting",
+        slots: {
+            "0": ["minecraft:iron_ore"]
+        },
+        result: {
+            item: "minecraft:iron_ingot",
+            count: 1
+        },
+        typeSpecific: {
+            experience: 0.7,
+            cookingTime: 200
+        },
+        group: "iron_ingot",
+        category: "misc",
+        ...overrides
+    };
+}
+
 export const shapelessVoxel: DataDrivenRegistryElement<RecipeProps> = {
     identifier: { namespace: "test", registry: "recipe", resource: "shapeless" },
     data: {

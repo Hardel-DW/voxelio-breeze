@@ -18,10 +18,6 @@ export * from "@/core/engine/renderer/value";
 
 export * from "@/core/engine/utils/field";
 export * from "@/core/engine/utils/property";
-
-export * from "@/core/schema/primitive/properties";
-export * from "@/core/schema/primitive/label";
-
 export * from "@/core/DatapackError";
 
 export * from "@/core/engine/actions/index";
