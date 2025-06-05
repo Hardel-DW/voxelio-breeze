@@ -1,99 +1,134 @@
-import { Identifier } from "@/core/Identifier";
-import { ENGINE_VERSION } from "@/core/Version";
-import type { Analysers, GetAnalyserVoxel } from "@/core/engine/Analyser";
-import type { ActionValue } from "@/core/engine/actions/types";
-import type { Action } from "@/core/engine/actions/types";
-import { createDifferenceFromAction } from "@/core/engine/migrations/logValidation";
-import type { FileLog, FileLogUpdated, Log, LogDifference, LogValue } from "@/core/engine/migrations/types";
+import type { ChangeSet, DiffOptions } from "./types";
+import { deepDiff, captureState } from "./differ";
 
 export class Logger {
-    private readonly log: Log;
-    private readonly engine: number;
+    private changes: ChangeSet[] = [];
+    private options: DiffOptions;
 
-    constructor(log: Log, engine: number = ENGINE_VERSION) {
-        this.log = log;
-        this.engine = engine;
+    constructor(options: DiffOptions = {}) {
+        this.options = options;
     }
 
-    public getEngine(): number {
-        return this.engine;
-    }
+    /**
+     * Tracks changes during a tool operation
+     */
+    async trackChanges<T extends Record<string, unknown>>(
+        element: T,
+        operation: (element: T) => Promise<Partial<T> | undefined>
+    ): Promise<Partial<T> | undefined> {
+        const beforeState = captureState(element);
+        const result = await operation(element);
 
-    public getVersion(): number {
-        return this.log.version;
-    }
-
-    public getLogs(): Log {
-        return this.log;
-    }
-
-    // Trouve ou crée un FileLog pour un identifiant donné
-    private findOrCreateFileLog(identifier: string, registry: string): FileLog {
-        let fileLog = this.log.logs.find((log) => log.identifier === identifier);
-
-        if (!fileLog) {
-            fileLog = { identifier, registry, type: "updated", differences: [] };
-            this.log.logs.push(fileLog);
+        if (result) {
+            const afterState = captureState(result);
+            this.addDiff(beforeState, afterState, element);
         }
 
-        return fileLog;
+        return result;
     }
 
-    // Ajoute ou met à jour une différence
-    public logDifference(identifier: string, registry: string, difference: LogDifference | LogDifference[]) {
-        const fileLog = this.findOrCreateFileLog(identifier, registry);
+    /**
+     * Syncs changes by comparing two states (for manual changes detection)
+     */
+    sync<T extends Record<string, unknown>>(beforeState: T, afterState: T, elementId?: string, elementType?: string): void {
+        const before = captureState(beforeState);
+        const after = captureState(afterState);
+        this.addDiff(before, after, afterState, elementId, elementType);
+    }
 
-        if (fileLog.type !== "updated") {
-            return;
-        }
+    /**
+     * Exports all changes as JSON
+     */
+    exportJson(): string {
+        return JSON.stringify(
+            {
+                voxel_studio_log: {
+                    version: "1.0.0",
+                    generated_at: new Date().toISOString(),
+                    changes: this.changes
+                }
+            },
+            null,
+            2
+        );
+    }
 
-        // Si c'est un tableau de différences, on les traite une par une
-        if (Array.isArray(difference)) {
-            for (const diff of difference) {
-                this.handleSingleDifference(fileLog as FileLogUpdated, diff);
-            }
-        } else {
-            this.handleSingleDifference(fileLog as FileLogUpdated, difference);
+    /**
+     * Imports changes from JSON
+     */
+    importJson(json: string): void {
+        try {
+            const data = JSON.parse(json);
+            const changes = data.voxel_studio_log?.changes || data.changes || data;
+            this.changes = Array.isArray(changes) ? changes : [];
+        } catch (error) {
+            throw new Error(`Failed to import changes: ${error}`);
         }
     }
 
-    private handleSingleDifference(fileLog: FileLogUpdated, difference: LogDifference) {
-        const existingDiffIndex = fileLog.differences.findIndex((diff: LogDifference) => diff.path === difference.path);
+    /**
+     * Gets all recorded changes
+     */
+    getChanges(): ChangeSet[] {
+        return [...this.changes];
+    }
 
-        if (existingDiffIndex !== -1) {
-            if (difference.type === "remove") {
-                fileLog.differences.splice(existingDiffIndex, 1);
-            } else {
-                fileLog.differences[existingDiffIndex] = difference;
-            }
-        } else if (difference.type !== "remove") {
-            fileLog.differences.push(difference);
+    /**
+     * Clears all recorded changes
+     */
+    clearChanges(): void {
+        this.changes = [];
+    }
+
+    /**
+     * Internal method to add differences
+     */
+    private addDiff(
+        before: Record<string, unknown>,
+        after: Record<string, unknown>,
+        element: Record<string, unknown>,
+        elementId?: string,
+        elementType?: string
+    ): void {
+        const differences = deepDiff(before, after, this.options);
+
+        if (differences.length > 0) {
+            this.changes.push({
+                element_id: elementId || this.extractElementId(element),
+                element_type: elementType || this.extractElementType(element),
+                differences,
+                timestamp: new Date().toISOString()
+            });
         }
     }
 
-    // Ajouter une nouvelle méthode pour récupérer la valeur originale
-    public getOriginalValue(identifier: string, field: string): LogValue | undefined {
-        const fileLog = this.log.logs.find((log) => log.identifier === identifier);
-        if (fileLog && fileLog.type === "updated") {
-            const difference = fileLog.differences.find((diff) => diff.path === field);
-            return difference?.type === "set" ? difference.origin_value : undefined;
+    /**
+     * Extracts element ID from common patterns
+     */
+    private extractElementId(element: Record<string, unknown>): string | undefined {
+        if (typeof element.id === "string") return element.id;
+        if (typeof element._id === "string") return element._id;
+
+        const identifier = element.identifier as Record<string, unknown> | undefined;
+        if (identifier?.namespace && identifier?.resource) {
+            return `${identifier.namespace}:${identifier.resource}`;
         }
+
         return undefined;
     }
 
-    public handleActionDifference<T extends keyof Analysers>(
-        action: Action,
-        element: GetAnalyserVoxel<T>,
-        value?: ActionValue,
-        version: number = Number.POSITIVE_INFINITY
-    ): void {
-        const difference = createDifferenceFromAction(action, element, version, this, value);
-        if (difference) {
-            this.logDifference(new Identifier(element.identifier).toString(), element.identifier.registry || "unknown", difference);
-        }
-    }
+    /**
+     * Extracts element type from common patterns
+     */
+    private extractElementType(element: Record<string, unknown>): string | undefined {
+        if (typeof element.type === "string") return element.type;
+        if (typeof element._type === "string") return element._type;
 
-    public serialize(minified = false) {
-        return JSON.stringify({ ...this.getLogs(), engine: this.getEngine() }, null, minified ? 0 : 4);
+        const identifier = element.identifier as Record<string, unknown> | undefined;
+        if (typeof identifier?.registry === "string") {
+            return identifier.registry;
+        }
+
+        return undefined;
     }
 }
