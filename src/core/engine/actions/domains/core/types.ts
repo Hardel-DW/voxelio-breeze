@@ -1,3 +1,4 @@
+import type { Condition } from "@/core/engine/condition/types";
 import { createHandlers, type AllExpectedHandlerKeys, type ValidateHandlerRegistry } from "../../types";
 
 // Core domain action types
@@ -20,7 +21,7 @@ export interface CoreActions {
         actions: Array<any>;
     };
     alternative: {
-        condition: unknown;
+        condition: boolean | Condition;
         ifTrue: any;
         ifFalse?: any;
     };

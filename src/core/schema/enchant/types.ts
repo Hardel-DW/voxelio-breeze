@@ -1,6 +1,7 @@
 import type { VoxelElement } from "@/core/Element";
 import type { SlotRegistryType } from "@/core/engine/managers/SlotManager";
-import { Identifier, type SingleOrMultiple } from "@/index";
+import { Identifier } from "@/core/Identifier";
+import type { SingleOrMultiple } from "@/index";
 import type { TextComponentType } from "@/schema/text/TextComponentType";
 
 const tags_related_to_functionality = [

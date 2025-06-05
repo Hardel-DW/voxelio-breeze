@@ -1,13 +1,23 @@
 import { downloadZip, type InputWithMeta } from "@voxelio/zip";
 import type { DataDrivenRegistryElement, DataDrivenElement } from "@/core/Element";
 
+/**
+ * Create a zip file from a record of files
+ * @param filesRecord - A record of files to create
+ * @returns A zip file
+ */
 export async function createZipFile(filesRecord: Record<string, Uint8Array>): Promise<File> {
     const files: InputWithMeta[] = Object.entries(filesRecord).map(([path, content]) => ({ name: path, input: new File([content], path) }));
     const zipContent = downloadZip(files);
     return new File([await zipContent.arrayBuffer()], "datapack.zip");
 }
 
-// We want to make fonction to do this automatically au dessus
+/**
+ * Prepare files for a datapack, add pack.mcmeta based on version.
+ * @param filesRecord - A record of files to create
+ * @param packVersion - The version of the pack
+ * @returns A record of files
+ */
 export function prepareFiles(filesRecord: Record<string, Record<string, unknown>>, packVersion = 61) {
     const files: Record<string, Uint8Array> = {};
 
@@ -23,6 +33,12 @@ export function prepareFiles(filesRecord: Record<string, Record<string, unknown>
     return files;
 }
 
+/**
+ * Create files from DataDrivenRegistryElement.
+ * @param elements - The elements to create files from
+ * @param packVersion - The version of the pack
+ * @returns A record of files
+ */
 export function createFilesFromElements(
     elements: DataDrivenRegistryElement<DataDrivenElement>[],
     packVersion = 61

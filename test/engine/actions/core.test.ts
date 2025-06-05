@@ -102,7 +102,7 @@ describe("Action System", () => {
             expect(result).not.toBe(element.data);
         });
 
-        it("should handle alternative actions with condition", async () => {
+        it("should handle alternative actions with boolean condition", async () => {
             const element = createMockEnchantmentElement({ minCostBase: 10 });
 
             // Vérifie l'état initial
@@ -130,6 +130,263 @@ describe("Action System", () => {
 
             // Vérifie que l'objet original n'a pas changé
             expect(element.data.minCostBase).toBe(10);
+            expect(result).not.toBe(element.data);
+        });
+
+        it("should handle alternative actions with false condition", async () => {
+            const element = createMockEnchantmentElement({ minCostBase: 10 });
+
+            const action: CoreAction = {
+                type: "core.alternative",
+                condition: false,
+                ifTrue: {
+                    type: "core.set_value",
+                    path: "minCostBase",
+                    value: 20
+                },
+                ifFalse: {
+                    type: "core.set_value",
+                    path: "minCostBase",
+                    value: 5
+                }
+            };
+
+            const result = await updateData(action, element.data, 48);
+            expect(result).toBeDefined();
+            expect(result?.minCostBase).toBe(5); // ifFalse exécuté
+            expect(element.data.minCostBase).toBe(10);
+            expect(result).not.toBe(element.data);
+        });
+
+        it("should handle alternative actions without ifFalse", async () => {
+            const element = createMockEnchantmentElement({ minCostBase: 10 });
+
+            const action: CoreAction = {
+                type: "core.alternative",
+                condition: false,
+                ifTrue: {
+                    type: "core.set_value",
+                    path: "minCostBase",
+                    value: 20
+                }
+                // Pas de ifFalse
+            };
+
+            const result = await updateData(action, element.data, 48);
+            expect(result).toBeDefined();
+            expect(result?.minCostBase).toBe(10); // Pas de changement
+            expect(result).toBe(element.data); // Même objet retourné
+        });
+
+        it("should handle alternative with if_field_is_undefined condition", async () => {
+            const element = createMockEnchantmentElement({
+                minCostBase: 10
+                // weight equal 1 in default element
+            });
+
+            const action: CoreAction = {
+                type: "core.alternative",
+                condition: {
+                    condition: "if_field_is_undefined",
+                    field: "weight"
+                },
+                ifTrue: {
+                    type: "core.set_value",
+                    path: "weight",
+                    value: 5
+                },
+                ifFalse: {
+                    type: "core.set_value",
+                    path: "weight",
+                    value: 10
+                }
+            };
+
+            const result = await updateData(action, element.data, 48);
+            expect(result).toBeDefined();
+            expect(result?.weight).toBe(10); // weight était undefined donc ifFalse
+            expect(element.data.weight).toBe(1);
+            expect(result).not.toBe(element.data);
+        });
+
+        it("should handle alternative with compare_value_to_field_value condition", async () => {
+            const element = createMockEnchantmentElement({
+                minCostBase: 10,
+                maxCostBase: 20
+            });
+
+            const action: CoreAction = {
+                type: "core.alternative",
+                condition: {
+                    condition: "compare_value_to_field_value",
+                    field: "minCostBase",
+                    value: "maxCostBase"
+                },
+                ifTrue: {
+                    type: "core.set_value",
+                    path: "balanced",
+                    value: true
+                },
+                ifFalse: {
+                    type: "core.set_value",
+                    path: "balanced",
+                    value: false
+                }
+            };
+
+            const result = await updateData(action, element.data, 48);
+            expect(result).toBeDefined();
+            expect(result?.balanced).toBe(false); // 10 != 20
+            expect(element.data.balanced).toBeUndefined();
+            expect(result).not.toBe(element.data);
+        });
+
+        it("should handle alternative with all_of condition", async () => {
+            const element = createMockEnchantmentElement({
+                weight: 10,
+                mode: "normal"
+            });
+
+            const action: CoreAction = {
+                type: "core.alternative",
+                condition: {
+                    condition: "all_of",
+                    terms: [
+                        {
+                            condition: "compare_to_value",
+                            compare: "weight",
+                            value: 10
+                        },
+                        {
+                            condition: "compare_to_value",
+                            compare: "mode",
+                            value: "normal"
+                        }
+                    ]
+                },
+                ifTrue: {
+                    type: "core.set_value",
+                    path: "weight",
+                    value: 5
+                },
+                ifFalse: {
+                    type: "core.set_value",
+                    path: "weight",
+                    value: 9
+                }
+            };
+
+            const result = await updateData(action, element.data, 48);
+            expect(result).toBeDefined();
+            expect(result?.weight).toBe(5);
+            expect(element.data.weight).toBe(10);
+            expect(result).not.toBe(element.data);
+        });
+
+        it("should handle alternative with any_of condition", async () => {
+            const element = createMockEnchantmentElement({
+                weight: 5,
+                mode: "only_creative"
+            });
+
+            const action: CoreAction = {
+                type: "core.alternative",
+                condition: {
+                    condition: "any_of",
+                    terms: [
+                        {
+                            condition: "compare_to_value",
+                            compare: "weight",
+                            value: "10"
+                        },
+                        {
+                            condition: "compare_to_value",
+                            compare: "mode",
+                            value: "only_creative"
+                        }
+                    ]
+                },
+                ifTrue: {
+                    type: "core.set_value",
+                    path: "mode",
+                    value: "normal"
+                },
+                ifFalse: {
+                    type: "core.set_value",
+                    path: "mode",
+                    value: "soft_delete"
+                }
+            };
+
+            const result = await updateData(action, element.data, 48);
+            expect(result).toBeDefined();
+            expect(result?.mode).toBe("normal"); // Au moins une condition vraie (mode=only_creative)
+            expect(element.data.mode).toBe("only_creative");
+            expect(result).not.toBe(element.data);
+        });
+
+        it("should handle alternative with inverted condition", async () => {
+            const element = createMockEnchantmentElement({
+                mode: "normal"
+            });
+
+            const action: CoreAction = {
+                type: "core.alternative",
+                condition: {
+                    condition: "inverted",
+                    terms: {
+                        condition: "compare_to_value",
+                        compare: "mode",
+                        value: "only_creative"
+                    }
+                },
+                ifTrue: {
+                    type: "core.set_value",
+                    path: "notCreative",
+                    value: true
+                },
+                ifFalse: {
+                    type: "core.set_value",
+                    path: "notCreative",
+                    value: false
+                }
+            };
+
+            const result = await updateData(action, element.data, 48);
+            expect(result).toBeDefined();
+            expect(result?.notCreative).toBe(true); // NOT(mode=creative) = NOT(false) = true
+            expect(element.data.notCreative).toBeUndefined();
+            expect(result).not.toBe(element.data);
+        });
+
+        it("should handle alternative with contains condition", async () => {
+            const element = createMockEnchantmentElement({
+                tags: ["minecraft:curse", "minecraft:rare"]
+            });
+
+            const action: CoreAction = {
+                type: "core.alternative",
+                condition: {
+                    condition: "contains",
+                    field: "tags",
+                    values: ["minecraft:curse"]
+                },
+                ifTrue: {
+                    type: "core.set_value",
+                    path: "isCurse",
+                    value: true
+                },
+                ifFalse: {
+                    type: "core.set_value",
+                    path: "isCurse",
+                    value: false
+                }
+            };
+
+            const result = await updateData(action, element.data, 48);
+            expect(result).toBeDefined();
+            expect(result?.isCurse).toBe(true); // tags contient "minecraft:curse"
+            expect(element.data.isCurse).toBeUndefined();
             expect(result).not.toBe(element.data);
         });
 

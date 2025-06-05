@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, beforeEach } from "vitest";
 import { Datapack } from "@/core/Datapack";
 import { registryFile } from "@test/template/datapack";
 import { prepareFiles } from "@test/template/utils";

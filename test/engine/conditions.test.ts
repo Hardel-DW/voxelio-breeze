@@ -5,6 +5,39 @@ import { createMockEnchantmentElement } from "@test/template/concept/enchant/Vox
 
 describe("Condition System", () => {
     describe("EqualCondition", () => {
+        it("should check compare_to_value with string", () => {
+            const element = createMockEnchantmentElement();
+            const condition: Condition = {
+                condition: "compare_to_value",
+                compare: "supportedItems",
+                value: "#minecraft:sword"
+            };
+
+            expect(checkCondition(condition, element.data)).toBe(true);
+        });
+
+        it("should check compare_to_value with number", () => {
+            const element = createMockEnchantmentElement({ weight: 10 });
+            const condition: Condition = {
+                condition: "compare_to_value",
+                compare: "weight",
+                value: 10
+            };
+
+            expect(checkCondition(condition, element.data)).toBe(true);
+        });
+
+        it("should check compare_to_value with mode", () => {
+            const element = createMockEnchantmentElement({ mode: "only_creative" });
+            const condition: Condition = {
+                condition: "compare_to_value",
+                compare: "mode",
+                value: "only_creative"
+            };
+
+            expect(checkCondition(condition, element.data)).toBe(true);
+        });
+
         it("should check string equality", () => {
             const element = createMockEnchantmentElement();
             const condition: Condition = {

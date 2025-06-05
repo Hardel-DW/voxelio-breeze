@@ -1,14 +1,14 @@
 import { getManager } from "@/core/engine/Manager";
 import type { ActionHandler } from "../../types";
 import type { EnchantmentAction } from "./types";
-import { getFieldValue } from "../../utils";
+import { getFieldValue, getValueAtPath, setValueAtPath } from "../../utils";
 import { type SlotRegistryType, isArraySlotRegistryType, isSlotRegistryType } from "@/core/engine/managers/SlotManager";
 import { isStringArray } from "@/core/engine/utils/property";
 
 /**
  * Handler for enchantment.set_computed_slot action
- * Modifies the slot field of the element with the given value. It adds or removes the value from the slot.
- * If the value is already in the slot, it will be removed, otherwise it will be added.
+ * Toggles a slot value in the target array. If the slot is already present, it will be removed.
+ * If the slot is not present, it will be added using SlotManager logic.
  */
 export class SetComputedSlotHandler implements ActionHandler<EnchantmentAction> {
     execute(
@@ -18,18 +18,9 @@ export class SetComputedSlotHandler implements ActionHandler<EnchantmentAction> 
     ): Record<string, unknown> | undefined {
         if (!version) throw new Error("Version is required for computed slot actions");
 
-        const shadowCopy = structuredClone(element);
         const { path } = action;
         const computedValue = getFieldValue(action.slot);
-
-        // Navigate to the field using path
-        const pathParts = path.split(".");
-        let current = shadowCopy;
-        for (let i = 0; i < pathParts.length - 1; i++) {
-            current = current[pathParts[i]] as Record<string, unknown>;
-        }
-        const field = pathParts[pathParts.length - 1];
-        const unformattedValue = current[field];
+        const unformattedValue = getValueAtPath(element, path);
 
         let slotValue: SlotRegistryType;
         if (typeof computedValue === "string" && isSlotRegistryType(computedValue)) {
@@ -45,15 +36,14 @@ export class SetComputedSlotHandler implements ActionHandler<EnchantmentAction> 
             throw new Error(`Invalid SlotRegistryType array: ${unformattedValue}`);
         }
 
-        // Utiliser le ManagerSelector pour obtenir le SlotManager approprié
+        // Get SlotManager for the version
         const slotManager = getManager("slot", version);
         if (!slotManager) {
             throw new Error(`SlotManager is not available for version ${version}`);
         }
 
-        // Update the field with the computed slot value
-        current[field] = slotManager.apply(currentValue, slotValue);
-
-        return shadowCopy;
+        // Apply the slot toggle and return new element
+        const newSlots = slotManager.apply(currentValue, slotValue);
+        return setValueAtPath(element, path, newSlots);
     }
 }
