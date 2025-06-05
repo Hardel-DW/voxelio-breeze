@@ -206,7 +206,6 @@ describe("E2E Logs System", () => {
 
 describe("E2E Logs Replay System", () => {
     it("should create logs, parse datapack, transform logs to actions and verify results", async () => {
-        // Étape 1: Créer des logs avec 5 changements
         const testLogs = {
             voxel_studio_log: {
                 version: "1.0.0",
@@ -249,188 +248,109 @@ describe("E2E Logs Replay System", () => {
             }
         };
 
-        console.log("✓ Logs créés avec 5 changements sur 3 éléments");
-
-        // Étape 2: Prendre lootTableFile et enchantmentFile et en faire un zip
         const files = prepareFiles({ ...lootTableFile, ...enchantmentFile });
+        // Inject logs into datapack
+        files["voxel/logs.json"] = new TextEncoder().encode(JSON.stringify(testLogs));
         const datapackFile = await createZipFile(files);
 
-        console.log("✓ Datapack zip créé avec loot tables et enchantements");
-
-        // Étape 3: Parser le datapack
         const result = await parseDatapack(datapackFile);
-        console.log("✓ Datapack parsé, éléments trouvés:", result.elements.size);
 
-        // Étape 4: Récupérer le logger
-        const logger = result.logger;
-        console.log("✓ Logger récupéré");
+        // Get imported logs from the datapack logger
+        const importedChanges = result.logger.getChanges();
 
-        // Étape 5: Transformer les logs en actions et les appliquer aux éléments
-        console.log("Début de l'application des actions...");
+        // Verify imported logs
+        expect(importedChanges).toHaveLength(5);
 
-        // Trouver les éléments concernés par les logs
-        const testLootTable = Array.from(result.elements.values()).find(
-            (el) => el.identifier.namespace === "test" && el.identifier.resource === "test" && el.identifier.registry === "loot_table"
-        );
+        // Transform logs to actions and apply them
+        const elementsMap = new Map<string, any>();
+        for (const element of result.elements.values()) {
+            const id = `${element.identifier.namespace}:${element.identifier.resource}`;
+            elementsMap.set(id, element);
+        }
 
-        const attackSpeedEnchant = Array.from(result.elements.values()).find(
-            (el) =>
-                el.identifier.namespace === "enchantplus" &&
-                el.identifier.resource === "sword/attack_speed" &&
-                el.identifier.registry === "enchantment"
-        );
+        // Group changes by element_id to apply them sequentially
+        const changesByElement = new Map<string, typeof importedChanges>();
+        for (const change of importedChanges) {
+            if (!change.element_id) continue;
+            if (!changesByElement.has(change.element_id)) {
+                changesByElement.set(change.element_id, []);
+            }
+            const elementChanges = changesByElement.get(change.element_id);
+            if (elementChanges) {
+                elementChanges.push(change);
+            }
+        }
 
-        const advancedLootTable = Array.from(result.elements.values()).find(
-            (el) => el.identifier.namespace === "test" && el.identifier.resource === "advanced" && el.identifier.registry === "loot_table"
-        );
+        const modifiedElements = new Map<string, any>();
+
+        // Apply changes for each element
+        for (const [elementId, changes] of changesByElement) {
+            let currentElement = elementsMap.get(elementId);
+            expect(currentElement).toBeDefined();
+
+            if (!currentElement) throw new Error(`Element ${elementId} not found`);
+
+            // Apply all differences for this element
+            for (const change of changes) {
+                for (const difference of change.differences) {
+                    currentElement = await updateData(
+                        {
+                            type: "core.set_value",
+                            path: difference.path,
+                            value: difference.value
+                        },
+                        currentElement,
+                        123
+                    );
+
+                    if (!currentElement) throw new Error(`updateData failed for ${elementId} at path ${difference.path}`);
+                }
+            }
+
+            modifiedElements.set(elementId, currentElement);
+        }
+
+        // Verify results match the logs
+        const testLootTable = modifiedElements.get("test:test");
+        const attackSpeedEnchant = modifiedElements.get("enchantplus:sword/attack_speed");
+        const advancedLootTable = modifiedElements.get("test:advanced");
 
         expect(testLootTable).toBeDefined();
         expect(attackSpeedEnchant).toBeDefined();
         expect(advancedLootTable).toBeDefined();
 
-        if (!testLootTable) throw new Error("testLootTable not found");
-        if (!attackSpeedEnchant) throw new Error("attackSpeedEnchant not found");
-        if (!advancedLootTable) throw new Error("advancedLootTable not found");
-
-        console.log("✓ Éléments cibles trouvés");
-
-        // Appliquer les changements du log 1 (loot table: pools.0.rolls + bonus_rolls)
-        let modifiedLootTable = await updateData(
-            {
-                type: "core.set_value",
-                path: "pools.0.rolls",
-                value: 8
-            },
-            testLootTable,
-            123
-        );
-
-        if (!modifiedLootTable) throw new Error("modifiedLootTable is null after pools.0.rolls");
-
-        modifiedLootTable = await updateData(
-            {
-                type: "core.set_value",
-                path: "pools.0.bonus_rolls",
-                value: 3
-            },
-            modifiedLootTable,
-            123
-        );
-
-        if (!modifiedLootTable) throw new Error("modifiedLootTable is null after pools.0.bonus_rolls");
-
-        // Appliquer changement du log 2 (loot table: type)
-        modifiedLootTable = await updateData(
-            {
-                type: "core.set_value",
-                path: "type",
-                value: "minecraft:chest"
-            },
-            modifiedLootTable,
-            123
-        );
-
-        if (!modifiedLootTable) throw new Error("modifiedLootTable is null after type");
-
-        // Appliquer changement du log 3 (enchant: max_level)
-        const modifiedAttackSpeed = await updateData(
-            {
-                type: "core.set_value",
-                path: "max_level",
-                value: 15
-            },
-            attackSpeedEnchant,
-            123
-        );
-
-        if (!modifiedAttackSpeed) throw new Error("modifiedAttackSpeed is null");
-
-        // Appliquer changement du log 4 (enchant: min_cost.base)
-        const modifiedAttackSpeed2 = await updateData(
-            {
-                type: "core.set_value",
-                path: "min_cost.base",
-                value: 25
-            },
-            modifiedAttackSpeed,
-            123
-        );
-
-        if (!modifiedAttackSpeed2) throw new Error("modifiedAttackSpeed2 is null");
-
-        // Appliquer changement du log 5 (loot table advanced: pools.0.rolls)
-        const modifiedAdvanced = await updateData(
-            {
-                type: "core.set_value",
-                path: "pools.0.rolls",
-                value: 5
-            },
-            advancedLootTable,
-            123
-        );
-
-        if (!modifiedAdvanced) throw new Error("modifiedAdvanced is null");
-
-        console.log("✓ Toutes les actions appliquées");
-
-        // Étape 6: Vérifier que c'est bien les bonnes valeurs attendues
-
-        // Vérifications loot table
-        expect(modifiedLootTable).toBeDefined();
         // @ts-ignore - for test access
-        expect(modifiedLootTable.pools[0].rolls).toBe(8);
+        expect(testLootTable.pools[0].rolls).toBe(8);
         // @ts-ignore - for test access
-        expect(modifiedLootTable.pools[0].bonus_rolls).toBe(3);
+        expect(testLootTable.pools[0].bonus_rolls).toBe(3);
         // @ts-ignore - for test access
-        expect(modifiedLootTable.type).toBe("minecraft:chest");
+        expect(testLootTable.type).toBe("minecraft:chest");
+        // @ts-ignore - for test access
+        expect(attackSpeedEnchant.max_level).toBe(15);
+        // @ts-ignore - for test access
+        expect(attackSpeedEnchant.min_cost.base).toBe(25);
+        // @ts-ignore - for test access
+        expect(advancedLootTable.pools[0].rolls).toBe(5);
 
-        // Vérifications enchantement attack_speed
-        expect(modifiedAttackSpeed2).toBeDefined();
-        // @ts-ignore - for test access
-        expect(modifiedAttackSpeed2.max_level).toBe(15);
-        // @ts-ignore - for test access
-        expect(modifiedAttackSpeed2.min_cost.base).toBe(25);
-
-        // Vérifications loot table advanced
-        expect(modifiedAdvanced).toBeDefined();
-        // @ts-ignore - for test access
-        expect(modifiedAdvanced.pools[0].rolls).toBe(5);
-
-        console.log("✓ Toutes les valeurs correspondent aux logs!");
-
-        // Vérification supplémentaire: comparer avec les logs originaux
+        // Verify values match the original test logs
         const changes = testLogs.voxel_studio_log.changes;
-
-        // Changement 1 - pools.0.rolls
         expect(changes[0].differences[0].value).toBe(8);
         // @ts-ignore
-        expect(modifiedLootTable.pools[0].rolls).toBe(changes[0].differences[0].value);
-
-        // Changement 2 - pools.0.bonus_rolls
+        expect(testLootTable.pools[0].rolls).toBe(changes[0].differences[0].value);
         expect(changes[0].differences[1].value).toBe(3);
         // @ts-ignore
-        expect(modifiedLootTable.pools[0].bonus_rolls).toBe(changes[0].differences[1].value);
-
-        // Changement 3 - type
+        expect(testLootTable.pools[0].bonus_rolls).toBe(changes[0].differences[1].value);
         expect(changes[1].differences[0].value).toBe("minecraft:chest");
         // @ts-ignore
-        expect(modifiedLootTable.type).toBe(changes[1].differences[0].value);
-
-        // Changement 4 - max_level
+        expect(testLootTable.type).toBe(changes[1].differences[0].value);
         expect(changes[2].differences[0].value).toBe(15);
         // @ts-ignore
-        expect(modifiedAttackSpeed2.max_level).toBe(changes[2].differences[0].value);
-
-        // Changement 5 - min_cost.base
+        expect(attackSpeedEnchant.max_level).toBe(changes[2].differences[0].value);
         expect(changes[3].differences[0].value).toBe(25);
         // @ts-ignore
-        expect(modifiedAttackSpeed2.min_cost.base).toBe(changes[3].differences[0].value);
-
-        // Changement 6 - advanced loot table pools.0.rolls
+        expect(attackSpeedEnchant.min_cost.base).toBe(changes[3].differences[0].value);
         expect(changes[4].differences[0].value).toBe(5);
         // @ts-ignore
-        expect(modifiedAdvanced.pools[0].rolls).toBe(changes[4].differences[0].value);
-
-        console.log("✓ Test complet réussi! Logs → Actions → Résultats vérifiés");
+        expect(advancedLootTable.pools[0].rolls).toBe(changes[4].differences[0].value);
     });
 });
