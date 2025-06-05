@@ -61,9 +61,7 @@ export async function parseDatapack<T extends keyof Analysers>(file: File): Prom
     }
 
     if (elements.size === 0) throw new DatapackError("tools.warning.no_elements");
-    const logger = logs
-        ? new Logger(JSON.parse(new TextDecoder().decode(logs)))
-        : new Logger({ id, date, version, isModded, datapack: { name, description, namespaces }, isMinified: true, logs: [] });
+    const logger = new Logger(new TextDecoder().decode(logs));
 
     return { name, files, elements, version, isModded, logger };
 }

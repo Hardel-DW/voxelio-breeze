@@ -1,61 +1,7 @@
 import { describe, it, expect } from "vitest";
-import { deepDiff, captureState } from "@/core/engine/migrations/differ";
+import { deepDiff } from "@/core/engine/migrations/differ";
 
 describe("Differ System", () => {
-    describe("captureState", () => {
-        it("should normalize basic values", () => {
-            const element = {
-                name: "test",
-                value: 42,
-                enabled: true,
-                nullable: null,
-                undef: undefined
-            };
-
-            const state = captureState(element);
-
-            expect(state.name).toBe("test");
-            expect(state.value).toBe(42);
-            expect(state.enabled).toBe(true);
-            expect(state.nullable).toBe(null);
-            expect(state.undef).toBe(undefined);
-        });
-
-        it("should normalize nested objects", () => {
-            const element = {
-                config: {
-                    settings: {
-                        debug: true,
-                        level: 5
-                    }
-                }
-            };
-
-            const state = captureState(element);
-
-            expect(state.config).toEqual({
-                settings: {
-                    debug: true,
-                    level: 5
-                }
-            });
-        });
-
-        it("should normalize arrays", () => {
-            const element = {
-                items: ["a", "b", "c"],
-                numbers: [1, 2, 3],
-                nested: [{ id: 1 }, { id: 2 }]
-            };
-
-            const state = captureState(element);
-
-            expect(state.items).toEqual(["a", "b", "c"]);
-            expect(state.numbers).toEqual([1, 2, 3]);
-            expect(state.nested).toEqual([{ id: 1 }, { id: 2 }]);
-        });
-    });
-
     describe("deepDiff", () => {
         it("should detect no changes when objects are identical", () => {
             const before = { name: "test", value: 42 };
@@ -215,46 +161,6 @@ describe("Differ System", () => {
                 value: 3,
                 origin_value: 2
             });
-        });
-
-        it("should respect ignorePaths option", () => {
-            const before = { name: "test", timestamp: "2023-01-01", value: 42 };
-            const after = { name: "test", timestamp: "2023-01-02", value: 100 };
-
-            const differences = deepDiff(before, after, {
-                ignorePaths: ["timestamp"]
-            });
-
-            expect(differences).toHaveLength(1);
-            expect(differences[0].path).toBe("value");
-        });
-
-        it("should respect maxDepth option", () => {
-            const before = {
-                level1: {
-                    level2: {
-                        level3: {
-                            value: "deep"
-                        }
-                    }
-                }
-            };
-            const after = {
-                level1: {
-                    level2: {
-                        level3: {
-                            value: "changed"
-                        }
-                    }
-                }
-            };
-
-            const differences = deepDiff(before, after, {
-                maxDepth: 2
-            });
-
-            // Should not detect changes deeper than level 2
-            expect(differences).toHaveLength(0);
         });
 
         it("should handle type changes", () => {

@@ -122,8 +122,7 @@ describe("Logger System", () => {
             expect(parsed.voxel_studio_log.version).toBe("1.0.0");
             expect(parsed.voxel_studio_log.changes).toHaveLength(1);
 
-            const newLogger = new Logger();
-            newLogger.importJson(json);
+            const newLogger = new Logger(json);
 
             expect(newLogger.getChanges()).toEqual(testLogger.getChanges());
         });
@@ -139,14 +138,12 @@ describe("Logger System", () => {
             ];
 
             // Direct changes array
-            testLogger.importJson(JSON.stringify(changes));
-            expect(testLogger.getChanges()).toHaveLength(1);
-
-            testLogger.clearChanges();
+            const testLogger1 = new Logger(JSON.stringify(changes));
+            expect(testLogger1.getChanges()).toHaveLength(1);
 
             // Legacy format
-            testLogger.importJson(JSON.stringify({ changes }));
-            expect(testLogger.getChanges()).toHaveLength(1);
+            const testLogger2 = new Logger(JSON.stringify({ changes }));
+            expect(testLogger2.getChanges()).toHaveLength(1);
         });
     });
 

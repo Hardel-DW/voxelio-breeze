@@ -14,8 +14,3 @@ export interface ChangeSet {
     differences: LogDifference[];
     timestamp: string;
 }
-
-export interface DiffOptions {
-    ignorePaths?: string[];
-    maxDepth?: number;
-}

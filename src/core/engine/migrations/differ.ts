@@ -1,9 +1,9 @@
-import type { LogDifference, DiffOptions } from "./types";
+import type { LogDifference } from "./types";
 
 /**
  * Normalizes a value to be safely serializable and comparable
  */
-function normalizeValue(value: unknown): unknown {
+export function normalizeValue(value: unknown): unknown {
     if (value === null || value === undefined) {
         return value;
     }
@@ -25,13 +25,6 @@ function normalizeValue(value: unknown): unknown {
     }
 
     return String(value);
-}
-
-/**
- * Captures the current state of an element in a normalized form
- */
-export function captureState(element: Record<string, unknown>): Record<string, unknown> {
-    return normalizeValue(element) as Record<string, unknown>;
 }
 
 /**
@@ -58,178 +51,78 @@ function isEqual(a: unknown, b: unknown): boolean {
     return false;
 }
 
-/**
- * Builds a path string from an array of path segments
- */
-function buildPath(segments: (string | number)[]): string {
-    return segments.join(".");
-}
+// Helper functions for unified comparison logic
+const createDiff = (type: LogDifference["type"], path: string, value?: unknown, origin_value?: unknown): LogDifference => ({
+    type,
+    path,
+    ...(value !== undefined && { value }),
+    ...(origin_value !== undefined && { origin_value })
+});
 
-/**
- * Recursively compares two objects and generates LogDifference entries
- */
-function compareObjects(
-    before: Record<string, unknown>,
-    after: Record<string, unknown>,
-    pathSegments: (string | number)[] = [],
-    options: DiffOptions = {}
-): LogDifference[] {
-    const differences: LogDifference[] = [];
-    const currentPath = buildPath(pathSegments);
+const buildPath = (segments: (string | number)[]): string => segments.join(".");
 
-    // Check max depth
-    if (options.maxDepth !== undefined && pathSegments.length >= options.maxDepth) {
-        return differences;
+const getStructureEntries = (value: unknown): [string | number, unknown][] => {
+    if (Array.isArray(value)) {
+        return value.map((item, index) => [index, item] as [number, unknown]);
     }
+    return Object.entries(value as Record<string, unknown>);
+};
 
-    // Check if path should be ignored
-    if (options.ignorePaths?.includes(currentPath)) {
-        return differences;
-    }
-
-    // Get all unique keys from both objects
-    const allKeys = new Set([...Object.keys(before), ...Object.keys(after)]);
-
-    for (const key of allKeys) {
-        const newPathSegments = [...pathSegments, key];
-        const path = buildPath(newPathSegments);
-
-        // Skip ignored paths
-        if (options.ignorePaths?.includes(path)) {
-            continue;
-        }
-
-        const beforeValue = before[key];
-        const afterValue = after[key];
-
-        // Key was removed
-        if (beforeValue !== undefined && afterValue === undefined) {
-            differences.push({ type: "remove", path, origin_value: beforeValue });
-        }
-        // Key was added
-        else if (beforeValue === undefined && afterValue !== undefined) {
-            differences.push({ type: "add", path, value: afterValue });
-        }
-        // Key exists in both - check for changes
-        else if (beforeValue !== undefined && afterValue !== undefined) {
-            if (!isEqual(beforeValue, afterValue)) {
-                // If both are objects, recurse
-                if (
-                    typeof beforeValue === "object" &&
-                    typeof afterValue === "object" &&
-                    beforeValue !== null &&
-                    afterValue !== null &&
-                    !Array.isArray(beforeValue) &&
-                    !Array.isArray(afterValue)
-                ) {
-                    differences.push(
-                        ...compareObjects(
-                            beforeValue as Record<string, unknown>,
-                            afterValue as Record<string, unknown>,
-                            newPathSegments,
-                            options
-                        )
-                    );
-                } else {
-                    // If both are arrays, compare them as arrays
-                    if (Array.isArray(beforeValue) && Array.isArray(afterValue)) {
-                        differences.push(...compareArrays(beforeValue, afterValue, newPathSegments, options));
-                    } else {
-                        differences.push({ type: "set", path, value: afterValue, origin_value: beforeValue });
-                    }
-                }
-            }
-        }
-    }
-
-    return differences;
-}
+const isStructure = (value: unknown): value is Record<string, unknown> | unknown[] => typeof value === "object" && value !== null;
 
 /**
- * Compares two arrays and generates LogDifference entries
+ * Unified comparison for objects and arrays
  */
-function compareArrays(
-    before: unknown[],
-    after: unknown[],
-    pathSegments: (string | number)[] = [],
-    options: DiffOptions = {}
-): LogDifference[] {
-    const differences: LogDifference[] = [];
+function compareStructures(before: unknown, after: unknown, pathSegments: (string | number)[] = []): LogDifference[] {
+    const beforeEntries = new Map(getStructureEntries(before));
+    const afterEntries = new Map(getStructureEntries(after));
+    const allKeys = new Set([...beforeEntries.keys(), ...afterEntries.keys()]);
 
-    // Compare arrays by index
-    const maxLength = Math.max(before.length, after.length);
-
-    for (let i = 0; i < maxLength; i++) {
-        const newPathSegments = [...pathSegments, i];
-        const path = buildPath(newPathSegments);
-
-        if (options.ignorePaths?.includes(path)) {
-            continue;
-        }
-
-        const beforeValue = before[i];
-        const afterValue = after[i];
+    return Array.from(allKeys).flatMap((key) => {
+        const newPath = buildPath([...pathSegments, key]);
+        const beforeValue = beforeEntries.get(key);
+        const afterValue = afterEntries.get(key);
 
         if (beforeValue !== undefined && afterValue === undefined) {
-            differences.push({ type: "remove", path, origin_value: beforeValue });
-        } else if (beforeValue === undefined && afterValue !== undefined) {
-            differences.push({ type: "add", path, value: afterValue });
-        } else if (beforeValue !== undefined && afterValue !== undefined) {
-            if (!isEqual(beforeValue, afterValue)) {
-                if (typeof beforeValue === "object" && typeof afterValue === "object" && beforeValue !== null && afterValue !== null) {
-                    if (Array.isArray(beforeValue) && Array.isArray(afterValue)) {
-                        differences.push(...compareArrays(beforeValue, afterValue, newPathSegments, options));
-                    } else if (!Array.isArray(beforeValue) && !Array.isArray(afterValue)) {
-                        differences.push(
-                            ...compareObjects(
-                                beforeValue as Record<string, unknown>,
-                                afterValue as Record<string, unknown>,
-                                newPathSegments,
-                                options
-                            )
-                        );
-                    } else {
-                        differences.push({ type: "set", path, value: afterValue, origin_value: beforeValue });
-                    }
-                } else {
-                    differences.push({ type: "set", path, value: afterValue, origin_value: beforeValue });
-                }
-            }
+            return [createDiff("remove", newPath, undefined, beforeValue)];
         }
-    }
 
-    return differences;
+        if (beforeValue === undefined && afterValue !== undefined) {
+            return [createDiff("add", newPath, afterValue)];
+        }
+
+        if (beforeValue !== undefined && afterValue !== undefined && !isEqual(beforeValue, afterValue)) {
+            const bothAreStructures = isStructure(beforeValue) && isStructure(afterValue);
+            const sameArrayType = Array.isArray(beforeValue) === Array.isArray(afterValue);
+
+            if (bothAreStructures && sameArrayType) {
+                return compareStructures(beforeValue, afterValue, [...pathSegments, key]);
+            }
+
+            return [createDiff("set", newPath, afterValue, beforeValue)];
+        }
+
+        return [];
+    });
 }
 
 /**
  * Main diff function that compares two states and returns differences
  */
-export function deepDiff(before: unknown, after: unknown, options: DiffOptions = {}): LogDifference[] {
+export function deepDiff(before: unknown, after: unknown): LogDifference[] {
     const normalizedBefore = normalizeValue(before);
     const normalizedAfter = normalizeValue(after);
 
-    // If values are primitives or null/undefined, compare directly
-    if (
-        typeof normalizedBefore !== "object" ||
-        typeof normalizedAfter !== "object" ||
-        normalizedBefore === null ||
-        normalizedAfter === null
-    ) {
-        if (!isEqual(normalizedBefore, normalizedAfter)) {
-            return [{ type: "set", path: "", value: normalizedAfter, origin_value: normalizedBefore }];
+    if (!isEqual(normalizedBefore, normalizedAfter)) {
+        const bothAreStructures = isStructure(normalizedBefore) && isStructure(normalizedAfter);
+        const sameArrayType = Array.isArray(normalizedBefore) === Array.isArray(normalizedAfter);
+
+        if (bothAreStructures && sameArrayType) {
+            return compareStructures(normalizedBefore, normalizedAfter, []);
         }
-        return [];
+
+        return [createDiff("set", "", normalizedAfter, normalizedBefore)];
     }
 
-    // Handle arrays
-    if (Array.isArray(normalizedBefore) && Array.isArray(normalizedAfter)) {
-        return compareArrays(normalizedBefore, normalizedAfter, [], options);
-    }
-
-    // Handle objects
-    if (!Array.isArray(normalizedBefore) && !Array.isArray(normalizedAfter)) {
-        return compareObjects(normalizedBefore as Record<string, unknown>, normalizedAfter as Record<string, unknown>, [], options);
-    }
-
-    return [{ type: "set", path: "", value: normalizedAfter, origin_value: normalizedBefore }];
+    return [];
 }

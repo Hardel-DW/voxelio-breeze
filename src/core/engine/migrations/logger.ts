@@ -1,12 +1,13 @@
-import type { ChangeSet, DiffOptions } from "./types";
-import { deepDiff, captureState } from "./differ";
+import type { ChangeSet } from "./types";
+import { deepDiff, normalizeValue } from "./differ";
 
 export class Logger {
     private changes: ChangeSet[] = [];
-    private options: DiffOptions;
 
-    constructor(options: DiffOptions = {}) {
-        this.options = options;
+    constructor(jsonData?: string) {
+        if (jsonData) {
+            this.importJson(jsonData);
+        }
     }
 
     /**
@@ -16,11 +17,11 @@ export class Logger {
         element: T,
         operation: (element: T) => Promise<Partial<T> | undefined>
     ): Promise<Partial<T> | undefined> {
-        const beforeState = captureState(element);
+        const beforeState = normalizeValue(element) as Record<string, unknown>;
         const result = await operation(element);
 
         if (result) {
-            const afterState = captureState(result);
+            const afterState = normalizeValue(result) as Record<string, unknown>;
             this.addDiff(beforeState, afterState, element);
         }
 
@@ -31,8 +32,8 @@ export class Logger {
      * Syncs changes by comparing two states (for manual changes detection)
      */
     sync<T extends Record<string, unknown>>(beforeState: T, afterState: T, elementId?: string, elementType?: string): void {
-        const before = captureState(beforeState);
-        const after = captureState(afterState);
+        const before = normalizeValue(beforeState) as Record<string, unknown>;
+        const after = normalizeValue(afterState) as Record<string, unknown>;
         this.addDiff(before, after, afterState, elementId, elementType);
     }
 
@@ -51,19 +52,6 @@ export class Logger {
             null,
             2
         );
-    }
-
-    /**
-     * Imports changes from JSON
-     */
-    importJson(json: string): void {
-        try {
-            const data = JSON.parse(json);
-            const changes = data.voxel_studio_log?.changes || data.changes || data;
-            this.changes = Array.isArray(changes) ? changes : [];
-        } catch (error) {
-            throw new Error(`Failed to import changes: ${error}`);
-        }
     }
 
     /**
@@ -90,7 +78,7 @@ export class Logger {
         elementId?: string,
         elementType?: string
     ): void {
-        const differences = deepDiff(before, after, this.options);
+        const differences = deepDiff(before, after);
 
         if (differences.length > 0) {
             this.changes.push({
@@ -130,5 +118,18 @@ export class Logger {
         }
 
         return undefined;
+    }
+
+    /**
+     * Imports changes from JSON
+     */
+    private importJson(json: string): void {
+        try {
+            const data = JSON.parse(json);
+            const changes = data.voxel_studio_log?.changes || data.changes || data;
+            this.changes = Array.isArray(changes) ? changes : [];
+        } catch (error) {
+            throw new Error(`Failed to import changes: ${error}`);
+        }
     }
 }

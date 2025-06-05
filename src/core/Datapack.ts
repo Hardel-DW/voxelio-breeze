@@ -356,7 +356,7 @@ export class Datapack {
      */
     private prepareLogger(files: InputWithoutMeta[], logger: Logger | undefined, isMinified: boolean) {
         if (logger) {
-            const logData = logger.serialize(isMinified);
+            const logData = logger.exportJson();
             files.push(this.prepareFile("voxel/logs.json", logData, isMinified));
         }
     }
