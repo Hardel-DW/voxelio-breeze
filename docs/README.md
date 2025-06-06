@@ -85,6 +85,8 @@ Le système d'actions est organisé en domaines :
   des enchantements
 - [**Guide Loot Table**](./loot-table-guide.md) - Conversion des tables de loot
 - [**Guide Recipe**](./recipe-guide.md) - Conversion des recettes de craft
+- [**Guide Structure**](./structure-guide.md) - Conversion des structures et
+  système Jigsaw
 
 ### ⚡ Documentation des actions
 
@@ -97,6 +99,8 @@ Le système d'actions est organisé en domaines :
 - [**Actions Loot Table**](./actions-loot-table.md) - Actions pour les tables de
   loot
 - [**Actions Recipe**](./actions-recipe.md) - Actions pour les recettes
+- [**Actions Structure**](./actions-structure.md) - Actions pour les structures
+  et spawn overrides
 
 #### Système d'actions
 
@@ -110,6 +114,11 @@ Le système d'actions est organisé en domaines :
 
 - [**Parsing**](./parsing.md) - Architecture générale du parsing
 - [**Compiling**](./compiling.md) - Architecture générale du compiling
+
+### 🏗️ Guide de développement
+
+- [**Ajout d'un nouveau concept**](./adding-new-concept.md) - Guide complet pour
+  implémenter un nouveau concept depuis zéro
 
 ## Installation et utilisation
 

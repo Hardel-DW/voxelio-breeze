@@ -10,6 +10,9 @@ import type { Enchantment } from "@/schema/enchantment/Enchantment";
 import { VoxelToLootDataDriven } from "../schema/loot/Compiler";
 import { LootDataDrivenToVoxelFormat } from "../schema/loot/Parser";
 import type { LootTableProps, MinecraftLootTable } from "../schema/loot/types";
+import { VoxelToStructureDataDriven } from "../schema/structure/Compiler";
+import { StructureDataDrivenToVoxelFormat } from "../schema/structure/Parser";
+import type { StructureProps, MinecraftStructure } from "../schema/structure/types";
 
 export type GetAnalyserVoxel<T extends keyof Analysers> = Analysers[T]["voxel"];
 export type GetAnalyserMinecraft<T extends keyof Analysers> = Analysers[T]["minecraft"];
@@ -26,6 +29,10 @@ export type Analysers = {
     recipe: {
         voxel: RecipeProps;
         minecraft: MinecraftRecipe;
+    };
+    "worldgen/structure": {
+        voxel: StructureProps;
+        minecraft: MinecraftStructure;
     };
 };
 
@@ -54,6 +61,11 @@ export const analyserCollection: VersionedAnalysers = {
         compiler: VoxelToRecipeDataDriven,
         parser: RecipeDataDrivenToVoxelFormat,
         hasTag: false
+    },
+    "worldgen/structure": {
+        compiler: VoxelToStructureDataDriven,
+        parser: StructureDataDrivenToVoxelFormat,
+        hasTag: true
     }
 };
 

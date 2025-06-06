@@ -1,10 +1,10 @@
 import { Datapack } from "@/core/Datapack";
 import { DatapackError } from "@/core/DatapackError";
-import type { ConfiguratorConfigFromDatapack, DataDrivenElement, VoxelElement, VoxelRegistryElement } from "@/core/Element";
+import type { ConfiguratorConfigFromDatapack, DataDrivenElement, VoxelElement } from "@/core/Element";
 import type { DataDrivenRegistryElement } from "@/core/Element";
 import { Identifier } from "@/core/Identifier";
 import type { Analysers, GetAnalyserMinecraft, GetAnalyserVoxel } from "@/core/engine/Analyser";
-import { analyserCollection, conceptWithTag, getAllConcepts } from "@/core/engine/Analyser";
+import { analyserCollection } from "@/core/engine/Analyser";
 import { Logger } from "@/core/engine/migrations/logger";
 
 export interface ParserParams<K extends DataDrivenElement> {

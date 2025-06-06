@@ -7,7 +7,7 @@ export type BaseCondition = {
 export type ConditionEqualsString = {
     condition: "compare_to_value";
     compare: string;
-    value: string;
+    value: string | number | boolean;
 };
 
 export interface ConditionEqualsUndefined extends BaseCondition {
@@ -16,7 +16,7 @@ export interface ConditionEqualsUndefined extends BaseCondition {
 
 export interface ConditionEqualsFieldValue extends BaseCondition {
     condition: "compare_value_to_field_value";
-    value: string;
+    value: string | number | boolean;
 }
 
 export interface ConditionContain extends BaseCondition {

@@ -22,8 +22,6 @@ export const VoxelToEnchantmentDataDriven: Compiler<EnchantmentProps, Enchantmen
     // Optimisation: éviter le double clone
     const enchantment = original ? structuredClone(original) : ({} as Enchantment);
     const tagRegistry = `tags/${config}`;
-
-    // Optimisation: traitement des tags plus efficace
     let tags: IdentifierObject[] = [];
     if (element.tags.length > 0) {
         tags = tagsToIdentifiers(element.tags, tagRegistry);

@@ -23,14 +23,15 @@ export default defineConfig({
         dts({
             entryRoot: "src",
             outputDir: "dist",
-            exclude: ["test/**/*"],
+            exclude: ["test/**/*", "benchmark/**/*"],
             rollupTypes: true
         })
     ],
     resolve: {
         alias: {
             "@": resolve(__dirname, "src"),
-            "@test": resolve(__dirname, "test")
+            "@test": resolve(__dirname, "test"),
+            "@benchmark": resolve(__dirname, "benchmark")
         }
     }
 });
