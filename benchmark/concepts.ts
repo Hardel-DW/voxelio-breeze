@@ -6,6 +6,8 @@ import { VoxelToRecipeDataDriven } from "../src/core/schema/recipe/Compiler";
 import { RecipeDataDrivenToVoxelFormat } from "../src/core/schema/recipe/Parser";
 import { StructureDataDrivenToVoxelFormat } from "../src/core/schema/structure/Parser";
 import { VoxelToStructureDataDriven } from "../src/core/schema/structure/Compiler";
+import { StructureSetDataDrivenToVoxelFormat } from "../src/core/schema/structure_set/Parser";
+import { VoxelToStructureSetDataDriven } from "../src/core/schema/structure_set/Compiler";
 import { DATA_DRIVEN_TEMPLATE_ENCHANTMENT } from "../test/template/concept/enchant/DataDriven";
 import { VOXEL_TEMPLATE_ENCHANTMENT } from "../test/template/concept/enchant/VoxelDriven";
 import { shapeless, shaped, smelting, transform } from "../test/template/concept/recipe/DataDriven";
@@ -14,6 +16,18 @@ import { DATA_DRIVEN_TEMPLATE_LOOT_TABLE } from "../test/template/concept/loot/D
 import { VOXEL_TEMPLATE_LOOT_TABLE } from "../test/template/concept/loot/VoxelDriven";
 import { village, mineshaft, bastion, fortress } from "../test/template/concept/structure/DataDriven";
 import { villageVoxel, mineshaftVoxel, bastionVoxel, fortressVoxel } from "../test/template/concept/structure/VoxelDriven";
+import {
+    strongholdStructureSet,
+    ruinedPortalStructureSet,
+    endCityStructureSet,
+    villageStructureSet
+} from "../test/template/concept/structure_set/DataDriven";
+import {
+    villageVoxel as villageVoxelStructureSet,
+    strongholdVoxel,
+    ruinedPortalVoxel,
+    endCityVoxel
+} from "../test/template/concept/structure_set/VoxelDriven";
 
 interface BenchmarkResult {
     name: string;
@@ -184,6 +198,40 @@ const concepts: ConceptConfig[] = [
                 name: "fortress (legacy)",
                 datadriven: fortress,
                 voxel: fortressVoxel.data,
+                size: "~2KB"
+            }
+        ]
+    },
+    {
+        name: "structure_set",
+        displayName: "STRUCTURE SET",
+        icon: "🗺️",
+        parser: (element) => StructureSetDataDrivenToVoxelFormat({ element }),
+        compiler: (voxel, original) => VoxelToStructureSetDataDriven(voxel, "worldgen/structure_set", original),
+        registry: "worldgen/structure_set",
+        testCases: [
+            {
+                name: "villages (concentric)",
+                datadriven: villageStructureSet,
+                voxel: villageVoxelStructureSet.data,
+                size: "~2KB"
+            },
+            {
+                name: "strongholds (concentric)",
+                datadriven: strongholdStructureSet,
+                voxel: strongholdVoxel.data,
+                size: "~3KB"
+            },
+            {
+                name: "ruined portals (random)",
+                datadriven: ruinedPortalStructureSet,
+                voxel: ruinedPortalVoxel.data,
+                size: "~2.5KB"
+            },
+            {
+                name: "end cities (random)",
+                datadriven: endCityStructureSet,
+                voxel: endCityVoxel.data,
                 size: "~2KB"
             }
         ]

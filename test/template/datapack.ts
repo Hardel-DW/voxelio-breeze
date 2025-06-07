@@ -5,6 +5,7 @@ import { completeLootTable, advancedLootTable, ultimateTestLootTable, finalBossO
 import { prepareFiles, createFilesFromElements, createZipFile } from "./utils";
 import { recipeDataDriven } from "./concept/recipe/DataDriven";
 import { structureDataDriven } from "./concept/structure/DataDriven";
+import { structureSetDataDriven } from "./concept/structure_set/DataDriven";
 
 export const lootTableFile = {
     "data/test/loot_table/test.json": completeLootTable,
@@ -41,5 +42,6 @@ export const enchantmentWithTagFiles = createFilesFromElements([
 
 export const recipeFile = createFilesFromElements(recipeDataDriven);
 export const structureFile = createFilesFromElements(structureDataDriven);
+export const structureSetFile = createFilesFromElements(structureSetDataDriven);
 export const nonValidMcmetaZip = prepareFiles({}, -1);
 export const lootTableZip = await createZipFile(prepareFiles(lootTableFile));

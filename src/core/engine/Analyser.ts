@@ -13,6 +13,9 @@ import type { LootTableProps, MinecraftLootTable } from "../schema/loot/types";
 import { VoxelToStructureDataDriven } from "../schema/structure/Compiler";
 import { StructureDataDrivenToVoxelFormat } from "../schema/structure/Parser";
 import type { StructureProps, MinecraftStructure } from "../schema/structure/types";
+import { VoxelToStructureSetDataDriven } from "../schema/structure_set/Compiler";
+import { StructureSetDataDrivenToVoxelFormat } from "../schema/structure_set/Parser";
+import type { StructureSetProps, MinecraftStructureSet } from "../schema/structure_set/types";
 
 export type GetAnalyserVoxel<T extends keyof Analysers> = Analysers[T]["voxel"];
 export type GetAnalyserMinecraft<T extends keyof Analysers> = Analysers[T]["minecraft"];
@@ -33,6 +36,10 @@ export type Analysers = {
     "worldgen/structure": {
         voxel: StructureProps;
         minecraft: MinecraftStructure;
+    };
+    "worldgen/structure_set": {
+        voxel: StructureSetProps;
+        minecraft: MinecraftStructureSet;
     };
 };
 
@@ -65,6 +72,11 @@ export const analyserCollection: VersionedAnalysers = {
     "worldgen/structure": {
         compiler: VoxelToStructureDataDriven,
         parser: StructureDataDrivenToVoxelFormat,
+        hasTag: true
+    },
+    "worldgen/structure_set": {
+        compiler: VoxelToStructureSetDataDriven,
+        parser: StructureSetDataDrivenToVoxelFormat,
         hasTag: true
     }
 };

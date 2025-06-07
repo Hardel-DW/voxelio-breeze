@@ -721,3 +721,37 @@ Ce guide explique la conversion bidirectionnelle entre le format Minecraft et le
 
 Ce pattern garantit une intégration cohérente de nouveaux concepts dans l'écosystème voxel-breeze tout en maintenant la qualité et les performances.
 ```
+
+Prompt : @adding-new-concept.md @actions-loot-table.md @loot-table-guide.md
+
+Je veux que tu prenne connaissances de l'applications. Je vais te donner une
+tache aprés, en rapport avec l'implémentation des structures set, dans un format
+propriétaire pratique pour gérer le UI.
+
+- Ont va faire le Compiler/ Parser avec les actions associés
+
+Séparément voici un exemples avec Loot. @types.ts @Compiler.ts @Parser.ts
+@Analyser.ts
+
+Et ensuite faire les tests avec la structure suivante :
+
+- Les Mocks dans test/template/concept/*.
+- Les tests dans test/engine/concept/*
+- Les tests pour les actions dans test/engine/actions/*
+- Les benchmark dans dans benchmark
+
+Informations spécifiques :
+
+- Structure set auras la clef "worldgen/structure_set".
+- Structure set posséde des tags associés.
+
+Voici la documentation du concept en format mcdoc. Nous traitons que la 1.21.
+N'inclus donc pas les versions antérieures.
+
+IMPORTANT : Ne met rien dans le champ configurator, surtout pas "test" ou
+autres. configurator: "test" C'est une fonctionnalités qui va être refactorer,
+et qui permet a un datapacks/mods de fournir des infromations lors de la
+compilation/parsing ou pour l'affichage UI.
+
+- Cette valeur ne peut pas être modifier par le UI.
+- Ou l'élement n'est pas afficher dans la sidebar...
