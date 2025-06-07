@@ -15,12 +15,16 @@ export const StructureDataDrivenToVoxelFormat: StructureParser = ({
     // Normalize biomes to array
     const biomes = Array.isArray(data.biomes) ? data.biomes : [data.biomes];
 
-    // Convert spawn overrides from record to array
-    const spawnOverrides: SpawnOverride[] = Object.entries(data.spawn_overrides || {}).map(([category, override]) => ({
-        mobCategory: category as MobCategory,
-        boundingBox: override.bounding_box,
-        spawns: override.spawns || []
-    }));
+    // Convert spawn overrides from record to array (only if not empty)
+    const spawnOverridesEntries = Object.entries(data.spawn_overrides || {});
+    const spawnOverrides: SpawnOverride[] | undefined =
+        spawnOverridesEntries.length > 0
+            ? spawnOverridesEntries.map(([category, override]) => ({
+                  mobCategory: category as MobCategory,
+                  boundingBox: override.bounding_box,
+                  spawns: override.spawns || []
+              }))
+            : undefined;
 
     // Build base structure
     const structure: StructureProps = {
@@ -28,10 +32,14 @@ export const StructureDataDrivenToVoxelFormat: StructureParser = ({
         type: data.type,
         biomes,
         step: data.step,
-        spawnOverrides,
         override: configurator,
         tags
     };
+
+    // Add spawn overrides only if present
+    if (spawnOverrides) {
+        structure.spawnOverrides = spawnOverrides;
+    }
 
     // Add optional base properties
     if (data.terrain_adaptation) {

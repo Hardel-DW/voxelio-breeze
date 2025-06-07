@@ -37,9 +37,9 @@ export const VoxelToStructureDataDriven: StructureCompiler = (
         structure.terrain_adaptation = element.terrainAdaptation;
     }
 
-    // Convert spawn overrides from array to record
+    // Convert spawn overrides from array to record (always set, even if empty)
+    structure.spawn_overrides = {} as Record<MobCategory, MinecraftSpawnOverride>;
     if (element.spawnOverrides && element.spawnOverrides.length > 0) {
-        structure.spawn_overrides = {} as Record<MobCategory, MinecraftSpawnOverride>;
         for (const override of element.spawnOverrides) {
             structure.spawn_overrides[override.mobCategory] = {
                 bounding_box: override.boundingBox,

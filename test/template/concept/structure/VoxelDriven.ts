@@ -34,6 +34,7 @@ export function createMockStructure(overrides: Partial<StructureProps> = {}): St
         maxDistanceFromCenter: 80,
         useExpansionHack: false,
         terrainAdaptation: "beard_thin",
+        tags: [],
         ...overrides
     };
 }
@@ -48,6 +49,7 @@ export function createLegacyStructure(overrides: Partial<StructureProps> = {}): 
             mineshaftType: "normal",
             probability: 0.004
         },
+        tags: [],
         ...overrides
     };
 }
@@ -84,7 +86,8 @@ export const villageVoxel: DataDrivenRegistryElement<StructureProps> = {
         },
         projectStartToHeightmap: "WORLD_SURFACE_WG",
         maxDistanceFromCenter: 80,
-        useExpansionHack: false
+        useExpansionHack: false,
+        tags: []
     }
 };
 
@@ -98,7 +101,8 @@ export const mineshaftVoxel: DataDrivenRegistryElement<StructureProps> = {
         typeSpecific: {
             mineshaftType: "normal",
             probability: 0.004
-        }
+        },
+        tags: []
     }
 };
 
@@ -120,7 +124,8 @@ export const bastionVoxel: DataDrivenRegistryElement<StructureProps> = {
         },
         projectStartToHeightmap: "WORLD_SURFACE_WG",
         maxDistanceFromCenter: 111,
-        useExpansionHack: false
+        useExpansionHack: false,
+        tags: []
     }
 };
 
@@ -138,7 +143,8 @@ export const fortressVoxel: DataDrivenRegistryElement<StructureProps> = {
                 minInclusive: 27,
                 maxInclusive: 36
             }
-        }
+        },
+        tags: []
     }
 };
 

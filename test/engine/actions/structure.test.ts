@@ -8,7 +8,7 @@ describe("Structure Actions", () => {
         type: "minecraft:village",
         biomes: ["minecraft:plains"],
         step: "surface_structures",
-        spawnOverrides: []
+        tags: []
     };
 
     describe("structure.set_biomes", () => {

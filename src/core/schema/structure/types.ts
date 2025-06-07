@@ -10,7 +10,7 @@ export interface StructureProps extends VoxelElement {
     biomes: string[]; // List of biome IDs or tags
     step: DecorationStep;
     terrainAdaptation?: TerrainAdaptation;
-    spawnOverrides: SpawnOverride[];
+    spawnOverrides?: SpawnOverride[]; // Made optional
 
     // Jigsaw-specific properties (flattened)
     startPool?: string;
@@ -74,9 +74,7 @@ export interface MinecraftStructure extends DataDrivenElement {
     biomes: string[] | string;
     step: DecorationStep;
     terrain_adaptation?: TerrainAdaptation;
-    spawn_overrides: Record<MobCategory, MinecraftSpawnOverride>;
-
-    // Jigsaw config (spread from structure_config)
+    spawn_overrides: Partial<Record<MobCategory, MinecraftSpawnOverride>>;
     start_pool?: string;
     size?: number;
     start_height?: any;
@@ -87,8 +85,6 @@ export interface MinecraftStructure extends DataDrivenElement {
     pool_aliases?: MinecraftPoolAlias[];
     dimension_padding?: number | MinecraftDimensionPadding;
     liquid_settings?: LiquidSettings;
-
-    // Legacy config properties
     probability?: number;
     mineshaft_type?: MineshaftType;
     height?: any;
