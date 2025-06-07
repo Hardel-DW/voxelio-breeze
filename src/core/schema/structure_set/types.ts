@@ -104,23 +104,6 @@ export interface CompilerResult {
 }
 
 /**
- * Utility function to extract unknown fields from an object, excluding known fields
- */
-export function extractUnknownFields(obj: Record<string, any>, knownFields: Set<string>): Record<string, any> | undefined {
-    const unknownFields: Record<string, any> = {};
-    let hasUnknownFields = false;
-
-    for (const [key, value] of Object.entries(obj)) {
-        if (!knownFields.has(key)) {
-            unknownFields[key] = value;
-            hasUnknownFields = true;
-        }
-    }
-
-    return hasUnknownFields ? unknownFields : undefined;
-}
-
-/**
  * Known Structure Set fields according to Minecraft specification
  */
 export const KNOWN_STRUCTURE_SET_FIELDS = new Set(["structures", "placement"]);

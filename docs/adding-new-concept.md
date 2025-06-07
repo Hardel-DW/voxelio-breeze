@@ -17,6 +17,33 @@ Voxel-breeze utilise une architecture de conversion bidirectionnelle :
 - **unknownFields** : Préservation des champs de mods non standard
 - **Tests** : Couverture complète avec templates TypeScript et benchmarks
 
+## Utilitaires centralisés
+
+Avant de commencer l'implémentation, familiarisez-vous avec les utilitaires
+centralisés dans `src/core/schema/utils.ts` :
+
+### Fonctions disponibles
+
+```typescript
+import {
+    extractUnknownFields,
+    mergeKnownFields,
+    processElementTags,
+} from "@/core/schema/utils";
+
+// Préservation des champs de mods
+const unknownFields = extractUnknownFields(data, KNOWN_FIELDS);
+
+// Traitement automatique des tags
+const tags = processElementTags(element.tags, config);
+
+// Fusion de sets de champs connus
+const allKnownFields = mergeKnownFields(SET1, SET2, SET3);
+```
+
+Ces utilitaires éliminent la duplication de code et garantissent une approche
+cohérente entre tous les concepts.
+
 ## Étapes d'implémentation
 
 ### 1. 📋 Schema Core (`src/core/schema/{concept}/`)
@@ -93,17 +120,24 @@ export const LEGACY_TYPES = new Set(["minecraft:legacy"]);
 
 - **{ConceptName}Props (Voxel)** : Interface simplifiée pour l'UI web
 - **Minecraft{ConceptName} (DataDriven)** : Format JSON Minecraft natif
-- **extractUnknownFields** : Préservation des champs de mods qui ne proviennent
-  pas de la structure Mojang
+- **extractUnknownFields** : Importé de `@/core/schema/utils`, préservation des
+  champs de mods
 - **KNOWN_FIELDS** : Liste des champs officiels pour filtrer les champs inconnus
 - **Constantes** : Détection automatique des types/variants
+
+**Utilitaires centralisés** :
+
+- `extractUnknownFields` : Préservation des champs de mods
+- `processElementTags` : Traitement automatique des tags
+- `mergeKnownFields` : Fusion de sets de champs connus
 
 #### `Parser.ts` - Conversion Minecraft → Voxel
 
 ```typescript
 import type { ParserParams } from "@/core/engine/Parser";
 import type { {ConceptName}Parser, {ConceptName}Props, Minecraft{ConceptName} } from "./types";
-import { KNOWN_{CONCEPT}_FIELDS, SPECIAL_TYPES, extractUnknownFields } from "./types";
+import { KNOWN_{CONCEPT}_FIELDS, SPECIAL_TYPES } from "./types";
+import { extractUnknownFields } from "@/core/schema/utils";
 
 export const {ConceptName}DataDrivenToVoxelFormat: {ConceptName}Parser = ({
     element,
@@ -190,7 +224,7 @@ import type {
     Minecraft{ConceptName}
 } from "./types";
 import { SPECIAL_TYPES } from "./types";
-import { tagsToIdentifiers } from "@/core/Tag";
+import { processElementTags } from "@/core/schema/utils";
 
 export const VoxelTo{ConceptName}DataDriven: {ConceptName}Compiler = (
     element: {ConceptName}Props,
@@ -198,12 +232,7 @@ export const VoxelTo{ConceptName}DataDriven: {ConceptName}Compiler = (
     original?: Minecraft{ConceptName}
 ): CompilerResult => {
     const concept = original ? structuredClone(original) : ({} as Minecraft{ConceptName});
-    const tagRegistry = `tags/${config}`;
-    let tags: IdentifierObject[] = [];
-    
-    if (element.tags.length > 0) {
-        tags = tagsToIdentifiers(element.tags, tagRegistry);
-    }
+    let tags: IdentifierObject[] = processElementTags(element.tags, config);
 
     // 1. Propriétés de base
     concept.main_property = element.mainProperty;
@@ -254,7 +283,8 @@ function denormalizeComplexProperty(prop: SimplifiedType): ComplexMinecraftType 
 
 - **structuredClone** : Clone profond pour immutabilité
 - **Reconstruction conditionnelle** : Hiérarchie vs legacy
-- **tagsToIdentifiers** : Génération automatique des tags
+- **processElementTags** : Génération automatique des tags (remplace
+  tagsToIdentifiers)
 - **Object.assign** : Restauration champs préservés
 
 #### Mise à jour `Analyser.ts`
@@ -722,7 +752,9 @@ Ce guide explique la conversion bidirectionnelle entre le format Minecraft et le
 Ce pattern garantit une intégration cohérente de nouveaux concepts dans l'écosystème voxel-breeze tout en maintenant la qualité et les performances.
 ```
 
-Prompt : @adding-new-concept.md @actions-loot-table.md @loot-table-guide.md
+## Prompt : (Inclure le markdown dans le prompt)
+
+@adding-new-concept.md @actions-loot-table.md @loot-table-guide.md
 
 Je veux que tu prenne connaissances de l'applications. Je vais te donner une
 tache aprés, en rapport avec l'implémentation des structures set, dans un format

@@ -10,7 +10,7 @@ import type {
 } from "./types";
 import { JIGSAW_STRUCTURE_TYPES } from "./types";
 import type { IdentifierObject } from "@/core/Identifier";
-import { tagsToIdentifiers } from "@/core/Tag";
+import { processElementTags } from "@/core/schema/utils";
 
 /**
  * Compile Voxel format back to Minecraft Structure
@@ -21,11 +21,7 @@ export const VoxelToStructureDataDriven: StructureCompiler = (
     original?: MinecraftStructure
 ): CompilerResult => {
     const structure = original ? structuredClone(original) : ({} as MinecraftStructure);
-    const tagRegistry = `tags/${config}`;
-    let tags: IdentifierObject[] = [];
-    if (element.tags.length > 0) {
-        tags = tagsToIdentifiers(element.tags, tagRegistry);
-    }
+    const tags: IdentifierObject[] = processElementTags(element.tags, config);
 
     // Set base properties
     structure.type = element.type;

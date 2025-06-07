@@ -1,6 +1,6 @@
 import type { DataDrivenRegistryElement } from "@/core/Element";
 import { Identifier, type IdentifierObject } from "@/core/Identifier";
-import { tagsToIdentifiers } from "@/core/Tag";
+import { processElementTags } from "@/core/schema/utils";
 import type { Analysers } from "@/core/engine/Analyser";
 import type { Compiler } from "@/core/engine/Compiler";
 import type { Enchantment } from "@/schema/enchantment/Enchantment";
@@ -21,11 +21,7 @@ export const VoxelToEnchantmentDataDriven: Compiler<EnchantmentProps, Enchantmen
 } => {
     // Optimisation: éviter le double clone
     const enchantment = original ? structuredClone(original) : ({} as Enchantment);
-    const tagRegistry = `tags/${config}`;
-    let tags: IdentifierObject[] = [];
-    if (element.tags.length > 0) {
-        tags = tagsToIdentifiers(element.tags, tagRegistry);
-    }
+    let tags: IdentifierObject[] = processElementTags(element.tags, config);
 
     // Assignations directes sans cloner element
     enchantment.max_level = element.maxLevel;
@@ -62,6 +58,7 @@ export const VoxelToEnchantmentDataDriven: Compiler<EnchantmentProps, Enchantmen
         enchantment.exclusive_set = element.exclusiveSet;
 
         if (typeof element.exclusiveSet === "string") {
+            const tagRegistry = `tags/${config}`;
             tags.push(Identifier.of(element.exclusiveSet, tagRegistry));
         }
     }

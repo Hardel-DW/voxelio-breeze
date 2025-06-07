@@ -10,7 +10,8 @@ import type {
     SmithingTransformData,
     SmithingTrimData
 } from "./types";
-import { KNOWN_RECIPE_FIELDS, extractUnknownFields, normalizeIngredient, positionToSlot } from "./types";
+import { KNOWN_RECIPE_FIELDS, normalizeIngredient, positionToSlot } from "./types";
+import { extractUnknownFields } from "@/core/schema/utils";
 
 /**
  * Parse Minecraft Recipe to simplified Voxel format with slot-based system

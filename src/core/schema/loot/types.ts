@@ -132,23 +132,6 @@ export interface CompilerResult {
     tags: IdentifierObject[];
 }
 
-/**
- * Utility function to extract unknown fields from an object, excluding known fields
- */
-export function extractUnknownFields(obj: Record<string, any>, knownFields: Set<string>): Record<string, any> | undefined {
-    const unknownFields: Record<string, any> = {};
-    let hasUnknownFields = false;
-
-    for (const [key, value] of Object.entries(obj)) {
-        if (!knownFields.has(key)) {
-            unknownFields[key] = value;
-            hasUnknownFields = true;
-        }
-    }
-
-    return hasUnknownFields ? unknownFields : undefined;
-}
-
 // Known fields constants for reuse
 export const KNOWN_ENTRY_FIELDS = new Set(["type", "name", "value", "weight", "quality", "conditions", "functions", "children", "expand"]);
 

@@ -10,7 +10,7 @@ import type {
 } from "./types";
 import { CONCENTRIC_RINGS_TYPES, RANDOM_SPREAD_TYPES } from "./types";
 import type { IdentifierObject } from "@/core/Identifier";
-import { tagsToIdentifiers } from "@/core/Tag";
+import { processElementTags } from "@/core/schema/utils";
 
 /**
  * Compile Voxel format back to Minecraft Structure Set
@@ -21,12 +21,7 @@ export const VoxelToStructureSetDataDriven: StructureSetCompiler = (
     original?: MinecraftStructureSet
 ): CompilerResult => {
     const structureSet = original ? structuredClone(original) : ({} as MinecraftStructureSet);
-    const tagRegistry = `tags/${config}`;
-    let tags: IdentifierObject[] = [];
-
-    if (element.tags.length > 0) {
-        tags = tagsToIdentifiers(element.tags, tagRegistry);
-    }
+    const tags: IdentifierObject[] = processElementTags(element.tags, config);
 
     // Convert structures array (simple mapping)
     const structures: MinecraftStructureSetElement[] = element.structures.map((struct) => ({

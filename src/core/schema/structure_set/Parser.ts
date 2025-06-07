@@ -1,12 +1,7 @@
 import type { ParserParams } from "@/core/engine/Parser";
 import type { StructureSetParser, StructureSetProps, MinecraftStructureSet, StructureSetStructure, PlacementType } from "./types";
-import {
-    KNOWN_STRUCTURE_SET_FIELDS,
-    KNOWN_PLACEMENT_FIELDS,
-    CONCENTRIC_RINGS_TYPES,
-    RANDOM_SPREAD_TYPES,
-    extractUnknownFields
-} from "./types";
+import { KNOWN_STRUCTURE_SET_FIELDS, KNOWN_PLACEMENT_FIELDS, CONCENTRIC_RINGS_TYPES, RANDOM_SPREAD_TYPES } from "./types";
+import { extractUnknownFields } from "@/core/schema/utils";
 
 /**
  * Parse Minecraft Structure Set to simplified Voxel format
