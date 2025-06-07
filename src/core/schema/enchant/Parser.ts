@@ -1,7 +1,8 @@
 import type { ParserParams } from "@/core/engine/Parser";
 import type { Parser } from "@/core/engine/Parser";
 import type { Enchantment } from "@/schema/enchantment/Enchantment";
-import { type EnchantmentProps, FUNCTIONALITY_TAGS_CACHE } from "./types";
+import { type EnchantmentProps, FUNCTIONALITY_TAGS_CACHE, KNOWN_ENCHANTMENT_FIELDS } from "./types";
+import { extractUnknownFields } from "@/core/schema/utils";
 
 /**
  * Take only one Enchantments with their tags, to transform it to Voxel format
@@ -44,6 +45,9 @@ export const EnchantmentDataDrivenToVoxelFormat: Parser<EnchantmentProps, Enchan
         mode = "soft_delete";
     }
 
+    // Extract unknown fields from mods
+    const unknownFields = extractUnknownFields(data, KNOWN_ENCHANTMENT_FIELDS);
+
     return {
         identifier: element.identifier,
         description,
@@ -62,6 +66,7 @@ export const EnchantmentDataDrivenToVoxelFormat: Parser<EnchantmentProps, Enchan
         slots,
         mode,
         disabledEffects: [],
+        unknownFields,
         override: configurator
     };
 };

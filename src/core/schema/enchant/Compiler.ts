@@ -76,6 +76,11 @@ export const VoxelToEnchantmentDataDriven: Compiler<EnchantmentProps, Enchantmen
         tags = [];
     }
 
+    // Restore unknown fields from mods
+    if (element.unknownFields) {
+        Object.assign(enchantment, element.unknownFields);
+    }
+
     return {
         element: {
             data: enchantment,

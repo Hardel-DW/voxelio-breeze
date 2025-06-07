@@ -34,4 +34,24 @@ export interface EnchantmentProps extends VoxelElement {
     tags: string[];
     mode: "normal" | "soft_delete" | "only_creative";
     disabledEffects: string[];
+
+    // Preserve unknown fields from mods
+    unknownFields?: Record<string, any>;
 }
+
+/**
+ * Known Enchantment fields according to Minecraft specification
+ */
+export const KNOWN_ENCHANTMENT_FIELDS = new Set([
+    "description",
+    "exclusive_set",
+    "supported_items",
+    "primary_items",
+    "max_level",
+    "weight",
+    "anvil_cost",
+    "min_cost",
+    "max_cost",
+    "effects",
+    "slots"
+]);
