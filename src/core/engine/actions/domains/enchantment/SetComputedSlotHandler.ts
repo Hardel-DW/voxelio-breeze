@@ -3,7 +3,6 @@ import type { ActionHandler } from "../../types";
 import type { EnchantmentAction } from "./types";
 import { getFieldValue, getValueAtPath, setValueAtPath } from "../../utils";
 import { type SlotRegistryType, isArraySlotRegistryType, isSlotRegistryType } from "@/core/engine/managers/SlotManager";
-import { isStringArray } from "@/core/engine/utils/property";
 
 /**
  * Handler for enchantment.set_computed_slot action
@@ -30,7 +29,11 @@ export class SetComputedSlotHandler implements ActionHandler<EnchantmentAction> 
         }
 
         let currentValue: SlotRegistryType[];
-        if (isStringArray(unformattedValue) && isArraySlotRegistryType(unformattedValue)) {
+        if (
+            Array.isArray(unformattedValue) &&
+            unformattedValue.every((item) => typeof item === "string") &&
+            isArraySlotRegistryType(unformattedValue)
+        ) {
             currentValue = unformattedValue;
         } else {
             throw new Error(`Invalid SlotRegistryType array: ${unformattedValue}`);
