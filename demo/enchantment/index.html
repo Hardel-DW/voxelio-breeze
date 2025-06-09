@@ -4,18 +4,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Voxel Breeze - Enchantment Demo</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
-        <h1>Enchantment Simulator Demo</h1>
-        <div class="demo-grid">
-            <!-- Configuration -->
-            <div class="panel">
+        <header class="page-header">
+            <h1>Enchantment Simulator</h1>
+            <p class="subtitle">A Voxel Breeze Demo</p>
+        </header>
+
+        <main class="demo-grid">
+            <!-- Configuration Panel -->
+            <section class="panel">
                 <h2>Configuration</h2>
                 
                 <div class="form-group">
-                    <label for="item-select">Item:</label>
+                    <label for="item-select">Item</label>
                     <select id="item-select">
                         <option value="sword">Diamond Sword</option>
                         <option value="book">Book</option>
@@ -25,27 +32,29 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="bookshelves">Number of Bookshelves (0-15):</label>
-                    <input type="number" id="bookshelves" min="0" max="15" value="15">
+                    <label for="bookshelves">Bookshelves</label>
+                    <input type="number" id="bookshelves" min="0" max="15" value="15" placeholder="0-15">
                 </div>
 
                 <div class="form-group">
-                    <label for="enchantability">Item Enchantability:</label>
-                    <input type="number" id="enchantability" min="1" max="25" value="10">
+                    <label for="enchantability">Item Enchantability</label>
+                    <input type="number" id="enchantability" min="1" max="25" value="10" placeholder="e.g., 10 for Diamond">
                 </div>
 
-                <button onclick="simulateEnchantment()">Simulate Enchantment Table</button>
-                <button onclick="calculateProbabilities()">Calculate Probabilities</button>
-            </div>
+                <div class="button-group">
+                    <button onclick="simulateEnchantment()">Simulate Enchantments</button>
+                    <button onclick="calculateProbabilities()">Calculate Probabilities</button>
+                </div>
+            </section>
 
-            <!-- Résultats -->
-            <div class="panel">
+            <!-- Results Panel -->
+            <section class="panel">
                 <h2>Results</h2>
                 <div id="results" class="results">
-                    Click a button to start the simulation...
+                    <p>Click a button to start the simulation...</p>
                 </div>
-            </div>
-        </div>
+            </section>
+        </main>
     </div>
 
     <script type="module" src="script.js"></script>
