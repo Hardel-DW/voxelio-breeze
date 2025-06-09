@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { isPresentInTag, tagsToIdentifiers, getTagsFromRegistry, isTag, mergeTags, createTagFromElement } from "@/core/Tag";
+import Tags, { tagsToIdentifiers, isTag, mergeTags, createTagFromElement, isRegistryTag } from "@/core/Tag";
 import type { DataDrivenRegistryElement } from "@/core/Element";
 import type { Compiler } from "@/core/engine/Compiler";
-import type { TagType } from "@/schema/tag/TagType";
+import type { TagType } from "@/schema/TagType";
 
 describe("Tag Functions", () => {
     describe("isPresentInTag", () => {
@@ -18,15 +18,15 @@ describe("Tag Functions", () => {
         };
 
         it("should find string value in tag", () => {
-            expect(isPresentInTag(tag, "minecraft:test")).toBe(true);
+            expect(new Tags(tag.data).isPresentInTag("minecraft:test")).toBe(true);
         });
 
         it("should find object value in tag", () => {
-            expect(isPresentInTag(tag, "minecraft:optional")).toBe(true);
+            expect(new Tags(tag.data).isPresentInTag("minecraft:optional")).toBe(true);
         });
 
         it("should return false for non-existent value", () => {
-            expect(isPresentInTag(tag, "minecraft:non_existent")).toBe(false);
+            expect(new Tags(tag.data).isPresentInTag("minecraft:non_existent")).toBe(false);
         });
     });
 
@@ -63,18 +63,18 @@ describe("Tag Functions", () => {
                 values: ["minecraft:test", { id: "minecraft:optional", required: false }, "minecraft:other"]
             };
 
-            const result = getTagsFromRegistry(tag);
+            const result = new Tags(tag).fromRegistry();
             expect(result).toEqual(["minecraft:test", "minecraft:optional", "minecraft:other"]);
         });
     });
 
-    describe("isTag", () => {
+    describe("isRegistryTag", () => {
         it("should identify tag elements", () => {
             const tagElement = {
                 identifier: { namespace: "minecraft", registry: "tags/enchantment", resource: "test" },
                 data: { values: [] }
             };
-            expect(isTag(tagElement)).toBe(true);
+            expect(isRegistryTag(tagElement)).toBe(true);
         });
 
         it("should reject non-tag elements", () => {
@@ -82,12 +82,11 @@ describe("Tag Functions", () => {
                 identifier: { namespace: "minecraft", registry: "enchantment", resource: "test" },
                 data: {}
             };
-            expect(isTag(nonTagElement)).toBe(false);
+            expect(isRegistryTag(nonTagElement)).toBe(false);
         });
 
         it("should reject empty objects", () => {
             const nonTagElement = {};
-            // @ts-expect-error
             expect(isTag(nonTagElement)).toBe(false);
         });
     });

@@ -1,4 +1,5 @@
 import type { ParserParams } from "@/core/engine/Parser";
+import { extractUnknownFields } from "@/core/schema/utils";
 import type {
     CraftingTransmuteData,
     MinecraftRecipe,
@@ -10,10 +11,10 @@ import type {
     SmithingTransformData,
     SmithingTrimData
 } from "./types";
-import { KNOWN_RECIPE_FIELDS, extractUnknownFields, normalizeIngredient, positionToSlot } from "./types";
+import { KNOWN_RECIPE_FIELDS, normalizeIngredient, positionToSlot } from "./types";
 
 /**
- * Parse Minecraft Recipe to simplified Voxel format with slot-based system
+ * Parse Minecraft Recipe to simplified Voxel format with slot-based system.
  */
 export const RecipeDataDrivenToVoxelFormat: RecipeParser = ({ element, configurator }: ParserParams<MinecraftRecipe>): RecipeProps => {
     const data = element.data;
@@ -21,7 +22,6 @@ export const RecipeDataDrivenToVoxelFormat: RecipeParser = ({ element, configura
     let gridSize: { width: number; height: number } | undefined;
     let typeSpecific: RecipeTypeSpecific | undefined;
 
-    // Parse based on recipe type
     switch (data.type) {
         case "minecraft:crafting_shaped":
             parseShapedCrafting();
@@ -48,15 +48,12 @@ export const RecipeDataDrivenToVoxelFormat: RecipeParser = ({ element, configura
             parseSmithingTrim();
             break;
         default:
-            // Handle unknown/mod recipe types
             parseGenericRecipe();
             break;
     }
 
-    // Parse result
     let result: RecipeResult;
     if (data.type === "minecraft:smithing_trim") {
-        // Smithing trim doesn't produce a result item
         result = {
             item: "minecraft:air",
             count: 1
@@ -64,7 +61,6 @@ export const RecipeDataDrivenToVoxelFormat: RecipeParser = ({ element, configura
     } else if (data.result) {
         result = parseResult(data.result, data.count);
     } else {
-        // Fallback for recipes without explicit result
         result = {
             item: "minecraft:air",
             count: 1
@@ -91,12 +87,10 @@ export const RecipeDataDrivenToVoxelFormat: RecipeParser = ({ element, configura
         const pattern = Array.isArray(data.pattern) ? data.pattern : [data.pattern];
         const key = data.key;
 
-        // Calculate grid dimensions
         const height = pattern.length;
         const width = Math.max(...pattern.map((row) => row.length));
         gridSize = { width, height };
 
-        // Convert pattern + key to slots
         for (let row = 0; row < height; row++) {
             const patternRow = pattern[row] || "";
             for (let col = 0; col < width; col++) {
@@ -112,7 +106,6 @@ export const RecipeDataDrivenToVoxelFormat: RecipeParser = ({ element, configura
     function parseShapelessCrafting() {
         if (!data.ingredients) return;
 
-        // For shapeless, just assign slots sequentially
         let slotIndex = 0;
         for (const ingredient of data.ingredients) {
             slots[slotIndex.toString()] = normalizeIngredient(ingredient);
@@ -121,7 +114,6 @@ export const RecipeDataDrivenToVoxelFormat: RecipeParser = ({ element, configura
     }
 
     function parseCraftingTransmute() {
-        // Transmute uses fixed slots: 0 = input, 1 = material
         if (data.input) {
             slots["0"] = normalizeIngredient(data.input);
         }
@@ -136,7 +128,6 @@ export const RecipeDataDrivenToVoxelFormat: RecipeParser = ({ element, configura
     }
 
     function parseSmelting() {
-        // Smelting uses slot 0 for ingredient
         if (data.ingredient) {
             slots["0"] = normalizeIngredient(data.ingredient);
         }
@@ -148,14 +139,12 @@ export const RecipeDataDrivenToVoxelFormat: RecipeParser = ({ element, configura
     }
 
     function parseStonecutting() {
-        // Stonecutting uses slot 0 for ingredient
         if (data.ingredient) {
             slots["0"] = normalizeIngredient(data.ingredient);
         }
     }
 
     function parseSmithingTransform() {
-        // Smithing uses fixed slots: 0 = template, 1 = base, 2 = addition
         if (data.template) {
             slots["0"] = normalizeIngredient(data.template);
         }
@@ -174,7 +163,6 @@ export const RecipeDataDrivenToVoxelFormat: RecipeParser = ({ element, configura
     }
 
     function parseSmithingTrim() {
-        // Smithing trim uses same layout as transform
         if (data.template) {
             slots["0"] = normalizeIngredient(data.template);
         }
@@ -194,7 +182,6 @@ export const RecipeDataDrivenToVoxelFormat: RecipeParser = ({ element, configura
     }
 
     function parseGenericRecipe() {
-        // Try to extract ingredients from common fields
         let slotIndex = 0;
 
         if (data.ingredients) {
@@ -225,7 +212,6 @@ export const RecipeDataDrivenToVoxelFormat: RecipeParser = ({ element, configura
             };
         }
 
-        // Handle complex result objects
         return {
             item: result?.id || "minecraft:air",
             count: result?.count || legacyCount || 1,

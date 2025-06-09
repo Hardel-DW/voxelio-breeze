@@ -1,5 +1,5 @@
 import type { DataDrivenRegistryElement } from "@/core/Element";
-import type { TagType } from "@/schema/tag/TagType";
+import type { TagType } from "@/schema/TagType";
 
 const axes: TagType = {
     values: ["#minecraft:axes"]

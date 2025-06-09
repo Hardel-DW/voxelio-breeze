@@ -1,7 +1,8 @@
 import type { ParserParams } from "@/core/engine/Parser";
 import type { Parser } from "@/core/engine/Parser";
-import type { Enchantment } from "@/schema/enchantment/Enchantment";
-import { type EnchantmentProps, FUNCTIONALITY_TAGS_CACHE } from "./types";
+import { extractUnknownFields } from "@/core/schema/utils";
+import type { Enchantment } from "@/schema/Enchantment";
+import { type EnchantmentProps, FUNCTIONALITY_TAGS_CACHE, KNOWN_ENCHANTMENT_FIELDS } from "./types";
 
 /**
  * Take only one Enchantments with their tags, to transform it to Voxel format
@@ -35,7 +36,6 @@ export const EnchantmentDataDrivenToVoxelFormat: Parser<EnchantmentProps, Enchan
 
     let mode: "normal" | "soft_delete" | "only_creative" = "normal";
 
-    // Optimisation: utiliser le cache au lieu de créer des Identifiers
     if (tagsWithoutExclusiveSet.every((tag) => FUNCTIONALITY_TAGS_CACHE.has(tag))) {
         mode = "only_creative";
     }
@@ -43,6 +43,8 @@ export const EnchantmentDataDrivenToVoxelFormat: Parser<EnchantmentProps, Enchan
     if (!hasEffects && tagsWithoutExclusiveSet.length === 0) {
         mode = "soft_delete";
     }
+
+    const unknownFields = extractUnknownFields(data, KNOWN_ENCHANTMENT_FIELDS);
 
     return {
         identifier: element.identifier,
@@ -62,6 +64,7 @@ export const EnchantmentDataDrivenToVoxelFormat: Parser<EnchantmentProps, Enchan
         slots,
         mode,
         disabledEffects: [],
+        unknownFields,
         override: configurator
     };
 };

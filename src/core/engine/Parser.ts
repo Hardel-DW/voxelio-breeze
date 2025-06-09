@@ -1,10 +1,10 @@
 import { Datapack } from "@/core/Datapack";
 import { DatapackError } from "@/core/DatapackError";
-import type { ConfiguratorConfigFromDatapack, DataDrivenElement, VoxelElement, VoxelRegistryElement } from "@/core/Element";
+import type { ConfiguratorConfigFromDatapack, DataDrivenElement, VoxelElement } from "@/core/Element";
 import type { DataDrivenRegistryElement } from "@/core/Element";
 import { Identifier } from "@/core/Identifier";
 import type { Analysers, GetAnalyserMinecraft, GetAnalyserVoxel } from "@/core/engine/Analyser";
-import { analyserCollection, conceptWithTag, getAllConcepts } from "@/core/engine/Analyser";
+import { analyserCollection } from "@/core/engine/Analyser";
 import { Logger } from "@/core/engine/migrations/logger";
 
 export interface ParserParams<K extends DataDrivenElement> {
@@ -61,9 +61,7 @@ export async function parseDatapack<T extends keyof Analysers>(file: File): Prom
     }
 
     if (elements.size === 0) throw new DatapackError("tools.warning.no_elements");
-    const logger = logs
-        ? new Logger(JSON.parse(new TextDecoder().decode(logs)))
-        : new Logger({ id, date, version, isModded, datapack: { name, description, namespaces }, isMinified: true, logs: [] });
+    const logger = new Logger(logs ? new TextDecoder().decode(logs) : undefined);
 
     return { name, files, elements, version, isModded, logger };
 }

@@ -1,70 +1,70 @@
 {
-    "name": "@voxelio/breeze",
-    "author": {
-        "name": "Hardel",
-        "email": "teams.voxel@gmail.com",
-        "url": "https://voxel.hardel.io"
+  "name": "@voxelio/breeze",
+  "author": {
+    "name": "Hardel",
+    "email": "teams.voxel@gmail.com",
+    "url": "https://voxel.hardel.io"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Hardel-DW/voxel-core.git"
+  },
+  "homepage": "https://voxel.hardel.io",
+  "license": "MIT",
+  "version": "0.13.0",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "unpkg": "./dist/voxel.umd.cjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
     },
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/Hardel-DW/voxel-core.git"
+    "./core": {
+      "types": "./dist/core.d.ts",
+      "import": "./dist/core.js"
     },
-    "homepage": "https://voxel.hardel.io",
-    "license": "MIT",
-    "version": "0.13.1",
-    "type": "module",
-    "main": "./dist/index.js",
-    "module": "./dist/index.js",
-    "unpkg": "./dist/voxel.umd.cjs",
-    "types": "./dist/index.d.ts",
-    "exports": {
-        ".": {
-            "types": "./dist/index.d.ts",
-            "import": "./dist/index.js"
-        },
-        "./core": {
-            "types": "./dist/core.d.ts",
-            "import": "./dist/core.js"
-        },
-        "./converter": {
-            "types": "./dist/converter.d.ts",
-            "import": "./dist/converter.js"
-        },
-        "./schema": {
-            "types": "./dist/schema.d.ts",
-            "import": "./dist/schema.js"
-        }
+    "./converter": {
+      "types": "./dist/converter.d.ts",
+      "import": "./dist/converter.js"
     },
-    "scripts": {
-        "build": "tsc -p tsconfig.build.json && vite build",
-        "biome:format": "biome format --write ./src",
-        "biome:check": "biome check ./src",
-        "biome:unsafefix": "biome check --write --unsafe  ./src",
-        "check": "tsc --noEmit",
-        "test": "vitest",
-        "prepublishOnly": "pnpm run build",
-        "version": "pnpm run build",
-        "release:patch": "pnpm version patch && pnpm publish",
-        "release:minor": "pnpm version minor && pnpm publish",
-        "release:major": "pnpm version major && pnpm publish"
-    },
-    "dependencies": {
-        "@voxelio/zip": "^3.0.4"
-    },
-    "devDependencies": {
-        "@biomejs/biome": "^1.9.3",
-        "@types/node": "^22.13.1",
-        "tslib": "^2.6.2",
-        "typescript": "~5.7.2",
-        "vite": "^6.1.0",
-        "vite-plugin-dts": "^4.5.0",
-        "vitest": "^3.0.5"
-    },
-    "publishConfig": {
-        "access": "public"
-    },
-    "files": [
-        "dist/*",
-        "!**/*.tsbuildinfo"
-    ]
+    "./schema": {
+      "types": "./dist/schema.d.ts",
+      "import": "./dist/schema.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json && vite build",
+    "biome:format": "biome format --write ./src",
+    "biome:check": "biome check ./src",
+    "biome:unsafefix": "biome check --write --unsafe  ./src",
+    "check": "tsc --noEmit",
+    "test": "vitest",
+    "prepublishOnly": "pnpm run build",
+    "version": "pnpm run build",
+    "release:patch": "pnpm version patch && pnpm publish",
+    "release:minor": "pnpm version minor && pnpm publish",
+    "release:major": "pnpm version major && pnpm publish"
+  },
+  "dependencies": {
+    "@voxelio/zip": "^3.0.4"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^1.9.3",
+    "@types/node": "^22.13.1",
+    "tslib": "^2.6.2",
+    "typescript": "~5.8.3",
+    "vite": "npm:rolldown-vite@latest",
+    "vite-plugin-dts": "^4.5.4",
+    "vitest": "^3.2.1"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "dist/*",
+    "!**/*.tsbuildinfo"
+  ]
 }

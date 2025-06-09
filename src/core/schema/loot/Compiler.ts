@@ -20,12 +20,10 @@ export const VoxelToLootDataDriven: LootTableCompiler = (
 ): CompilerResult => {
     const lootTable = original ? structuredClone(original) : {};
 
-    // Build lookup maps once
     const itemMap = new Map(element.items.map((item) => [item.id, item]));
     const groupMap = new Map(element.groups.map((group) => [group.id, group]));
     const poolDataMap = new Map(element.pools?.map((p) => [p.poolIndex, p]) || []);
 
-    // Find max pool index
     const maxPool = Math.max(
         ...element.items.map((i) => i.poolIndex),
         ...element.groups.map((g) => g.poolIndex),
@@ -34,7 +32,6 @@ export const VoxelToLootDataDriven: LootTableCompiler = (
         0
     );
 
-    // Initialize pools
     const pools = Array.from({ length: maxPool + 1 }, (_, i) => {
         const poolData = poolDataMap.get(i);
         const originalPool = original?.pools?.[i];
@@ -47,7 +44,6 @@ export const VoxelToLootDataDriven: LootTableCompiler = (
             entries: []
         };
 
-        // Restore unknown fields
         if (poolData?.unknownFields) Object.assign(pool, poolData.unknownFields);
         else if (originalPool) {
             for (const key in originalPool) {
@@ -58,27 +54,22 @@ export const VoxelToLootDataDriven: LootTableCompiler = (
         return pool;
     });
 
-    // Find items in groups (for exclusion)
     const itemsInGroups = new Set(element.groups.flatMap((g) => g.items));
 
-    // Find child groups (for top-level detection)
     const childGroups = new Set(element.groups.flatMap((g) => g.items).filter((id) => groupMap.has(id)));
 
-    // Add standalone items to pools
     for (const item of element.items) {
         if (!itemsInGroups.has(item.id)) {
             pools[item.poolIndex]?.entries.push(buildEntry(item));
         }
     }
 
-    // Add top-level groups to pools
     for (const group of element.groups) {
         if (!childGroups.has(group.id)) {
             pools[group.poolIndex]?.entries.push(buildGroupEntry(group, itemMap, groupMap));
         }
     }
 
-    // Build final result
     return {
         element: {
             data: {
@@ -96,10 +87,9 @@ export const VoxelToLootDataDriven: LootTableCompiler = (
 };
 
 /**
- * Build entry from item - simplified
+ * Build entry from item.
  */
 function buildEntry(item: LootItem): MinecraftLootEntry {
-    // Handle items created by actions that might not have entryType
     const entryType = item.entryType || "minecraft:item";
 
     const entry: MinecraftLootEntry = {
@@ -112,7 +102,6 @@ function buildEntry(item: LootItem): MinecraftLootEntry {
         ...item.unknownFields
     };
 
-    // Set name/value based on type
     if (entryType === "minecraft:loot_table") entry.value = item.value ?? item.name;
     else if (entryType === "minecraft:tag") entry.name = item.name.replace(/^#/, "");
     else if (entryType !== "minecraft:empty") entry.name = item.name;
@@ -121,7 +110,7 @@ function buildEntry(item: LootItem): MinecraftLootEntry {
 }
 
 /**
- * Build group entry recursively - simplified
+ * Build group entry recursively.
  */
 function buildGroupEntry(group: LootGroup, itemMap: Map<string, LootItem>, groupMap: Map<string, LootGroup>): MinecraftLootEntry {
     return {

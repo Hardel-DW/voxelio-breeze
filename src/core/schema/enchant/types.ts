@@ -1,7 +1,8 @@
 import type { VoxelElement } from "@/core/Element";
+import { Identifier } from "@/core/Identifier";
 import type { SlotRegistryType } from "@/core/engine/managers/SlotManager";
-import { Identifier, type SingleOrMultiple } from "@/index";
-import type { TextComponentType } from "@/schema/text/TextComponentType";
+import type { SingleOrMultiple } from "@/index";
+import type { TextComponentType } from "@/schema/TextComponentType";
 
 const tags_related_to_functionality = [
     { namespace: "minecraft", registry: "tags/enchantment", resource: "curse" },
@@ -14,7 +15,6 @@ const tags_related_to_functionality = [
     { namespace: "minecraft", registry: "tags/enchantment", resource: "tooltip_order" }
 ];
 
-// Cache des tags de fonctionnalité pour éviter les créations répétées d'Identifier
 export const FUNCTIONALITY_TAGS_CACHE = new Set(tags_related_to_functionality.map((tag) => new Identifier(tag).toString()));
 export interface EnchantmentProps extends VoxelElement {
     description: TextComponentType;
@@ -33,4 +33,22 @@ export interface EnchantmentProps extends VoxelElement {
     tags: string[];
     mode: "normal" | "soft_delete" | "only_creative";
     disabledEffects: string[];
+    unknownFields?: Record<string, any>;
 }
+
+/**
+ * Known Enchantment fields according to Minecraft specification.
+ */
+export const KNOWN_ENCHANTMENT_FIELDS = new Set([
+    "description",
+    "exclusive_set",
+    "supported_items",
+    "primary_items",
+    "max_level",
+    "weight",
+    "anvil_cost",
+    "min_cost",
+    "max_cost",
+    "effects",
+    "slots"
+]);

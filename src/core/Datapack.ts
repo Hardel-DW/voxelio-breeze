@@ -1,14 +1,12 @@
 import { DatapackError } from "@/core/DatapackError";
-import type { DataDrivenElement } from "@/core/Element";
-import type { DataDrivenRegistryElement } from "@/core/Element";
+import type { DataDrivenElement, DataDrivenRegistryElement, LabeledElement } from "@/core/Element";
 import { Identifier, type IdentifierObject } from "@/core/Identifier";
-import { createTagFromElement, isPresentInTag, mergeDataDrivenRegistryElement } from "@/core/Tag";
+import Tags, { createTagFromElement, mergeDataDrivenRegistryElement } from "@/core/Tag";
 import { getMinecraftVersion } from "@/core/Version";
 import type { Analysers, GetAnalyserMinecraft } from "@/core/engine/Analyser";
 import type { Compiler } from "@/core/engine/Compiler";
 import type { Logger } from "@/core/engine/migrations/logger";
-import type { LabeledElement } from "@/core/schema/primitive/label";
-import type { TagType } from "@/schema/tag/TagType";
+import type { TagType } from "@/schema/TagType";
 import { downloadZip, extractZip } from "@voxelio/zip";
 import type { InputWithoutMeta } from "@voxelio/zip";
 
@@ -128,7 +126,7 @@ export class Datapack {
     getRelatedTags(registry: string | undefined, identifier: IdentifierObject): string[] {
         if (!registry) return [];
         return this.getRegistry<TagType>(registry)
-            .filter((tag) => isPresentInTag(tag, new Identifier(identifier).toString()))
+            .filter((tag) => new Tags(tag.data).isPresentInTag(new Identifier(identifier).toString()))
             .map((tag) => new Identifier(tag.identifier).toString());
     }
 
@@ -358,7 +356,7 @@ export class Datapack {
      */
     private prepareLogger(files: InputWithoutMeta[], logger: Logger | undefined, isMinified: boolean) {
         if (logger) {
-            const logData = logger.serialize(isMinified);
+            const logData = logger.exportJson();
             files.push(this.prepareFile("voxel/logs.json", logData, isMinified));
         }
     }

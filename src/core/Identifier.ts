@@ -19,7 +19,14 @@ export class Identifier {
     }
 
     static of(identifier: string, registry: string) {
-        const [namespace, resource] = (identifier.startsWith("#") ? identifier.slice(1) : identifier).split(":");
+        const cleanId = identifier.startsWith("#") ? identifier.slice(1) : identifier;
+
+        // Auto-prefix with "minecraft" if no namespace is provided
+        if (!cleanId.includes(":")) {
+            return new Identifier({ namespace: "minecraft", registry, resource: cleanId });
+        }
+
+        const [namespace, resource] = cleanId.split(":");
         return new Identifier({ namespace, registry, resource });
     }
 
@@ -133,6 +140,19 @@ export class Identifier {
      */
     static toDisplay(identifier: string): string {
         return Identifier.of(identifier, "none").toResourceName();
+    }
+
+    /**
+     * Normalizes an identifier string to full format with namespace
+     * @param identifier - The identifier string (with or without namespace)
+     * @param registry - The registry for context
+     * @returns Normalized identifier string
+     * @example
+     * Identifier.normalize("stone", "block"); // "minecraft:stone"
+     * Identifier.normalize("modname:stone", "block"); // "modname:stone"
+     */
+    static normalize(identifier: string, registry: string): string {
+        return Identifier.of(identifier, registry).toString();
     }
 }
 

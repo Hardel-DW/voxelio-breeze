@@ -14,7 +14,7 @@ export function checkCondition(condition: Condition | undefined, element: Record
 
     switch (condition.condition) {
         case "compare_to_value":
-            return CheckEqualConditionString(condition);
+            return CheckEqualConditionString(condition, element);
         case "compare_value_to_field_value":
             return CheckEqualFieldValueCondition(condition, element);
         case "if_field_is_undefined":

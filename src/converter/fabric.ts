@@ -36,7 +36,6 @@ export function generateFabricMod(commonData: ModMetadata) {
         }
     };
 
-    // Add optional fields only if they exist and aren't default values
     if (commonData.authors.length > 0) {
         config.authors = commonData.authors;
     }
@@ -45,7 +44,6 @@ export function generateFabricMod(commonData: ModMetadata) {
         config.icon = commonData.icon;
     }
 
-    // Add contact info only if any of the fields are non-default
     const contact: Record<string, string> = {};
     if (commonData.homepage && commonData.homepage !== DEFAULT_MOD_METADATA.homepage) {
         contact.homepage = commonData.homepage;

@@ -17,28 +17,21 @@ export default defineConfig({
             },
             formats: ["es"],
             fileName: (_, entryName) => `${entryName}.js`
-        },
-        rollupOptions: {
-            external: ["jszip"],
-            output: {
-                globals: {
-                    jszip: "JSZip"
-                }
-            }
         }
     },
     plugins: [
         dts({
             entryRoot: "src",
             outputDir: "dist",
-            exclude: ["test/**/*"],
+            exclude: ["test/**/*", "benchmark/**/*"],
             rollupTypes: true
         })
     ],
     resolve: {
         alias: {
             "@": resolve(__dirname, "src"),
-            "@test": resolve(__dirname, "test")
+            "@test": resolve(__dirname, "test"),
+            "@benchmark": resolve(__dirname, "benchmark")
         }
     }
 });

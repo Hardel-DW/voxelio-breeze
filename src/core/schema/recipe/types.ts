@@ -4,14 +4,11 @@ import type { IdentifierObject } from "@/core/Identifier";
 import type { Compiler } from "@/core/engine/Compiler";
 import type { Parser } from "@/core/engine/Parser";
 
-// Recipe structure with unified slot-based system
 export interface RecipeProps extends VoxelElement {
     type: RecipeType;
     group?: string;
     category?: string;
     showNotification?: boolean;
-
-    // Unified slot-based system
     slots: Record<string, string[]>; // "0" -> ["minecraft:diamond"], "1" -> ["#minecraft:logs"]
     gridSize?: { width: number; height: number }; // For shaped crafting only
 
@@ -27,7 +24,6 @@ export interface RecipeResult {
     unknownFields?: Record<string, any>;
 }
 
-// Type-specific data for different recipe types
 export type RecipeTypeSpecific = SmeltingData | SmithingTransformData | SmithingTrimData | CraftingTransmuteData;
 
 export interface SmeltingData {
@@ -36,7 +32,7 @@ export interface SmeltingData {
 }
 
 export interface SmithingTransformData {
-    templateSlot: string; // Reference to slot ID
+    templateSlot: string;
     baseSlot: string;
     additionSlot: string;
 }
@@ -45,15 +41,14 @@ export interface SmithingTrimData {
     templateSlot: string;
     baseSlot: string;
     additionSlot: string;
-    pattern?: string; // For 1.21.5+
+    pattern?: string;
 }
 
 export interface CraftingTransmuteData {
-    inputSlot: string; // The ingredient that transfers data
-    materialSlot: string; // Additional ingredient
+    inputSlot: string;
+    materialSlot: string;
 }
 
-// Recipe types
 export type RecipeType =
     | "minecraft:crafting_shaped"
     | "minecraft:crafting_shapeless"
@@ -70,7 +65,6 @@ export type RecipeType =
 export type CraftingBookCategory = "building" | "redstone" | "equipment" | "misc";
 export type CookingBookCategory = "food" | "blocks" | "misc";
 
-// Original Minecraft Recipe format
 export interface MinecraftRecipe extends DataDrivenElement {
     type: string;
     group?: string;
@@ -103,11 +97,9 @@ export interface MinecraftRecipe extends DataDrivenElement {
     result?: any;
     count?: number; // Legacy stonecutting
 
-    // Allow any additional fields for mod compatibility
     [key: string]: any;
 }
 
-// Parser and Compiler type definitions
 export type RecipeParser = Parser<RecipeProps, MinecraftRecipe>;
 export type RecipeCompiler = Compiler<RecipeProps, MinecraftRecipe>;
 
@@ -116,24 +108,6 @@ export interface CompilerResult {
     tags: IdentifierObject[];
 }
 
-/**
- * Utility function to extract unknown fields from an object, excluding known fields
- */
-export function extractUnknownFields(obj: Record<string, any>, knownFields: Set<string>): Record<string, any> | undefined {
-    const unknownFields: Record<string, any> = {};
-    let hasUnknownFields = false;
-
-    for (const [key, value] of Object.entries(obj)) {
-        if (!knownFields.has(key)) {
-            unknownFields[key] = value;
-            hasUnknownFields = true;
-        }
-    }
-
-    return hasUnknownFields ? unknownFields : undefined;
-}
-
-// Known fields constants
 export const KNOWN_RECIPE_FIELDS = new Set([
     "type",
     "group",
@@ -155,7 +129,6 @@ export const KNOWN_RECIPE_FIELDS = new Set([
     "count"
 ]);
 
-// Helper functions for ingredient normalization
 export function normalizeIngredient(ingredient: any): string[] {
     if (typeof ingredient === "string") {
         return [ingredient];
@@ -184,7 +157,6 @@ export function denormalizeIngredient(items: string[]): any {
     return items.map((item) => (item.startsWith("#") ? { tag: item.slice(1) } : { item }));
 }
 
-// Grid utility functions for slot-based system
 /**
  * Convert grid position to slot index
  * @param row Row position (0-indexed)

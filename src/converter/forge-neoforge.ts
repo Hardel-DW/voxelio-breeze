@@ -11,7 +11,7 @@ export function generateForgeMods(commonData: ModMetadata, platforms: ModPlatfor
     const modLoader = platforms.includes(ModPlatforms.FORGE) ? "lowcodefml" : "javafml";
     const loaderVersion = platforms.includes(ModPlatforms.FORGE) ? "40,)" : "1,)";
 
-    // Configuration de base
+    // Base configuration
     const baseConfig = [
         `modLoader = '${modLoader}'`,
         `loaderVersion = '[${loaderVersion}'`,
@@ -20,7 +20,7 @@ export function generateForgeMods(commonData: ModMetadata, platforms: ModPlatfor
         "mods = ["
     ];
 
-    // Création de l'élément mod en une seule ligne
+    // Create mod entry in a single line
     let modEntry = `\t{ modId = '${commonData.id}', version = '${commonData.version}', displayName = '${commonData.name}', description = "${commonData.description.replace(/"/g, '\\"')}"`;
 
     if (commonData.icon) {

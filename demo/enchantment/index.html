@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voxel Breeze - Enchantment Demo</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Enchantment Simulator Demo</h1>
+        <div class="demo-grid">
+            <!-- Configuration -->
+            <div class="panel">
+                <h2>Configuration</h2>
+                
+                <div class="form-group">
+                    <label for="item-select">Item:</label>
+                    <select id="item-select">
+                        <option value="sword">Diamond Sword</option>
+                        <option value="book">Book</option>
+                        <option value="bow">Bow</option>
+                        <option value="pickaxe">Diamond Pickaxe</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="bookshelves">Number of Bookshelves (0-15):</label>
+                    <input type="number" id="bookshelves" min="0" max="15" value="15">
+                </div>
+
+                <div class="form-group">
+                    <label for="enchantability">Item Enchantability:</label>
+                    <input type="number" id="enchantability" min="1" max="25" value="10">
+                </div>
+
+                <button onclick="simulateEnchantment()">Simulate Enchantment Table</button>
+                <button onclick="calculateProbabilities()">Calculate Probabilities</button>
+            </div>
+
+            <!-- Résultats -->
+            <div class="panel">
+                <h2>Results</h2>
+                <div id="results" class="results">
+                    Click a button to start the simulation...
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="script.js"></script>
+</body>
+</html> 

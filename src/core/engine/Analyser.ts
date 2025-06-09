@@ -6,10 +6,16 @@ import type { EnchantmentProps } from "@/core/schema/enchant/types";
 import { VoxelToRecipeDataDriven } from "@/core/schema/recipe/Compiler";
 import { RecipeDataDrivenToVoxelFormat } from "@/core/schema/recipe/Parser";
 import type { MinecraftRecipe, RecipeProps } from "@/core/schema/recipe/types";
-import type { Enchantment } from "@/schema/enchantment/Enchantment";
+import type { Enchantment } from "@/schema/Enchantment";
 import { VoxelToLootDataDriven } from "../schema/loot/Compiler";
 import { LootDataDrivenToVoxelFormat } from "../schema/loot/Parser";
 import type { LootTableProps, MinecraftLootTable } from "../schema/loot/types";
+import { VoxelToStructureDataDriven } from "../schema/structure/Compiler";
+import { StructureDataDrivenToVoxelFormat } from "../schema/structure/Parser";
+import type { MinecraftStructure, StructureProps } from "../schema/structure/types";
+import { VoxelToStructureSetDataDriven } from "../schema/structure_set/Compiler";
+import { StructureSetDataDrivenToVoxelFormat } from "../schema/structure_set/Parser";
+import type { MinecraftStructureSet, StructureSetProps } from "../schema/structure_set/types";
 
 export type GetAnalyserVoxel<T extends keyof Analysers> = Analysers[T]["voxel"];
 export type GetAnalyserMinecraft<T extends keyof Analysers> = Analysers[T]["minecraft"];
@@ -26,6 +32,14 @@ export type Analysers = {
     recipe: {
         voxel: RecipeProps;
         minecraft: MinecraftRecipe;
+    };
+    "worldgen/structure": {
+        voxel: StructureProps;
+        minecraft: MinecraftStructure;
+    };
+    "worldgen/structure_set": {
+        voxel: StructureSetProps;
+        minecraft: MinecraftStructureSet;
     };
 };
 
@@ -54,6 +68,16 @@ export const analyserCollection: VersionedAnalysers = {
         compiler: VoxelToRecipeDataDriven,
         parser: RecipeDataDrivenToVoxelFormat,
         hasTag: false
+    },
+    "worldgen/structure": {
+        compiler: VoxelToStructureDataDriven,
+        parser: StructureDataDrivenToVoxelFormat,
+        hasTag: true
+    },
+    "worldgen/structure_set": {
+        compiler: VoxelToStructureSetDataDriven,
+        parser: StructureSetDataDrivenToVoxelFormat,
+        hasTag: true
     }
 };
 

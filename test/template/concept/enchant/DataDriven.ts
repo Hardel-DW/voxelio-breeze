@@ -1,7 +1,7 @@
 import type { DataDrivenRegistryElement } from "@/core/Element";
 import type { SlotRegistryType } from "@/core/engine/managers/SlotManager";
 import type { EnchantmentProps } from "@/core/schema/enchant/types";
-import type { Enchantment } from "@/schema/enchantment/Enchantment";
+import type { Enchantment } from "@/schema/Enchantment";
 
 export const makeAdvancedEnchantment: (props: Partial<EnchantmentProps>) => DataDrivenRegistryElement<Enchantment> = (props) => {
     const base = {

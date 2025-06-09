@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voxel Breeze - Format Converter</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Voxel Breeze - Format Converter</h1>
+        
+        <div class="converter">
+            <div class="panel">
+                <h2>DataDriven Format (Minecraft)</h2>
+                <textarea id="dataDriven" placeholder="Paste your DataDriven JSON here..." spellcheck="false"></textarea>
+            </div>
+
+            <div class="controls">
+                <div class="schema-selector">
+                    <h3>Schema Type</h3>
+                    <select id="schemaType">
+                        <option value="recipe">Recipe</option>
+                        <option value="loot_table">Loot Table</option>
+                        <option value="enchantment">Enchantment</option>
+                    </select>
+                </div>
+
+                <button onclick="convertToVoxel()">
+                    DataDriven <span class="arrow">→</span> Voxel
+                </button>
+                
+                <button onclick="convertToDataDriven()">
+                    Voxel <span class="arrow">→</span> DataDriven
+                </button>
+
+                <button onclick="loadPlaceholder()" style="background: #2196F3;">
+                    Load example
+                </button>
+                
+                <button onclick="clearAll()" style="background: #f44336;">
+                    Clear all
+                </button>
+
+                <div id="status"></div>
+            </div>
+
+            <div class="panel">
+                <h2>VoxelDriven Format (Proprietary)</h2>
+                <textarea id="voxelDriven" placeholder="VoxelDriven format will appear here..." spellcheck="false"></textarea>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="script.js"></script>
+</body>
+</html> 
