@@ -1,7 +1,3 @@
-/**
- * Shared utilities for schema parsers and compilers
- */
-
 import type { IdentifierObject } from "@/core/Identifier";
 import { tagsToIdentifiers } from "@/core/Tag";
 import type { Analysers } from "@/core/engine/Analyser";

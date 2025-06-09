@@ -83,8 +83,8 @@ export class ConditionalLootHandler implements ActionHandler<LootTableAction> {
 
         const actionToExecute = conditionMet ? action.thenAction : action.elseAction;
         if (actionToExecute) {
-            // Récursif - il faut appeler le nouveau système d'actions
-            // Pour l'instant on retourne juste clone, ça sera fixé plus tard
+            // Recursive - we need to call the new action system
+            // For now we just return clone, it will be fixed later
             return clone;
         }
         return clone;

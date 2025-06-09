@@ -4,7 +4,7 @@ import type { LootGroup, LootItem, LootTableParser, LootTableProps, MinecraftLoo
 import { KNOWN_ENTRY_FIELDS, KNOWN_POOL_FIELDS, KNOWN_TABLE_FIELDS } from "./types";
 
 /**
- * Parse Minecraft LootTable to simplified Voxel format - Ultra-simplified version
+ * Parse Minecraft LootTable to simplified Voxel format.
  */
 export const LootDataDrivenToVoxelFormat: LootTableParser = ({
     element,
@@ -16,14 +16,12 @@ export const LootDataDrivenToVoxelFormat: LootTableParser = ({
     let itemCounter = 0;
     let groupCounter = 0;
 
-    // Process all pools and entries in one pass
     data.pools?.forEach((pool, poolIndex) => {
         pool.entries?.forEach((entry, entryIndex) => {
             processEntry(entry, poolIndex, entryIndex);
         });
     });
 
-    // Extract pool data
     const pools: PoolData[] =
         data.pools?.map((pool, poolIndex) => ({
             poolIndex,
@@ -47,13 +45,12 @@ export const LootDataDrivenToVoxelFormat: LootTableParser = ({
     };
 
     /**
-     * Process entry recursively - single function handles everything
+     * Process entry recursively.
      */
     function processEntry(entry: MinecraftLootEntry, poolIndex: number, entryIndex: number): string {
         const isGroup = entry.type.includes("alternatives") || entry.type.includes("group") || entry.type.includes("sequence");
 
         if (isGroup) {
-            // Handle group
             const groupId = `group_${groupCounter++}`;
             const groupType = entry.type.replace("minecraft:", "") as "alternatives" | "group" | "sequence";
 
@@ -73,12 +70,10 @@ export const LootDataDrivenToVoxelFormat: LootTableParser = ({
             return groupId;
         }
 
-        // Handle item
         const itemId = `item_${itemCounter++}`;
         let name = "";
         let value = undefined;
 
-        // Determine name and value based on type
         if (entry.type === "minecraft:loot_table") {
             const tableName = entry.value ?? entry.name;
             if (typeof tableName === "string") {

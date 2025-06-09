@@ -4,7 +4,7 @@ import type { DimensionPadding, MinecraftStructure, MobCategory, PoolAlias, Spaw
 import { JIGSAW_STRUCTURE_TYPES, KNOWN_STRUCTURE_FIELDS } from "./types";
 
 /**
- * Parse Minecraft Structure to simplified Voxel format
+ * Parse Minecraft Structure to simplified Voxel format.
  */
 export const StructureDataDrivenToVoxelFormat: StructureParser = ({
     element,
@@ -13,10 +13,8 @@ export const StructureDataDrivenToVoxelFormat: StructureParser = ({
 }: ParserParams<MinecraftStructure>): StructureProps => {
     const data = element.data;
 
-    // Normalize biomes to array
     const biomes = Array.isArray(data.biomes) ? data.biomes : [data.biomes];
 
-    // Convert spawn overrides from record to array (only if not empty)
     const spawnOverridesEntries = Object.entries(data.spawn_overrides || {});
     const spawnOverrides: SpawnOverride[] | undefined =
         spawnOverridesEntries.length > 0
@@ -27,7 +25,6 @@ export const StructureDataDrivenToVoxelFormat: StructureParser = ({
               }))
             : undefined;
 
-    // Build base structure
     const structure: StructureProps = {
         identifier: element.identifier,
         type: data.type,
@@ -37,17 +34,14 @@ export const StructureDataDrivenToVoxelFormat: StructureParser = ({
         tags
     };
 
-    // Add spawn overrides only if present
     if (spawnOverrides) {
         structure.spawnOverrides = spawnOverrides;
     }
 
-    // Add optional base properties
     if (data.terrain_adaptation) {
         structure.terrainAdaptation = data.terrain_adaptation;
     }
 
-    // Handle Jigsaw structures (flatten properties)
     if (JIGSAW_STRUCTURE_TYPES.has(data.type)) {
         if (data.start_pool) structure.startPool = data.start_pool;
         if (data.size !== undefined) structure.size = data.size;
@@ -60,10 +54,8 @@ export const StructureDataDrivenToVoxelFormat: StructureParser = ({
         if (data.dimension_padding) structure.dimensionPadding = normalizeDimensionPadding(data.dimension_padding);
         if (data.liquid_settings) structure.liquidSettings = data.liquid_settings;
     } else {
-        // For legacy structures, store type-specific config
         const typeSpecific: Record<string, any> = {};
 
-        // Copy legacy properties
         const legacyProps = [
             "probability",
             "mineshaft_type",
@@ -86,7 +78,6 @@ export const StructureDataDrivenToVoxelFormat: StructureParser = ({
         }
     }
 
-    // Preserve unknown fields
     const unknownFields = extractUnknownFields(data, KNOWN_STRUCTURE_FIELDS);
     if (unknownFields) {
         structure.unknownFields = unknownFields;

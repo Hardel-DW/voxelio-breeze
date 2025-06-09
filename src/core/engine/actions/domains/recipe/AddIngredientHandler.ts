@@ -16,7 +16,6 @@ export class AddIngredientHandler implements ActionHandler<RecipeAction> {
         if (replace || !newSlots[slot]) {
             newSlots[slot] = [...items];
         } else {
-            // Merge items, avoiding duplicates
             const existingItems = new Set(newSlots[slot]);
             const newItems = items.filter((item) => !existingItems.has(item));
             newSlots[slot] = [...newSlots[slot], ...newItems];
@@ -39,18 +38,15 @@ export class RemoveIngredientHandler implements ActionHandler<RecipeAction> {
         const { slot, items } = action;
 
         if (!newSlots[slot]) {
-            return newRecipe; // Slot doesn't exist
+            return newRecipe;
         }
 
         if (!items) {
-            // Remove entire slot
             delete newSlots[slot];
         } else {
-            // Remove specific items
             const itemsToRemove = new Set(items);
             newSlots[slot] = newSlots[slot].filter((item) => !itemsToRemove.has(item));
 
-            // Remove slot if empty
             if (newSlots[slot].length === 0) {
                 delete newSlots[slot];
             }
@@ -90,11 +86,9 @@ export class SwapSlotsHandler implements ActionHandler<RecipeAction> {
         const fromItems = newSlots[fromSlot] || [];
         const toItems = newSlots[toSlot] || [];
 
-        // Clear both slots first
         delete newSlots[fromSlot];
         delete newSlots[toSlot];
 
-        // Set new values if not empty
         if (toItems.length > 0) {
             newSlots[fromSlot] = [...toItems];
         }

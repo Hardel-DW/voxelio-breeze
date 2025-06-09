@@ -39,13 +39,11 @@ export class SetComputedSlotHandler implements ActionHandler<EnchantmentAction> 
             throw new Error(`Invalid SlotRegistryType array: ${unformattedValue}`);
         }
 
-        // Get SlotManager for the version
         const slotManager = getManager("slot", version);
         if (!slotManager) {
             throw new Error(`SlotManager is not available for version ${version}`);
         }
 
-        // Apply the slot toggle and return new element
         const newSlots = slotManager.apply(currentValue, slotValue);
         return setValueAtPath(element, path, newSlots);
     }

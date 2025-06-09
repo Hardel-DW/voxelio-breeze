@@ -1,7 +1,5 @@
-import type { PoolAlias } from "@/core/schema/structure/types";
 import { type AllExpectedHandlerKeys, type ValidateHandlerRegistry, createHandlers } from "../../types";
 
-// Structure domain action types
 export interface StructureActions {
     set_biomes: {
         biomes: string[];
@@ -45,12 +43,10 @@ export interface StructureActions {
     };
 }
 
-// Export typed actions for this domain
 export type StructureAction = {
     [K in keyof StructureActions]: StructureActions[K] & { type: `structure.${K}` };
 }[keyof StructureActions];
 
-// Use generic validation system
 export type StructureHandlerKeys = AllExpectedHandlerKeys<"structure", StructureActions>;
 export const createStructureHandlers = <T extends Record<StructureHandlerKeys, any>>(
     handlers: ValidateHandlerRegistry<T, StructureHandlerKeys>

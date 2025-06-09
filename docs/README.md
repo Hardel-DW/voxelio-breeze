@@ -81,11 +81,12 @@ Le système d'actions est organisé en domaines :
 
 ### 📋 Guides de parsing et compiling
 
-- [**Guide Enchantement**](./enchantment-guide.md) - Conversion bidirectionnelle
-  des enchantements
-- [**Guide Loot Table**](./loot-table-guide.md) - Conversion des tables de loot
-- [**Guide Recipe**](./recipe-guide.md) - Conversion des recettes de craft
-- [**Guide Structure**](./structure-guide.md) - Conversion des structures et
+- [**Guide Enchantement**](./concept/enchantment.md) - Conversion
+  bidirectionnelle des enchantements
+- [**Guide Loot Table**](./concept/loot-table.md) - Conversion des tables de
+  loot
+- [**Guide Recipe**](./concept/recipe.md) - Conversion des recettes de craft
+- [**Guide Structure**](./concept/structure.md) - Conversion des structures et
   système Jigsaw
 
 ### 🎮 Guides des mécaniques de jeu
@@ -97,28 +98,15 @@ Le système d'actions est organisé en domaines :
 
 #### Actions par domaine
 
-- [**Actions Core**](./actions-core.md) - Actions de base (set_value, toggle,
+- [**Actions Core**](./actions/core.md) - Actions de base (set_value, toggle,
   etc.)
-- [**Actions Enchantment**](./actions-enchantment.md) - Actions spécifiques aux
+- [**Actions Enchantment**](./actions/enchantment.md) - Actions spécifiques aux
   enchantements
-- [**Actions Loot Table**](./actions-loot-table.md) - Actions pour les tables de
+- [**Actions Loot Table**](./actions/loot-table.md) - Actions pour les tables de
   loot
-- [**Actions Recipe**](./actions-recipe.md) - Actions pour les recettes
-- [**Actions Structure**](./actions-structure.md) - Actions pour les structures
+- [**Actions Recipe**](./actions/recipe.md) - Actions pour les recettes
+- [**Actions Structure**](./actions/structure.md) - Actions pour les structures
   et spawn overrides
-
-#### Système d'actions
-
-- [**Actions Utils**](./actions-utils.md) - Utilitaires pour les actions
-- [**Actions Types**](./actions-types.md) - Système de types des actions
-- [**Actions Registry**](./actions-registry.md) - Registre et chargement des
-  actions
-- [**Actions Index**](./actions-index.md) - Point d'entrée principal des actions
-
-### 🔧 Documentation technique
-
-- [**Parsing**](./parsing.md) - Architecture générale du parsing
-- [**Compiling**](./compiling.md) - Architecture générale du compiling
 
 ### 🏗️ Guide de développement
 

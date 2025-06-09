@@ -11,7 +11,6 @@ export class SetPlacementConfigHandler implements ActionHandler<StructureSetActi
 
         const updatedElement = { ...structureSet };
 
-        // Update placement configuration properties
         if (action.salt !== undefined) {
             updatedElement.salt = action.salt;
         }

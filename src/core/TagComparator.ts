@@ -8,6 +8,7 @@ import type { OptionalTag, TagType } from "@/schema/TagType";
  */
 export default class TagsComparator {
     private readonly registry: string;
+    private readonly tagMap: Map<string, DataDrivenRegistryElement<TagType>>;
 
     /**
      * Creates a new TagsComparator instance
@@ -25,6 +26,7 @@ export default class TagsComparator {
         }
 
         this.registry = Array.from(registries)[0];
+        this.tagMap = new Map(tags.map((tag) => [new Identifier(tag.identifier).toString(), tag]));
     }
 
     /**
@@ -115,6 +117,6 @@ export default class TagsComparator {
      * @returns The found tag or undefined
      */
     private findTagByPath(path: string): DataDrivenRegistryElement<TagType> | undefined {
-        return this.tags.find((tag) => new Identifier(tag.identifier).toString() === path);
+        return this.tagMap.get(path);
     }
 }

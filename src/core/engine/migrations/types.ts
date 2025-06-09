@@ -1,4 +1,3 @@
-// Types for the generic diff system
 export type LogValue = string | number | boolean | null | undefined | LogValue[] | { [key: string]: LogValue };
 
 export interface LogDifference {

@@ -4,18 +4,16 @@ import type { IdentifierObject } from "@/core/Identifier";
 import type { Compiler } from "@/core/engine/Compiler";
 import type { Parser } from "@/core/engine/Parser";
 
-// Simplified structure format for UI
 export interface StructureProps extends VoxelElement {
-    type: string; // Structure type ID
-    biomes: string[]; // List of biome IDs or tags
+    type: string;
+    biomes: string[];
     step: DecorationStep;
     terrainAdaptation?: TerrainAdaptation;
-    spawnOverrides?: SpawnOverride[]; // Made optional
+    spawnOverrides?: SpawnOverride[];
 
-    // Jigsaw-specific properties (flattened)
     startPool?: string;
     size?: number;
-    startHeight?: any; // HeightProvider
+    startHeight?: any;
     startJigsawName?: string;
     projectStartToHeightmap?: HeightmapType;
     maxDistanceFromCenter?: number;
@@ -24,10 +22,8 @@ export interface StructureProps extends VoxelElement {
     dimensionPadding?: DimensionPadding;
     liquidSettings?: LiquidSettings;
 
-    // Legacy/other config stored as-is
     typeSpecific?: Record<string, any>;
 
-    // Preserve unknown fields from mods
     unknownFields?: Record<string, any>;
     tags: string[];
 }

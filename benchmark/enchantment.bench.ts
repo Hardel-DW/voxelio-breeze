@@ -8,7 +8,6 @@ import { VOXEL_TEMPLATE_ENCHANTMENT } from "@test/template/concept/enchant/Voxel
 describe("Enchantment Performance", () => {
     const { parser, compiler } = analyserCollection.enchantment;
 
-    // Test data
     const simpleDataDriven = DATA_DRIVEN_TEMPLATE_ENCHANTMENT[0];
     const complexDataDriven = DATA_DRIVEN_TEMPLATE_ENCHANTMENT[4]; // death_touch with complex effects
     const attributeDataDriven = DATA_DRIVEN_TEMPLATE_ENCHANTMENT[1]; // agility with attributes
@@ -17,7 +16,6 @@ describe("Enchantment Performance", () => {
     const onlyCreativeVoxel = VOXEL_TEMPLATE_ENCHANTMENT[1].data;
     const softDeleteVoxel = VOXEL_TEMPLATE_ENCHANTMENT[2].data;
 
-    // Create large enchantment dataset for stress testing
     const createLargeEnchantmentSet = (count: number): DataDrivenRegistryElement<Enchantment>[] => {
         return Array.from({ length: count }, (_, i) =>
             makeAdvancedEnchantment({
@@ -46,7 +44,6 @@ describe("Enchantment Performance", () => {
         );
     };
 
-    // Create complex nested effects enchantment
     const createComplexEffectsEnchantment = (): DataDrivenRegistryElement<Enchantment> => {
         return makeAdvancedEnchantment({
             identifier: { namespace: "test", registry: "enchantment", resource: "complex_effects" },

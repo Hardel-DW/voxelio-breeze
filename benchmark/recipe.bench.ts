@@ -36,7 +36,6 @@ describe("Recipe Performance", () => {
     const smeltingVoxelData = smeltingVoxel.data;
     const smithingVoxel = transformVoxel.data;
 
-    // Create a large shaped recipe for stress testing
     const largeShapedRecipe: DataDrivenRegistryElement<MinecraftRecipe> = {
         identifier: { namespace: "test", registry: "recipe", resource: "large_shaped" },
         data: {
@@ -52,7 +51,6 @@ describe("Recipe Performance", () => {
         }
     };
 
-    // Create a complex shapeless recipe with many ingredients
     const complexShapelessRecipe: DataDrivenRegistryElement<MinecraftRecipe> = {
         identifier: { namespace: "test", registry: "recipe", resource: "complex_shapeless" },
         data: {
@@ -83,7 +81,6 @@ describe("Recipe Performance", () => {
         }
     };
 
-    // Create multiple smelting recipes for batch testing
     const batchSmeltingRecipes = Array.from({ length: 50 }, (_, i) => ({
         identifier: { namespace: "test", registry: "recipe", resource: `smelting_${i}` },
         data: {
@@ -97,7 +94,6 @@ describe("Recipe Performance", () => {
         }
     }));
 
-    // Create mod recipe with custom fields
     const modRecipe: DataDrivenRegistryElement<MinecraftRecipe> = {
         identifier: { namespace: "test", registry: "recipe", resource: "mod_recipe" },
         data: {

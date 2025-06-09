@@ -36,7 +36,6 @@ export const EnchantmentDataDrivenToVoxelFormat: Parser<EnchantmentProps, Enchan
 
     let mode: "normal" | "soft_delete" | "only_creative" = "normal";
 
-    // Optimisation: utiliser le cache au lieu de créer des Identifiers
     if (tagsWithoutExclusiveSet.every((tag) => FUNCTIONALITY_TAGS_CACHE.has(tag))) {
         mode = "only_creative";
     }
@@ -45,7 +44,6 @@ export const EnchantmentDataDrivenToVoxelFormat: Parser<EnchantmentProps, Enchan
         mode = "soft_delete";
     }
 
-    // Extract unknown fields from mods
     const unknownFields = extractUnknownFields(data, KNOWN_ENCHANTMENT_FIELDS);
 
     return {

@@ -43,13 +43,14 @@ La table d'enchantement génère 3 options selon ces formules :
 
 ```typescript
 // Niveau de base (affecté par les étagères)
-const base = randomInt(1, 8) + floor(bookshelves / 2) +
-    randomInt(0, bookshelves);
+const clampedBookshelves = Math.min(15, Math.max(0, bookshelves));
+const base = randomInt(1, 8) + Math.floor(clampedBookshelves / 2) +
+    randomInt(0, clampedBookshelves);
 
 // Les 3 slots
-const topSlot = floor(max(base / 3, 1)); // Minimum 1
-const middleSlot = floor((base * 2) / 3 + 1); // Intermédiaire
-const bottomSlot = floor(max(base, bookshelves * 2)); // Maximum
+const topSlot = Math.floor(Math.max(base / 3, 1)); // Minimum 1
+const middleSlot = Math.floor((base * 2) / 3 + 1); // Intermédiaire
+const bottomSlot = Math.floor(Math.max(base, clampedBookshelves * 2)); // Maximum
 ```
 
 **Exemple avec 15 étagères** :
@@ -79,32 +80,80 @@ Un enchantement est disponible dans la table si :
 
 ```typescript
 // 1. Il est dans le tag "in_enchanting_table"
-const isInTable = inEnchantingTableTags.has(enchantmentId);
+const isInTable = this.isEnchantmentInEnchantingTable(enchantmentId);
 
 // 2. Il est compatible avec l'item
-const isCompatible = checkItemCompatibility(enchantment, itemTags);
+const isCompatible = this.checkItemCompatibility(enchantment, itemTagSet);
 
 // 3. Son niveau de coût correspond au niveau de puissance
-const applicableLevel = calculateApplicableLevel(enchantment, powerLevel);
+const applicableLevel = this.calculateApplicableLevel(
+    enchantment,
+    modifiedLevel,
+);
 ```
 
 ### 2. Compatibilité avec les items
 
-La compatibilité utilise cette logique **exclusive** :
+La compatibilité utilise cette logique **exclusive** avec optimisation par
+mapping :
 
 ```typescript
-// Si primary_items est défini, on utilise SEULEMENT primary_items
-// Sinon, on utilise supported_items
-const items = enchantment.primary_items || enchantment.supported_items;
+// Construction du mapping item -> enchantements (optimisation)
+private buildItemTagToEnchantmentsMap(): void {
+    for (const [id, enchantment] of this.enchantments.entries()) {
+        const items = enchantment.primary_items || enchantment.supported_items;
+        const supportedItems = Array.isArray(items) ? items : [items];
 
-// Support des tags et items directs
-if (supportedItem.startsWith("#")) {
-    // Tag d'item (ex: "#minecraft:weapon")
-    const tagName = supportedItem.substring(1);
-    return itemTags.includes(tagName);
-} else {
-    // Item direct (ex: "minecraft:diamond_sword")
-    return itemTags.includes(supportedItem);
+        for (const supportedItem of supportedItems) {
+            if (!this.itemTagToEnchantmentsMap.has(supportedItem)) {
+                this.itemTagToEnchantmentsMap.set(supportedItem, []);
+            }
+            this.itemTagToEnchantmentsMap.get(supportedItem)?.push(id);
+        }
+    }
+}
+
+// Recherche des enchantements candidats
+private findPossibleEnchantments(level: number, itemTagSet: Set<string>): Array<EnchantmentPossible> {
+    const candidateEnchantmentIds = new Set<string>();
+    
+    for (const tag of itemTagSet) {
+        // Support direct du tag
+        const enchantments = this.itemTagToEnchantmentsMap.get(tag) ?? [];
+        for (const enchId of enchantments) {
+            candidateEnchantmentIds.add(enchId);
+        }
+        
+        // Support du tag avec préfixe #
+        const hashTag = `#${tag}`;
+        const enchantmentsForHash = this.itemTagToEnchantmentsMap.get(hashTag) ?? [];
+        for (const enchId of enchantmentsForHash) {
+            candidateEnchantmentIds.add(enchId);
+        }
+    }
+    
+    // Filtrage et validation
+    const possible: Array<EnchantmentPossible> = [];
+    for (const id of candidateEnchantmentIds) {
+        const enchantment = this.enchantments.get(id);
+        if (!enchantment) continue;
+
+        if (!this.isEnchantmentInEnchantingTable(id)) {
+            continue;
+        }
+
+        const enchLevel = this.calculateApplicableLevel(enchantment, level);
+        if (enchLevel > 0) {
+            possible.push({
+                id,
+                enchantment,
+                weight: enchantment.weight,
+                applicableLevel: enchLevel
+            });
+        }
+    }
+
+    return possible;
 }
 ```
 
@@ -171,8 +220,9 @@ Chaque enchantement définit des plages de coût par niveau :
 **Calcul pour chaque niveau** :
 
 ```typescript
-const minCost = base + (level - 1) * perLevelAboveFirst;
-const maxCost = base + (level - 1) * perLevelAboveFirst;
+private calculateEnchantmentCost(cost: { base: number; per_level_above_first: number }, level: number): number {
+    return cost.base + Math.max(0, level - 1) * cost.per_level_above_first;
+}
 ```
 
 **Exemple Sharpness** :
@@ -189,26 +239,14 @@ Le système trouve le **niveau le plus élevé** possible pour le niveau de
 puissance :
 
 ```typescript
-function calculateApplicableLevel(enchantment, powerLevel) {
-    for (let level = 1; level <= enchantment.max_level; level++) {
-        const minCost = calculateCost(enchantment.min_cost, level);
-        const maxCost = calculateCost(enchantment.max_cost, level);
-
+private calculateApplicableLevel(enchantment: Enchantment, powerLevel: number): number {
+    // Optimisation : partir du niveau le plus élevé
+    for (let level = enchantment.max_level; level >= 1; level--) {
+        const minCost = this.calculateEnchantmentCost(enchantment.min_cost, level);
+        const maxCost = this.calculateEnchantmentCost(enchantment.max_cost, level);
+        
         if (powerLevel >= minCost && powerLevel <= maxCost) {
-            // Chercher le niveau le plus élevé possible
-            let applicableLevel = level;
-            for (
-                let higher = level + 1;
-                higher <= enchantment.max_level;
-                higher++
-            ) {
-                const higherMin = calculateCost(enchantment.min_cost, higher);
-                const higherMax = calculateCost(enchantment.max_cost, higher);
-                if (powerLevel >= higherMin && powerLevel <= higherMax) {
-                    applicableLevel = higher;
-                } else break;
-            }
-            return applicableLevel;
+            return level; // Premier niveau trouvé = le plus élevé
         }
     }
     return 0; // Aucun niveau applicable
@@ -235,19 +273,17 @@ function calculateApplicableLevel(enchantment, powerLevel) {
 Le niveau de base est modifié par l'enchantability :
 
 ```typescript
-function applyEnchantabilityModifiers(baseLevel, enchantability) {
+private applyEnchantabilityModifiers(baseLevel: number, enchantability: number): number {
     // Deux modificateurs aléatoires
-    const modifier1 = randomInt(0, floor(enchantability / 4)) + 1;
-    const modifier2 = randomInt(0, floor(enchantability / 4)) + 1;
-
-    // Niveau modifié
+    const modifier1 = this.randomInt(0, Math.floor(enchantability / 4)) + 1;
+    const modifier2 = this.randomInt(0, Math.floor(enchantability / 4)) + 1;
     let modifiedLevel = baseLevel + modifier1 + modifier2;
 
-    // Bonus aléatoire (±15%)
-    const randomBonus = 1 + (random() + random() - 1) * 0.15;
-    modifiedLevel = round(modifiedLevel * randomBonus);
+    // Bonus aléatoire (±15%) - formule améliorée
+    const randomBonus = 1 + (Math.random() + Math.random() - 1) * 0.15;
+    modifiedLevel = Math.round(modifiedLevel * randomBonus);
 
-    return max(1, modifiedLevel);
+    return Math.max(1, modifiedLevel);
 }
 ```
 
@@ -259,27 +295,48 @@ augmenté, permettant des enchantements de plus haut niveau.
 ### 1. Algorithme de sélection
 
 ```typescript
-function selectEnchantments(possibleEnchantments, level) {
-    const selected = [];
+private selectEnchantments(possibleEnchantments: Array<EnchantmentPossible>, level: number): Array<EnchantmentEntry> {
+    if (possibleEnchantments.length === 0) return [];
+
+    const selected: Array<EnchantmentEntry> = [];
+    let remaining = [...possibleEnchantments];
 
     // 1. Sélection pondérée du premier enchantement
-    const first = weightedRandomSelect(possibleEnchantments);
-    selected.push(first);
+    const first = this.weightedRandomSelect(remaining);
+    if (first) {
+        selected.push({
+            enchantment: first.id,
+            level: first.applicableLevel,
+            power: first.applicableLevel
+        });
+        remaining = remaining.filter((e) => e.id !== first.id);
+    }
 
     // 2. Enchantements supplémentaires (probabilité décroissante)
     let extraChance = (level + 1) / 50.0;
 
-    while (remaining.length > 0 && random() < extraChance) {
+    while (remaining.length > 0 && Math.random() < extraChance) {
         // Filtrer les enchantements incompatibles
         remaining = remaining.filter((e) =>
-            areEnchantmentsCompatible(e.id, selected.map((s) => s.enchantment))
+            this.areEnchantmentsCompatible(
+                e.id,
+                selected.map((s) => s.enchantment)
+            )
         );
 
-        const next = weightedRandomSelect(remaining);
+        if (remaining.length === 0) break;
+
+        const next = this.weightedRandomSelect(remaining);
         if (next) {
-            selected.push(next);
-            extraChance *= 0.5; // Réduire les chances
+            selected.push({
+                enchantment: next.id,
+                level: next.applicableLevel,
+                power: next.applicableLevel
+            });
+            remaining = remaining.filter((e) => e.id !== next.id);
         }
+
+        extraChance *= 0.5; // Réduire les chances
     }
 
     return selected;
@@ -296,21 +353,155 @@ Les enchantements peuvent être mutuellement exclusifs via `exclusive_set` :
 }
 ```
 
-Le système vérifie les intersections de tags d'exclusivité :
+Le système vérifie les intersections de tags d'exclusivité avec support des
+arrays :
 
 ```typescript
-function areEnchantmentsCompatible(newId, existingIds) {
-    const newExclusiveSet = getExclusiveSet(newId);
+private areEnchantmentsCompatible(newEnchantmentId: string, existingEnchantmentIds: string[]): boolean {
+    const newEnchant = this.enchantments.get(newEnchantmentId);
+    if (!newEnchant || !newEnchant.exclusive_set) {
+        return true;
+    }
 
-    for (const existingId of existingIds) {
-        const existingExclusiveSet = getExclusiveSet(existingId);
+    // Support des arrays et valeurs simples
+    const newSets = Array.isArray(newEnchant.exclusive_set) 
+        ? newEnchant.exclusive_set 
+        : [newEnchant.exclusive_set];
+
+    for (const existingId of existingEnchantmentIds) {
+        const existingEnchant = this.enchantments.get(existingId);
+        if (!existingEnchant || !existingEnchant.exclusive_set) {
+            continue;
+        }
+
+        const existingSets = Array.isArray(existingEnchant.exclusive_set)
+            ? existingEnchant.exclusive_set
+            : [existingEnchant.exclusive_set];
 
         // Vérifier si les tags d'exclusivité se chevauchent
-        if (shareExclusiveTag(newExclusiveSet, existingExclusiveSet)) {
-            return false;
+        for (const newSet of newSets) {
+            for (const existingSet of existingSets) {
+                if (newSet === existingSet) {
+                    return false;
+                }
+            }
         }
     }
     return true;
+}
+```
+
+### 3. Sélection pondérée améliorée
+
+```typescript
+private weightedRandomSelect<T extends { weight: number }>(items: T[]): T | null {
+    if (items.length === 0) return null;
+
+    const totalWeight = items.reduce((sum, item) => sum + item.weight, 0);
+    
+    // Gestion du cas où tous les poids sont 0
+    if (totalWeight === 0) {
+        return items[Math.floor(Math.random() * items.length)];
+    }
+
+    let random = Math.random() * totalWeight;
+    for (const item of items) {
+        if (random < item.weight) {
+            return item;
+        }
+        random -= item.weight;
+    }
+
+    return null; // Fallback
+}
+```
+
+## Gestion des tags et performance
+
+### 1. TagsComparator intégré
+
+Le simulateur utilise le système de tags intégré pour une gestion optimisée :
+
+```typescript
+constructor(enchantments: Map<string, Enchantment>, tags?: DataDrivenRegistryElement<TagType>[]) {
+    this.enchantments = enchantments;
+
+    if (tags && tags.length > 0) {
+        this.tagsComparator = new TagsComparator(tags);
+        this.initializeInEnchantingTableValues(tags);
+    }
+    this.buildItemTagToEnchantmentsMap();
+}
+
+private initializeInEnchantingTableValues(tags: DataDrivenRegistryElement<TagType>[]): void {
+    const inEnchantingTableTag = tags.find(
+        (tag) => tag.identifier.resource === "in_enchanting_table" && 
+               tag.identifier.registry === "tags/enchantment"
+    );
+
+    if (inEnchantingTableTag && this.tagsComparator) {
+        const values = this.tagsComparator.getRecursiveValues(inEnchantingTableTag.identifier);
+        this.inEnchantingTableValues = new Set(values);
+    }
+}
+
+private isEnchantmentInEnchantingTable(enchantmentId: string): boolean {
+    if (this.inEnchantingTableValues.size === 0) return true;
+    const normalizedId = Identifier.normalize(enchantmentId, "enchantment");
+    return this.inEnchantingTableValues.has(normalizedId);
+}
+```
+
+### 2. Optimisations de performance
+
+- **Mapping pré-calculé** : `itemTagToEnchantmentsMap` évite les recherches
+  répétées
+- **Sets pour les candidats** : Élimination automatique des doublons
+- **Recherche descendante** : `calculateApplicableLevel` commence par le niveau
+  max
+- **Filtrage précoce** : Vérification du tag `in_enchanting_table` avant les
+  calculs coûteux
+
+## Interfaces et types
+
+### 1. Interfaces principales
+
+```typescript
+export interface ItemData {
+    id: string;
+    enchantability: number;
+    tags: string[];
+}
+
+export interface EnchantmentOption {
+    level: number; // Niveau de base du slot
+    cost: number; // Coût en XP
+    enchantments: Array<EnchantmentEntry>;
+}
+
+export interface EnchantmentStats {
+    enchantmentId: string;
+    probability: number; // Probabilité en %
+    averageLevel: number; // Niveau moyen
+    minLevel: number; // Niveau minimum observé
+    maxLevel: number; // Niveau maximum observé
+}
+```
+
+### 2. Interfaces internes
+
+```typescript
+interface EnchantmentEntry {
+    enchantment: string; // ID de l'enchantement
+    level: number; // Niveau applicable
+    power: number; // Puissance (= level)
+}
+
+interface EnchantmentPossible {
+    id: string;
+    enchantment: Enchantment;
+    weight: number;
+    applicableLevel: number;
 }
 ```
 
@@ -341,7 +532,8 @@ sélection.
 
 ### 1. Calcul de probabilités
 
-La classe `EnchantmentSimulator` permet de calculer les probabilités :
+La classe `EnchantmentSimulator` permet de calculer les probabilités avec des
+statistiques avancées :
 
 ```typescript
 const simulator = new EnchantmentSimulator(enchantments, tags);
@@ -353,9 +545,12 @@ const stats = simulator.calculateEnchantmentProbabilities(
     10000, // Nombre d'itérations
 );
 
-// Résultat : probabilité de chaque enchantement
+// Résultat : statistiques détaillées par enchantement
 stats.forEach((stat) => {
-    console.log(`${stat.enchantmentId}: ${stat.probability.toFixed(2)}%`);
+    console.log(`${stat.enchantmentId}:`);
+    console.log(`  Probabilité: ${stat.probability.toFixed(2)}%`);
+    console.log(`  Niveau moyen: ${stat.averageLevel.toFixed(1)}`);
+    console.log(`  Plage: ${stat.minLevel}-${stat.maxLevel}`);
 });
 ```
 
@@ -368,9 +563,11 @@ const options = simulator.simulateEnchantmentTable(
     ["minecraft:sword"], // Tags item
 );
 
-// 3 options : [topSlot, middleSlot, bottomSlot]
+// Retourne un tuple de 3 options : [topSlot, middleSlot, bottomSlot]
 options.forEach((option, i) => {
-    console.log(`Option ${i + 1} (coût ${option.cost}):`);
+    console.log(
+        `Option ${i + 1} (niveau ${option.level}, coût ${option.cost}):`,
+    );
     option.enchantments.forEach((ench) => {
         console.log(`  ${ench.enchantment} ${ench.level}`);
     });
@@ -421,6 +618,16 @@ options.forEach((option, i) => {
 - Enchantements de bas niveau uniquement
 - Probabilité d'enchantements multiples très faible
 
+### Performance et optimisations
+
+**Nouvelles optimisations dans le simulateur** :
+
+1. **Pré-calcul des mappings** : Évite les recherches O(n) répétées
+2. **Gestion intelligente des tags** : Support automatique des formats `tag` et
+   `#tag`
+3. **Filtrage précoce** : Élimination rapide des enchantements non-éligibles
+4. **Statistics robustes** : Calculs de min/max/moyenne sur de gros échantillons
+
 Ce système data-driven offre une flexibilité complète pour personnaliser les
 mécaniques d'enchantement via des datapacks tout en maintenant la complexité du
-système original.
+système original avec des performances optimisées.

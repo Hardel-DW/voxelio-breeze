@@ -20,8 +20,8 @@ export class AddLootItemHandler implements ActionHandler<LootTableAction> {
             conditions: action.item.conditions || [],
             functions: action.item.functions || [],
             poolIndex: action.poolIndex,
-            entryIndex: 0, // Will be recalculated
-            entryType: "minecraft:item" // Default entry type for new items
+            entryIndex: 0,
+            entryType: "minecraft:item"
         };
         clone.items.push(newItem);
         return clone;

@@ -22,7 +22,6 @@ export default function register(): Map<string, ActionHandler<StructureSetAction
     return new Map(Object.entries(handlerDefinitions));
 }
 
-// Inline handlers for simpler actions
 class RemoveStructureHandler implements ActionHandler<StructureSetAction> {
     execute(
         action: Extract<StructureSetAction, { type: "structure_set.remove_structure" }>,
@@ -30,9 +29,7 @@ class RemoveStructureHandler implements ActionHandler<StructureSetAction> {
     ): Record<string, unknown> {
         const structureSet = element as any;
 
-        const updatedStructures = structureSet.structures.filter(
-            (struct: any, index: number) => `structure_${index}` !== action.structureId
-        );
+        const updatedStructures = structureSet.structures.filter((_: any, index: number) => `structure_${index}` !== action.structureId);
 
         return {
             ...structureSet,
@@ -138,7 +135,6 @@ class ReorderStructuresHandler implements ActionHandler<StructureSetAction> {
     ): Record<string, unknown> {
         const structureSet = element as any;
 
-        // Reorder structures based on the provided IDs
         const reorderedStructures = action.structureIds
             .map((id) => {
                 const index = Number.parseInt(id.replace("structure_", ""));

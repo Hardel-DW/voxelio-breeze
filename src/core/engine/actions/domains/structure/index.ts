@@ -20,7 +20,6 @@ export default function register(): Map<string, ActionHandler<StructureAction>> 
     return new Map(Object.entries(handlerDefinitions));
 }
 
-// Simple handlers for remaining actions
 class RemoveSpawnOverrideHandler implements ActionHandler<StructureAction> {
     execute(
         action: Extract<StructureAction, { type: "structure.remove_spawn_override" }>,

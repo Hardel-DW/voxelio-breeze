@@ -23,18 +23,15 @@ export const VoxelToStructureSetDataDriven: StructureSetCompiler = (
     const structureSet = original ? structuredClone(original) : ({} as MinecraftStructureSet);
     const tags: IdentifierObject[] = processElementTags(element.tags, config);
 
-    // Convert structures array (simple mapping)
     const structures: MinecraftStructureSetElement[] = element.structures.map((struct) => ({
         structure: struct.structure,
         weight: struct.weight
     }));
 
-    // Build placement object (reconstruct hierarchy)
     const placement: MinecraftStructurePlacement = {
         type: element.placementType
     };
 
-    // Add common placement properties if present
     if (element.salt !== undefined) {
         placement.salt = element.salt;
     }
@@ -55,18 +52,14 @@ export const VoxelToStructureSetDataDriven: StructureSetCompiler = (
         placement.exclusion_zone = exclusionZone;
     }
 
-    // Add type-specific properties (reconstruct from flattened format)
     if (CONCENTRIC_RINGS_TYPES.has(element.placementType)) {
         if (element.distance !== undefined) placement.distance = element.distance;
         if (element.spread !== undefined) placement.spread = element.spread;
         if (element.count !== undefined) placement.count = element.count;
         if (element.preferredBiomes?.length) {
-            // Restore to original format if available, otherwise use array
             if (original?.placement?.preferred_biomes) {
-                // Preserve original format (string or array)
                 placement.preferred_biomes = original.placement.preferred_biomes;
             } else {
-                // Default to array format for new elements
                 placement.preferred_biomes = element.preferredBiomes;
             }
         }
@@ -76,21 +69,17 @@ export const VoxelToStructureSetDataDriven: StructureSetCompiler = (
         if (element.spreadType) placement.spread_type = element.spreadType;
     }
 
-    // Restore unknown fields
     if (element.unknownFields) {
-        // Extract placement-specific unknown fields
         if (element.unknownFields.placement) {
             Object.assign(placement, element.unknownFields.placement);
         }
 
-        // Extract root-level unknown fields
         const rootFields = { ...element.unknownFields };
-        rootFields.placement = undefined; // Remove placement to avoid duplication
+        rootFields.placement = undefined;
 
         Object.assign(structureSet, rootFields);
     }
 
-    // Set final structure
     structureSet.structures = structures;
     structureSet.placement = placement;
 

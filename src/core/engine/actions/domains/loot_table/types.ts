@@ -1,4 +1,3 @@
-// Loot table domain action types
 export interface LootTableActions {
     add_loot_item: {
         poolIndex: number;
@@ -73,12 +72,11 @@ export interface LootTableActions {
             groupId?: string;
             count?: number;
         };
-        thenAction: any; // Will be typed as LootTableAction when imported
-        elseAction?: any; // Will be typed as LootTableAction when imported
+        thenAction: any;
+        elseAction?: any;
     };
 }
 
-// Export typed actions for this domain
 export type LootTableAction = {
     [K in keyof LootTableActions]: LootTableActions[K] & { type: `loot_table.${K}` };
 }[keyof LootTableActions];

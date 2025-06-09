@@ -14,20 +14,17 @@ export const StructureSetDataDrivenToVoxelFormat: StructureSetParser = ({
     const data = element.data;
     const placement = data.placement;
 
-    // Convert structures array (simple mapping)
     const structures: StructureSetStructure[] = data.structures.map((struct) => ({
         structure: struct.structure,
         weight: struct.weight
     }));
 
-    // Normalize preferred biomes to array for UI consistency
     const preferredBiomes = placement.preferred_biomes
         ? Array.isArray(placement.preferred_biomes)
             ? placement.preferred_biomes
             : [placement.preferred_biomes]
         : undefined;
 
-    // Build base structure set with flattened placement properties
     const structureSet: StructureSetProps = {
         identifier: element.identifier,
         structures,
@@ -36,7 +33,6 @@ export const StructureSetDataDrivenToVoxelFormat: StructureSetParser = ({
         tags
     };
 
-    // Add common placement properties if present
     if (placement.salt !== undefined) {
         structureSet.salt = placement.salt;
     }
@@ -56,7 +52,6 @@ export const StructureSetDataDrivenToVoxelFormat: StructureSetParser = ({
         };
     }
 
-    // Add type-specific properties (flattened from nested placement)
     if (CONCENTRIC_RINGS_TYPES.has(placement.type)) {
         if (placement.distance !== undefined) structureSet.distance = placement.distance;
         if (placement.spread !== undefined) structureSet.spread = placement.spread;
@@ -68,7 +63,6 @@ export const StructureSetDataDrivenToVoxelFormat: StructureSetParser = ({
         if (placement.spread_type) structureSet.spreadType = placement.spread_type;
     }
 
-    // Preserve unknown fields from placement and root level
     const placementUnknownFields = extractUnknownFields(placement, KNOWN_PLACEMENT_FIELDS);
     const rootUnknownFields = extractUnknownFields(data, KNOWN_STRUCTURE_SET_FIELDS);
 

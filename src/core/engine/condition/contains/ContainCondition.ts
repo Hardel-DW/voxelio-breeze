@@ -7,12 +7,10 @@ export function CheckContainCondition(condition: ConditionContain, element: Reco
         return false;
     }
 
-    // If condition.values is provided, check if any of those values exist in fieldValue
     if (condition.values) {
         return condition.values.some((value) => fieldValue.includes(value));
     }
 
-    // If value is provided (from action), check if it exists in fieldValue
     if (value && typeof value === "string") {
         return fieldValue.includes(value);
     }

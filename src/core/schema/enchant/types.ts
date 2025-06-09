@@ -15,7 +15,6 @@ const tags_related_to_functionality = [
     { namespace: "minecraft", registry: "tags/enchantment", resource: "tooltip_order" }
 ];
 
-// Cache des tags de fonctionnalité pour éviter les créations répétées d'Identifier
 export const FUNCTIONALITY_TAGS_CACHE = new Set(tags_related_to_functionality.map((tag) => new Identifier(tag).toString()));
 export interface EnchantmentProps extends VoxelElement {
     description: TextComponentType;
@@ -34,13 +33,11 @@ export interface EnchantmentProps extends VoxelElement {
     tags: string[];
     mode: "normal" | "soft_delete" | "only_creative";
     disabledEffects: string[];
-
-    // Preserve unknown fields from mods
     unknownFields?: Record<string, any>;
 }
 
 /**
- * Known Enchantment fields according to Minecraft specification
+ * Known Enchantment fields according to Minecraft specification.
  */
 export const KNOWN_ENCHANTMENT_FIELDS = new Set([
     "description",

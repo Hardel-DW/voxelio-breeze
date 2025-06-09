@@ -1,7 +1,6 @@
 import type { Condition } from "@/core/engine/condition/types";
 import { type AllExpectedHandlerKeys, type ValidateHandlerRegistry, createHandlers } from "../../types";
 
-// Core domain action types
 export interface CoreActions {
     set_value: {
         path: string;
@@ -27,12 +26,10 @@ export interface CoreActions {
     };
 }
 
-// Export typed actions for this domain
 export type CoreAction = {
     [K in keyof CoreActions]: CoreActions[K] & { type: `core.${K}` };
 }[keyof CoreActions];
 
-// Use generic validation system
 export type CoreHandlerKeys = AllExpectedHandlerKeys<"core", CoreActions>;
 export const createCoreHandlers = <T extends Record<CoreHandlerKeys, any>>(handlers: ValidateHandlerRegistry<T, CoreHandlerKeys>): T =>
     createHandlers(handlers);

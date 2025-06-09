@@ -23,17 +23,14 @@ export const VoxelToStructureDataDriven: StructureCompiler = (
     const structure = original ? structuredClone(original) : ({} as MinecraftStructure);
     const tags: IdentifierObject[] = processElementTags(element.tags, config);
 
-    // Set base properties
     structure.type = element.type;
     structure.biomes = element.biomes.length === 1 ? element.biomes[0] : element.biomes;
     structure.step = element.step;
 
-    // Set optional base properties
     if (element.terrainAdaptation) {
         structure.terrain_adaptation = element.terrainAdaptation;
     }
 
-    // Convert spawn overrides from array to record (always set, even if empty)
     structure.spawn_overrides = {} as Record<MobCategory, MinecraftSpawnOverride>;
     if (element.spawnOverrides && element.spawnOverrides.length > 0) {
         for (const override of element.spawnOverrides) {
@@ -44,7 +41,6 @@ export const VoxelToStructureDataDriven: StructureCompiler = (
         }
     }
 
-    // Handle Jigsaw structures (spread flattened properties)
     if (JIGSAW_STRUCTURE_TYPES.has(element.type)) {
         if (element.startPool) structure.start_pool = element.startPool;
         if (element.size !== undefined) structure.size = element.size;
@@ -57,13 +53,11 @@ export const VoxelToStructureDataDriven: StructureCompiler = (
         if (element.dimensionPadding) structure.dimension_padding = denormalizeDimensionPadding(element.dimensionPadding);
         if (element.liquidSettings) structure.liquid_settings = element.liquidSettings;
     } else {
-        // For legacy structures, restore type-specific config
         if (element.typeSpecific) {
             Object.assign(structure, element.typeSpecific);
         }
     }
 
-    // Restore unknown fields
     if (element.unknownFields) {
         Object.assign(structure, element.unknownFields);
     }
@@ -78,7 +72,7 @@ export const VoxelToStructureDataDriven: StructureCompiler = (
 };
 
 /**
- * Denormalize pool alias back to Minecraft format
+ * Denormalize pool alias back to Minecraft format.
  */
 function denormalizePoolAlias(alias: any): MinecraftPoolAlias {
     const result: MinecraftPoolAlias = {
@@ -94,15 +88,13 @@ function denormalizePoolAlias(alias: any): MinecraftPoolAlias {
 }
 
 /**
- * Denormalize dimension padding back to Minecraft format
+ * Denormalize dimension padding back to Minecraft format.
  */
 function denormalizeDimensionPadding(padding: any): number | any {
-    // If both values are the same, return a simple number
     if (padding.bottom !== undefined && padding.top !== undefined && padding.bottom === padding.top) {
         return padding.bottom;
     }
 
-    // Otherwise return object format
     const result: any = {};
     if (padding.bottom !== undefined) result.bottom = padding.bottom;
     if (padding.top !== undefined) result.top = padding.top;

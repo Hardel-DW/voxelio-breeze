@@ -147,7 +147,6 @@ export class UnnestGroupHandler implements ActionHandler<LootTableAction> {
         const lootTable = element as LootTableProps;
         const clone = structuredClone(lootTable);
 
-        // Remove group from all parent groups but keep the group itself
         for (const group of clone.groups) {
             group.items = group.items.filter((itemId) => itemId !== action.groupId);
         }

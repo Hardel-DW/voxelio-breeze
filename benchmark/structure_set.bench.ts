@@ -9,7 +9,6 @@ import {
 } from "@test/template/concept/structure_set/DataDriven";
 
 describe("StructureSet Benchmark", () => {
-    // Parsing benchmarks
     bench("parse village structure set (random spread)", () => {
         StructureSetDataDrivenToVoxelFormat({
             element: villageStructureSet,
@@ -38,7 +37,6 @@ describe("StructureSet Benchmark", () => {
         });
     });
 
-    // Compiling benchmarks
     const villageVoxel = StructureSetDataDrivenToVoxelFormat({
         element: villageStructureSet,
         tags: []
@@ -75,7 +73,6 @@ describe("StructureSet Benchmark", () => {
         VoxelToStructureSetDataDriven(endCityVoxel, "worldgen/structure_set");
     });
 
-    // Round-trip benchmarks
     bench("round-trip village structure set", () => {
         const voxel = StructureSetDataDrivenToVoxelFormat({
             element: villageStructureSet,
@@ -94,7 +91,6 @@ describe("StructureSet Benchmark", () => {
         VoxelToStructureSetDataDriven(voxel, "worldgen/structure_set", ruinedPortalStructureSet.data);
     });
 
-    // Batch operations benchmark
     const allStructureSets = [villageStructureSet, strongholdStructureSet, ruinedPortalStructureSet, endCityStructureSet];
 
     bench("parse all structure sets (4 items)", () => {

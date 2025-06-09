@@ -22,14 +22,14 @@ importers:
         specifier: ^2.6.2
         version: 2.8.1
       typescript:
-        specifier: ~5.7.2
-        version: 5.7.3
+        specifier: ~5.8.3
+        version: 5.8.3
       vite:
         specifier: npm:rolldown-vite@latest
         version: rolldown-vite@6.3.17(@types/node@22.13.1)(esbuild@0.25.5)
       vite-plugin-dts:
         specifier: ^4.5.4
-        version: 4.5.4(@types/node@22.13.1)(rolldown-vite@6.3.17(@types/node@22.13.1)(esbuild@0.25.5))(rollup@4.41.1)(typescript@5.7.3)
+        version: 4.5.4(@types/node@22.13.1)(rolldown-vite@6.3.17(@types/node@22.13.1)(esbuild@0.25.5))(rollup@4.41.1)(typescript@5.8.3)
       vitest:
         specifier: ^3.2.1
         version: 3.2.1(@types/node@22.13.1)(@vitest/browser@3.2.1)(lightningcss@1.30.1)
@@ -1124,13 +1124,13 @@ packages:
   tslib@2.8.1:
     resolution: {integrity: sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w==}
 
-  typescript@5.7.3:
-    resolution: {integrity: sha512-84MVSjMEHP+FQRPy3pX9sTVV/INIex71s9TL2Gm5FG/WG1SqXeKyZ0k7/blY/4FdOzI12CBy1vGc4og/eus0fw==}
+  typescript@5.8.2:
+    resolution: {integrity: sha512-aJn6wq13/afZp/jT9QZmwEjDqqvSGp1VT5GVg+f/t6/oVyrgXM6BY1h9BRh/O5p3PlUPAe+WuiEZOmb/49RqoQ==}
     engines: {node: '>=14.17'}
     hasBin: true
 
-  typescript@5.8.2:
-    resolution: {integrity: sha512-aJn6wq13/afZp/jT9QZmwEjDqqvSGp1VT5GVg+f/t6/oVyrgXM6BY1h9BRh/O5p3PlUPAe+WuiEZOmb/49RqoQ==}
+  typescript@5.8.3:
+    resolution: {integrity: sha512-p1diW6TqL9L07nNxvRMM7hMMw4c5XOo/1ibL4aAIGmSAt9slTE1Xgw5KWuof2uTOvCg9BY7ZRi+GaF+7sfgPeQ==}
     engines: {node: '>=14.17'}
     hasBin: true
 
@@ -1739,7 +1739,7 @@ snapshots:
       de-indent: 1.0.2
       he: 1.2.0
 
-  '@vue/language-core@2.2.0(typescript@5.7.3)':
+  '@vue/language-core@2.2.0(typescript@5.8.3)':
     dependencies:
       '@volar/language-core': 2.4.11
       '@vue/compiler-dom': 3.5.13
@@ -1750,7 +1750,7 @@ snapshots:
       muggle-string: 0.4.1
       path-browserify: 1.0.1
     optionalDependencies:
-      typescript: 5.7.3
+      typescript: 5.8.3
 
   '@vue/shared@3.5.13': {}
 
@@ -2228,9 +2228,9 @@ snapshots:
 
   tslib@2.8.1: {}
 
-  typescript@5.7.3: {}
-
   typescript@5.8.2: {}
+
+  typescript@5.8.3: {}
 
   ufo@1.5.4: {}
 
@@ -2263,18 +2263,18 @@ snapshots:
       - tsx
       - yaml
 
-  vite-plugin-dts@4.5.4(@types/node@22.13.1)(rolldown-vite@6.3.17(@types/node@22.13.1)(esbuild@0.25.5))(rollup@4.41.1)(typescript@5.7.3):
+  vite-plugin-dts@4.5.4(@types/node@22.13.1)(rolldown-vite@6.3.17(@types/node@22.13.1)(esbuild@0.25.5))(rollup@4.41.1)(typescript@5.8.3):
     dependencies:
       '@microsoft/api-extractor': 7.52.8(@types/node@22.13.1)
       '@rollup/pluginutils': 5.1.4(rollup@4.41.1)
       '@volar/typescript': 2.4.11
-      '@vue/language-core': 2.2.0(typescript@5.7.3)
+      '@vue/language-core': 2.2.0(typescript@5.8.3)
       compare-versions: 6.1.1
       debug: 4.4.1
       kolorist: 1.8.0
       local-pkg: 1.1.1
       magic-string: 0.30.17
-      typescript: 5.7.3
+      typescript: 5.8.3
     optionalDependencies:
       vite: rolldown-vite@6.3.17(@types/node@22.13.1)(esbuild@0.25.5)
     transitivePeerDependencies:

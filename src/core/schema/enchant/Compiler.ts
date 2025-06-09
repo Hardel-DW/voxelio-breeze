@@ -19,11 +19,9 @@ export const VoxelToEnchantmentDataDriven: Compiler<EnchantmentProps, Enchantmen
     element: DataDrivenRegistryElement<Enchantment>;
     tags: IdentifierObject[];
 } => {
-    // Optimisation: éviter le double clone
     const enchantment = original ? structuredClone(original) : ({} as Enchantment);
     let tags: IdentifierObject[] = processElementTags(element.tags, config);
 
-    // Assignations directes sans cloner element
     enchantment.max_level = element.maxLevel;
     enchantment.weight = element.weight;
     enchantment.anvil_cost = element.anvilCost;
@@ -31,7 +29,6 @@ export const VoxelToEnchantmentDataDriven: Compiler<EnchantmentProps, Enchantmen
     enchantment.slots = element.slots;
     enchantment.effects = element.effects;
 
-    // Optimisation: création d'objets seulement si nécessaire
     enchantment.min_cost = {
         base: element.minCostBase,
         per_level_above_first: element.minCostPerLevelAboveFirst
@@ -49,7 +46,6 @@ export const VoxelToEnchantmentDataDriven: Compiler<EnchantmentProps, Enchantmen
         enchantment.supported_items = element.primaryItems;
     }
 
-    // Optimisation: filtre plus efficace pour only_creative
     if (element.mode === "only_creative") {
         tags = tags.filter((tag) => FUNCTIONALITY_TAGS_CACHE.has(tag.toString()));
     }
@@ -63,7 +59,6 @@ export const VoxelToEnchantmentDataDriven: Compiler<EnchantmentProps, Enchantmen
         }
     }
 
-    // Optimisation: traitement des effets désactivés plus efficace
     if (element.disabledEffects.length > 0 && enchantment.effects) {
         for (const effect of element.disabledEffects) {
             delete enchantment.effects[effect as keyof typeof enchantment.effects];
@@ -76,7 +71,6 @@ export const VoxelToEnchantmentDataDriven: Compiler<EnchantmentProps, Enchantmen
         tags = [];
     }
 
-    // Restore unknown fields from mods
     if (element.unknownFields) {
         Object.assign(enchantment, element.unknownFields);
     }

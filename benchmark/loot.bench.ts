@@ -15,7 +15,6 @@ describe("LootTable Performance", () => {
     const complexVoxel = VOXEL_TEMPLATE_LOOT_TABLE[1].data;
     const multiPoolVoxel = VOXEL_TEMPLATE_LOOT_TABLE[2].data;
 
-    // Create a large loot table for stress testing
     const largeLootTable: DataDrivenRegistryElement<MinecraftLootTable> = {
         identifier: { namespace: "test", registry: "loot_table", resource: "large_test" },
         data: {
@@ -48,7 +47,6 @@ describe("LootTable Performance", () => {
         }
     };
 
-    // Create nested group structure for complexity testing
     const nestedGroupLootTable: DataDrivenRegistryElement<MinecraftLootTable> = {
         identifier: { namespace: "test", registry: "loot_table", resource: "nested_test" },
         data: {

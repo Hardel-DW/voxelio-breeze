@@ -51,7 +51,9 @@ function isEqual(a: unknown, b: unknown): boolean {
     return false;
 }
 
-// Helper functions for unified comparison logic
+/**
+ * Create a diff object
+ */
 const createDiff = (type: LogDifference["type"], path: string, value?: unknown, origin_value?: unknown): LogDifference => ({
     type,
     path,
@@ -59,8 +61,14 @@ const createDiff = (type: LogDifference["type"], path: string, value?: unknown, 
     ...(origin_value !== undefined && { origin_value })
 });
 
+/**
+ * Build a path from segments
+ */
 const buildPath = (segments: (string | number)[]): string => segments.join(".");
 
+/**
+ * Get structure entries
+ */
 const getStructureEntries = (value: unknown): [string | number, unknown][] => {
     if (Array.isArray(value)) {
         return value.map((item, index) => [index, item] as [number, unknown]);

@@ -22,13 +22,11 @@ export function setValueAtPath(obj: Record<string, unknown>, path: string, value
     const pathParts = path.split(".");
     let current = result;
 
-    // Navigate to the parent of the target property, creating copies at each level
     for (let i = 0; i < pathParts.length - 1; i++) {
         const part = pathParts[i];
         if (!(part in current)) {
             current[part] = {};
         } else {
-            // Create a copy of the nested object to maintain immutability
             if (Array.isArray(current[part])) {
                 current[part] = [...(current[part] as unknown[])];
             } else if (typeof current[part] === "object" && current[part] !== null) {
@@ -38,7 +36,6 @@ export function setValueAtPath(obj: Record<string, unknown>, path: string, value
         current = current[part] as Record<string, unknown>;
     }
 
-    // Set the final value
     const lastKey = pathParts[pathParts.length - 1];
     current[lastKey] = value;
 
@@ -76,16 +73,14 @@ export function deleteValueAtPath(obj: Record<string, unknown>, path: string): R
     const pathParts = path.split(".");
     let current = result;
 
-    // Navigate to the parent of the target property
     for (let i = 0; i < pathParts.length - 1; i++) {
         const part = pathParts[i];
         if (!(part in current)) {
-            return result; // Path doesn't exist, nothing to delete
+            return result;
         }
         current = current[part] as Record<string, unknown>;
     }
 
-    // Delete the final property
     const lastKey = pathParts[pathParts.length - 1];
     current[lastKey] = undefined;
 

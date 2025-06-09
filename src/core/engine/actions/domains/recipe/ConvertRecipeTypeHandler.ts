@@ -13,16 +13,13 @@ export class ConvertRecipeTypeHandler implements ActionHandler<RecipeAction> {
         const { newType, preserveIngredients } = action;
         newRecipe.type = newType as any;
 
-        // Handle type-specific conversions
         if (preserveIngredients !== false) {
             switch (newType) {
                 case "minecraft:crafting_shapeless":
-                    // Remove grid constraints for shapeless
                     newRecipe.gridSize = undefined;
                     break;
 
                 case "minecraft:crafting_shaped":
-                    // Add default grid size if not present
                     if (!newRecipe.gridSize) {
                         newRecipe.gridSize = { width: 3, height: 3 };
                     }
@@ -32,7 +29,6 @@ export class ConvertRecipeTypeHandler implements ActionHandler<RecipeAction> {
                 case "minecraft:blasting":
                 case "minecraft:smoking":
                 case "minecraft:campfire_cooking": {
-                    // Convert to single ingredient in slot 0
                     const allItems = this.getAllItemsFromSlots(newRecipe.slots);
                     newRecipe.slots = allItems.length > 0 ? { "0": [allItems[0]] } : {};
                     newRecipe.gridSize = undefined;
@@ -40,7 +36,6 @@ export class ConvertRecipeTypeHandler implements ActionHandler<RecipeAction> {
                 }
 
                 case "minecraft:stonecutting": {
-                    // Single ingredient, no cooking time
                     const stoneItems = this.getAllItemsFromSlots(newRecipe.slots);
                     newRecipe.slots = stoneItems.length > 0 ? { "0": [stoneItems[0]] } : {};
                     newRecipe.gridSize = undefined;

@@ -4,33 +4,26 @@ import type { IdentifierObject } from "@/core/Identifier";
 import type { Compiler } from "@/core/engine/Compiler";
 import type { Parser } from "@/core/engine/Parser";
 
-// Simplified structure set format for UI
 export interface StructureSetProps extends VoxelElement {
-    // Core structures list (simplified)
     structures: StructureSetStructure[];
 
-    // Placement configuration (flattened)
     placementType: PlacementType;
 
-    // Common placement properties
     salt?: number;
     frequencyReductionMethod?: FrequencyReductionMethod;
     frequency?: number;
     locateOffset?: [number, number, number];
 
-    // Exclusion zone (simplified)
     exclusionZone?: {
         otherSet: string;
         chunkCount: number;
     };
 
-    // Concentric rings specific (flattened)
     distance?: number;
     spread?: number;
     count?: number;
     preferredBiomes?: string[];
 
-    // Random spread specific (flattened)
     spacing?: number;
     separation?: number;
     spreadType?: SpreadType;
@@ -41,7 +34,7 @@ export interface StructureSetProps extends VoxelElement {
 }
 
 export interface StructureSetStructure {
-    structure: string; // Structure ID
+    structure: string;
     weight: number;
 }
 
@@ -94,7 +87,6 @@ export type FrequencyReductionMethod = "default" | "legacy_type_1" | "legacy_typ
 
 export type SpreadType = "linear" | "triangular";
 
-// Parser and Compiler type definitions
 export type StructureSetParser = Parser<StructureSetProps, MinecraftStructureSet>;
 export type StructureSetCompiler = Compiler<StructureSetProps, MinecraftStructureSet>;
 
@@ -118,12 +110,10 @@ export const KNOWN_PLACEMENT_FIELDS = new Set([
     "frequency",
     "exclusion_zone",
     "locate_offset",
-    // Concentric rings
     "distance",
     "spread",
     "count",
     "preferred_biomes",
-    // Random spread
     "spacing",
     "separation",
     "spread_type"

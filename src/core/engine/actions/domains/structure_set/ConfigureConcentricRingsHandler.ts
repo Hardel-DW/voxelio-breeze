@@ -11,7 +11,6 @@ export class ConfigureConcentricRingsHandler implements ActionHandler<StructureS
 
         const updatedElement = { ...structureSet };
 
-        // Update concentric rings specific properties
         if (action.distance !== undefined) {
             updatedElement.distance = action.distance;
         }

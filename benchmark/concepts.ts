@@ -44,7 +44,7 @@ interface ConceptConfig {
     icon: string;
     parser: (element: any) => any;
     compiler: (voxel: any, original?: any) => any;
-    registry: string; // For display/reference only
+    registry: string;
     testCases: {
         name: string;
         datadriven: any;
@@ -56,12 +56,10 @@ interface ConceptConfig {
 function benchmark(name: string, fn: () => void, iterations = 1000): BenchmarkResult {
     const times: number[] = [];
 
-    // Warmup
     for (let i = 0; i < 10; i++) {
         fn();
     }
 
-    // Actual benchmark
     for (let i = 0; i < iterations; i++) {
         const start = performance.now();
         fn();
@@ -88,7 +86,6 @@ function formatResult(result: BenchmarkResult): string {
     return `${result.name.padEnd(40)} | ${result.opsPerSecond.toFixed(0).padStart(8)} ops/s | ${result.avgTime.toFixed(3).padStart(8)}ms avg | ${result.minTime.toFixed(3).padStart(8)}ms min | ${result.maxTime.toFixed(3).padStart(8)}ms max`;
 }
 
-// Configuration for all concepts
 const concepts: ConceptConfig[] = [
     {
         name: "enchantment",
@@ -240,7 +237,6 @@ const concepts: ConceptConfig[] = [
 
 console.log("🚀 Voxel Breeze Performance Comparison\n");
 
-// Run benchmarks for each concept
 const allResults: Array<{ concept: string; results: BenchmarkResult[] }> = [];
 
 for (const concept of concepts) {
@@ -253,7 +249,6 @@ for (const concept of concepts) {
 
     const conceptResults: BenchmarkResult[] = [];
 
-    // Parse benchmarks
     for (const testCase of concept.testCases) {
         conceptResults.push(
             benchmark(`Parse ${testCase.name}`, () => {
@@ -262,7 +257,6 @@ for (const concept of concepts) {
         );
     }
 
-    // Compile benchmarks (use first test case for simplicity)
     const firstCase = concept.testCases[0];
     conceptResults.push(
         benchmark(`Compile ${firstCase.name}`, () => {
@@ -270,9 +264,7 @@ for (const concept of concepts) {
         })
     );
 
-    // Round-trip benchmarks
     for (const testCase of concept.testCases.slice(0, 2)) {
-        // Limit to first 2 for performance
         conceptResults.push(
             benchmark(`Round-trip ${testCase.name}`, () => {
                 const voxel = concept.parser(testCase.datadriven);
@@ -281,7 +273,6 @@ for (const concept of concepts) {
         );
     }
 
-    // Display results
     for (const result of conceptResults) {
         console.log(formatResult(result));
     }
@@ -293,7 +284,6 @@ for (const concept of concepts) {
 console.log("📈 PERFORMANCE COMPARISON");
 console.log("=".repeat(120));
 
-// Cross-concept performance analysis
 const conceptPerformances = allResults.map(({ concept, results }) => ({
     name: concept,
     displayName: concepts.find((c) => c.name === concept)?.displayName || concept,
@@ -344,7 +334,6 @@ console.log(`⚡ Fastest operation: ${fastestOperation.name} (${fastestOperation
 const performanceGap = fastestOperation.opsPerSecond / slowestOperation.opsPerSecond;
 console.log(`📊 Performance gap: ${performanceGap.toFixed(0)}x difference between fastest and slowest`);
 
-// Schema-specific recommendations
 console.log("\n💡 Schema-specific optimization recommendations:");
 
 const overallRanking = conceptPerformances
@@ -367,7 +356,6 @@ console.log(
     `🔻 Needs optimization: ${overallRanking[3].icon} ${overallRanking[3].displayName} (${overallRanking[3].overallScore.toFixed(0)} ops/s avg)`
 );
 
-// Performance alerts
 if (slowestOperation.opsPerSecond < 1000) {
     console.log("⚠️  Consider lazy loading for operations slower than 1000 ops/s");
 }

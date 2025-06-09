@@ -17,10 +17,8 @@ export class AddStructureHandler implements ActionHandler<StructureSetAction> {
         const updatedStructures = [...structureSet.structures];
 
         if (action.position !== undefined && action.position >= 0 && action.position <= updatedStructures.length) {
-            // Insert at specific position
             updatedStructures.splice(action.position, 0, newStructure);
         } else {
-            // Add at end
             updatedStructures.push(newStructure);
         }
 
