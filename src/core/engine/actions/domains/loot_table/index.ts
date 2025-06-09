@@ -1,27 +1,27 @@
 import type { ActionHandler } from "../../types";
-import type { LootTableAction } from "./types";
 import {
-    AddLootItemHandler,
-    RemoveLootItemHandler,
-    ModifyLootItemHandler,
-    DuplicateLootItemHandler,
-    BulkModifyItemsHandler
-} from "./ItemHandlers";
-import {
-    CreateLootGroupHandler,
-    ModifyLootGroupHandler,
-    DissolveLootGroupHandler,
-    ConvertItemToGroupHandler,
     ConvertGroupToItemHandler,
+    ConvertItemToGroupHandler,
+    CreateLootGroupHandler,
+    DissolveLootGroupHandler,
+    ModifyLootGroupHandler,
     NestGroupInGroupHandler,
     UnnestGroupHandler
 } from "./GroupHandlers";
 import {
-    MoveItemBetweenPoolsHandler,
-    MoveGroupBetweenPoolsHandler,
+    AddLootItemHandler,
+    BulkModifyItemsHandler,
+    DuplicateLootItemHandler,
+    ModifyLootItemHandler,
+    RemoveLootItemHandler
+} from "./ItemHandlers";
+import {
     BalanceWeightsHandler,
-    ConditionalLootHandler
+    ConditionalLootHandler,
+    MoveGroupBetweenPoolsHandler,
+    MoveItemBetweenPoolsHandler
 } from "./MovementHandlers";
+import type { LootTableAction } from "./types";
 
 export default function register(): Map<string, ActionHandler<LootTableAction>> {
     const handlers = new Map<string, ActionHandler<LootTableAction>>();

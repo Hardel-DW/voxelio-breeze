@@ -2,25 +2,88 @@ import type { DataDrivenRegistryElement } from "@/core/Element";
 import { Identifier } from "@/core/Identifier";
 import type { IdentifierObject } from "@/core/Identifier";
 import type { Compiler } from "@/core/engine/Compiler";
-import type { TagType } from "@/schema/tag/TagType";
+import type { TagType } from "@/schema/TagType";
 
 /**
- * Searches for a tag in a list of tags.
- * @param tag - The JSON tag object.
- * @param value - The value to search for.
+ * Represents a Minecraft tag system that can contain multiple values.
+ * Tags are used to group blocks, items, entities, or functions together.
  */
-export const isPresentInTag = (tag: DataDrivenRegistryElement<TagType>, value: string): boolean => {
-    return tag.data.values.some((tagValue) => {
-        if (typeof tagValue === "string") {
-            return tagValue === value;
-        }
+export default class Tags {
+    /**
+     * Creates a new Tags instance
+     * @param tags The tag data containing values and optional replace property
+     */
+    constructor(public readonly tags: TagType) {
+        this.tags = tags;
+    }
 
-        if (typeof tagValue === "object") {
-            return tagValue.id === value;
-        }
+    /**
+     * Gets the raw tag data
+     * @returns The TagType object containing values and replace property
+     * @example
+     * const tag = new Tags({
+     *   replace: false,
+     *   values: ["minecraft:diamond_sword", "minecraft:iron_sword"]
+     * });
+     * const data = tag.getTags(); // Returns the TagType object
+     */
+    getTags() {
+        return this.tags;
+    }
 
-        return false;
-    });
+    /**
+     * Checks if a specific value exists in the tag
+     * @param name The value to check for
+     * @returns True if the value exists in the tag
+     * @example
+     * const tag = new Tags({
+     *   values: ["minecraft:diamond_sword"]
+     * });
+     * tag.hasValue("minecraft:diamond_sword"); // Returns true
+     */
+    hasValue(name: string) {
+        return this.tags.values.includes(name);
+    }
+
+    getFirstValue(): string | null {
+        return (
+            this.tags.values.map((value) => (typeof value === "string" ? value : value.id)).find((value) => !value.startsWith("#")) ?? null
+        );
+    }
+
+    /**
+     * Gets all values in the tag
+     * @returns Array of values in the tag
+     * @example
+     * const tag = new Tags({
+     *   values: ["minecraft:diamond_sword", "minecraft:iron_sword"]
+     * });
+     * tag.getValues(); // Returns ["minecraft:diamond_sword", "minecraft:iron_sword"]
+     */
+    getValues() {
+        return this.tags.values;
+    }
+
+    fromRegistry(): string[] {
+        return this.tags.values.map((value) => (typeof value === "string" ? value : value.id));
+    }
+
+    isPresentInTag(value: string): boolean {
+        return this.tags.values.some((tagValue) => (typeof tagValue === "string" ? tagValue === value : tagValue.id === value));
+    }
+}
+
+export function isTag(tag: any): tag is TagType {
+    return tag && typeof tag === "object" && "values" in tag;
+}
+
+/**
+ * Check if an element is a tag.
+ * @param element - The element to check.
+ * @returns Whether the element is a tag.
+ */
+export const isRegistryTag = (element: DataDrivenRegistryElement<any>): element is DataDrivenRegistryElement<TagType> => {
+    return element?.identifier?.registry?.startsWith("tags/") ?? false;
 };
 
 /**
@@ -29,27 +92,7 @@ export const isPresentInTag = (tag: DataDrivenRegistryElement<TagType>, value: s
  * @param registry - The registry to use.
  * @returns The list of identifiers.
  */
-export const tagsToIdentifiers = (tags: string[], registry: string): IdentifierObject[] => {
-    return tags.map((tag) => Identifier.of(tag, registry));
-};
-
-/**
- * Get the tags from a registry element.
- * @param el - The registry element.
- * @returns The tags.
- */
-export const getTagsFromRegistry = (el: TagType): string[] => {
-    return el.values.map((value) => (typeof value === "string" ? value : value.id));
-};
-
-/**
- * Check if an element is a tag.
- * @param element - The element to check.
- * @returns Whether the element is a tag.
- */
-export const isTag = (element: DataDrivenRegistryElement<any>): element is DataDrivenRegistryElement<TagType> => {
-    return element?.identifier?.registry?.startsWith("tags/") ?? false;
-};
+export const tagsToIdentifiers = (tags: string[], registry: string): IdentifierObject[] => tags.map((tag) => Identifier.of(tag, registry));
 
 /**
  * Merge two tags.
@@ -57,63 +100,41 @@ export const isTag = (element: DataDrivenRegistryElement<any>): element is DataD
  * @param b - The second tag.
  * @returns The merged tag.
  */
-export const mergeTags = (a: TagType, b: TagType): TagType => {
-    return {
-        values: Array.from(new Set([...a.values, ...b.values]))
-    };
-};
+export const mergeTags = (a: TagType, b: TagType): TagType => ({
+    values: Array.from(new Set([...a.values, ...b.values]))
+});
 
 export const mergeDataDrivenRegistryElement = (
     a: DataDrivenRegistryElement<TagType>[],
     b: DataDrivenRegistryElement<TagType>[]
 ): DataDrivenRegistryElement<TagType>[] => {
-    const response = new Map<string, DataDrivenRegistryElement<TagType>>();
+    const tagMap = new Map<string, DataDrivenRegistryElement<TagType>>();
 
-    for (const tag of a) {
+    for (const tag of [...a, ...b]) {
         const key = new Identifier(tag.identifier).toFilePath();
-        response.set(key, tag);
+        const existing = tagMap.get(key);
+
+        tagMap.set(key, existing ? { identifier: existing.identifier, data: mergeTags(existing.data, tag.data) } : tag);
     }
 
-    for (const tag of b) {
-        const key = new Identifier(tag.identifier).toFilePath();
-        const existing = response.get(key);
-        if (existing) {
-            response.set(key, {
-                identifier: existing.identifier,
-                data: mergeTags(existing.data, tag.data)
-            });
-        } else {
-            response.set(key, tag);
-        }
-    }
-
-    return Array.from(response.values());
+    return Array.from(tagMap.values());
 };
 
 /**
  * Create a tag from a list of main elements like "enchantment".
- * @param elements - The elements to create the tag from.
- * @returns The tag.
  */
 export const createTagFromElement = (elements: ReturnType<Compiler>[]) => {
-    const tags: DataDrivenRegistryElement<TagType>[] = [];
-    const temp: Map<string, { identifier: IdentifierObject; elements: string[] }> = new Map();
+    const tagMap: Record<string, DataDrivenRegistryElement<TagType>> = {};
 
-    for (const element of elements) {
-        for (const tags of element.tags) {
-            const path = new Identifier(tags).toFilePath();
+    for (const { element, tags } of elements) {
+        for (const tag of tags) {
+            const key = new Identifier(tag).toFilePath();
+            const elementId = new Identifier(element.identifier).toString();
 
-            if (!temp.has(path)) temp.set(path, { identifier: tags, elements: [] });
-            temp.get(path)?.elements.push(new Identifier(element.element.identifier).toString());
+            tagMap[key] ??= { identifier: tag, data: { values: [] } };
+            tagMap[key].data.values.push(elementId);
         }
     }
 
-    for (const path of temp.keys()) {
-        const value = temp.get(path);
-        if (!value) continue;
-
-        tags.push({ identifier: value.identifier, data: { values: value.elements } });
-    }
-
-    return tags;
+    return Object.values(tagMap);
 };

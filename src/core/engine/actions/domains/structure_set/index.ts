@@ -1,9 +1,9 @@
 import type { ActionHandler } from "../../types";
+import { AddStructureHandler } from "./AddStructureHandler";
+import { ConfigureConcentricRingsHandler } from "./ConfigureConcentricRingsHandler";
+import { SetPlacementConfigHandler } from "./SetPlacementConfigHandler";
 import type { StructureSetAction } from "./types";
 import { createStructureSetHandlers } from "./types";
-import { AddStructureHandler } from "./AddStructureHandler";
-import { SetPlacementConfigHandler } from "./SetPlacementConfigHandler";
-import { ConfigureConcentricRingsHandler } from "./ConfigureConcentricRingsHandler";
 
 export default function register(): Map<string, ActionHandler<StructureSetAction>> {
     const handlerDefinitions = createStructureSetHandlers({

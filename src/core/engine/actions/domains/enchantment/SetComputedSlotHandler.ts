@@ -1,8 +1,8 @@
 import { getManager } from "@/core/engine/Manager";
-import type { ActionHandler } from "../../types";
-import type { EnchantmentAction } from "./types";
-import { getFieldValue, getValueAtPath, setValueAtPath } from "../../utils";
 import { type SlotRegistryType, isArraySlotRegistryType, isSlotRegistryType } from "@/core/engine/managers/SlotManager";
+import type { ActionHandler } from "../../types";
+import { getFieldValue, getValueAtPath, setValueAtPath } from "../../utils";
+import type { EnchantmentAction } from "./types";
 
 /**
  * Handler for enchantment.set_computed_slot action

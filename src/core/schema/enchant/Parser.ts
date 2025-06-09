@@ -1,8 +1,8 @@
 import type { ParserParams } from "@/core/engine/Parser";
 import type { Parser } from "@/core/engine/Parser";
-import type { Enchantment } from "@/schema/enchantment/Enchantment";
-import { type EnchantmentProps, FUNCTIONALITY_TAGS_CACHE, KNOWN_ENCHANTMENT_FIELDS } from "./types";
 import { extractUnknownFields } from "@/core/schema/utils";
+import type { Enchantment } from "@/schema/Enchantment";
+import { type EnchantmentProps, FUNCTIONALITY_TAGS_CACHE, KNOWN_ENCHANTMENT_FIELDS } from "./types";
 
 /**
  * Take only one Enchantments with their tags, to transform it to Voxel format

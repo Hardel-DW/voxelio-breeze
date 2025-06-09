@@ -1,6 +1,6 @@
+import type { LootItem, LootTableProps } from "@/core/schema/loot/types";
 import type { ActionHandler } from "../../types";
 import type { LootTableAction } from "./types";
-import type { LootItem, LootTableProps } from "@/core/schema/loot/types";
 
 let globalItemCounter = 0;
 

@@ -1,6 +1,6 @@
+import type { SpawnOverride } from "@/core/schema/structure/types";
 import type { ActionHandler } from "../../types";
 import type { StructureAction } from "./types";
-import type { SpawnOverride } from "@/core/schema/structure/types";
 
 export class AddSpawnOverrideHandler implements ActionHandler<StructureAction> {
     execute(

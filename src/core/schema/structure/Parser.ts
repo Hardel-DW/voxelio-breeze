@@ -1,7 +1,7 @@
 import type { ParserParams } from "@/core/engine/Parser";
-import type { StructureParser, StructureProps, MinecraftStructure, SpawnOverride, PoolAlias, DimensionPadding, MobCategory } from "./types";
-import { KNOWN_STRUCTURE_FIELDS, JIGSAW_STRUCTURE_TYPES } from "./types";
 import { extractUnknownFields } from "@/core/schema/utils";
+import type { DimensionPadding, MinecraftStructure, MobCategory, PoolAlias, SpawnOverride, StructureParser, StructureProps } from "./types";
+import { JIGSAW_STRUCTURE_TYPES, KNOWN_STRUCTURE_FIELDS } from "./types";
 
 /**
  * Parse Minecraft Structure to simplified Voxel format

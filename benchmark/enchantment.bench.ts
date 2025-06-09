@@ -1,6 +1,6 @@
 import { bench, describe } from "vitest";
 import { analyserCollection } from "@/core/engine/Analyser";
-import type { Enchantment } from "@/schema/enchantment/Enchantment";
+import type { Enchantment } from "@/schema/Enchantment";
 import type { DataDrivenRegistryElement } from "@/core/Element";
 import { DATA_DRIVEN_TEMPLATE_ENCHANTMENT, makeAdvancedEnchantment } from "@test/template/concept/enchant/DataDriven";
 import { VOXEL_TEMPLATE_ENCHANTMENT } from "@test/template/concept/enchant/VoxelDriven";

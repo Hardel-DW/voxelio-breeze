@@ -1,6 +1,6 @@
 import type { ActionHandler } from "../../types";
+import { getValueAtPath, setValueAtPath } from "../../utils";
 import type { CoreAction } from "./types";
-import { setValueAtPath, getValueAtPath } from "../../utils";
 
 export class SetValueHandler implements ActionHandler<CoreAction> {
     execute(

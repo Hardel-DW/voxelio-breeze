@@ -1,5 +1,5 @@
 import type { PoolAlias } from "@/core/schema/structure/types";
-import { createHandlers, type AllExpectedHandlerKeys, type ValidateHandlerRegistry } from "../../types";
+import { type AllExpectedHandlerKeys, type ValidateHandlerRegistry, createHandlers } from "../../types";
 
 // Structure domain action types
 export interface StructureActions {

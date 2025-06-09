@@ -1,6 +1,6 @@
+import type { RecipeProps } from "@/core/schema/recipe/types";
 import type { ActionHandler } from "../../types";
 import type { RecipeAction } from "./types";
-import type { RecipeProps } from "@/core/schema/recipe/types";
 
 export class ConvertRecipeTypeHandler implements ActionHandler<RecipeAction> {
     execute(

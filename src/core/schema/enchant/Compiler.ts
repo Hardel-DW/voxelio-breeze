@@ -1,9 +1,9 @@
 import type { DataDrivenRegistryElement } from "@/core/Element";
 import { Identifier, type IdentifierObject } from "@/core/Identifier";
-import { processElementTags } from "@/core/schema/utils";
 import type { Analysers } from "@/core/engine/Analyser";
 import type { Compiler } from "@/core/engine/Compiler";
-import type { Enchantment } from "@/schema/enchantment/Enchantment";
+import { processElementTags } from "@/core/schema/utils";
+import type { Enchantment } from "@/schema/Enchantment";
 import { type EnchantmentProps, FUNCTIONALITY_TAGS_CACHE } from "./types";
 
 /**

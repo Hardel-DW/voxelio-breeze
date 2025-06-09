@@ -1,11 +1,11 @@
-import type { ActionHandler } from "../../types";
 import type { ActionRegistry } from "../../registry";
+import type { ActionHandler } from "../../types";
+import { AlternativeHandler } from "./AlternativeHandler";
+import { SequentialHandler } from "./SequentialHandler";
+import { InvertBooleanHandler, SetValueHandler, ToggleValueHandler } from "./SetValueHandler";
+import { UndefinedHandler } from "./UndefinedHandler";
 import type { CoreAction } from "./types";
 import { createCoreHandlers } from "./types";
-import { SetValueHandler, ToggleValueHandler, InvertBooleanHandler } from "./SetValueHandler";
-import { UndefinedHandler } from "./UndefinedHandler";
-import { SequentialHandler } from "./SequentialHandler";
-import { AlternativeHandler } from "./AlternativeHandler";
 
 export default function register(registry: ActionRegistry): Map<string, ActionHandler<CoreAction>> {
     const handlerDefinitions = createCoreHandlers({

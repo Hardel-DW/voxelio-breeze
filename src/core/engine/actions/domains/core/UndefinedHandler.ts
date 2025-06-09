@@ -1,6 +1,6 @@
 import type { ActionHandler } from "../../types";
-import type { CoreAction } from "./types";
 import { deleteValueAtPath } from "../../utils";
+import type { CoreAction } from "./types";
 
 export class UndefinedHandler implements ActionHandler<CoreAction> {
     execute(

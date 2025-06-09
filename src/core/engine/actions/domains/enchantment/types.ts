@@ -1,5 +1,5 @@
 import type { SlotRegistryType } from "@/core/engine/managers/SlotManager";
-import { createHandlers, type AllExpectedHandlerKeys, type ValidateHandlerRegistry } from "../../types";
+import { type AllExpectedHandlerKeys, type ValidateHandlerRegistry, createHandlers } from "../../types";
 
 // Enchantment domain action types
 export interface EnchantmentActions {

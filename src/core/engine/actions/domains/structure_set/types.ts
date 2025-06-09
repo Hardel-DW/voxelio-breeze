@@ -1,5 +1,5 @@
-import { createHandlers, type AllExpectedHandlerKeys, type ValidateHandlerRegistry } from "../../types";
-import type { PlacementType, FrequencyReductionMethod, SpreadType } from "@/core/schema/structure_set/types";
+import type { FrequencyReductionMethod, PlacementType, SpreadType } from "@/core/schema/structure_set/types";
+import { type AllExpectedHandlerKeys, type ValidateHandlerRegistry, createHandlers } from "../../types";
 
 // Actions spécifiques au domaine Structure Set
 export interface StructureSetActions {

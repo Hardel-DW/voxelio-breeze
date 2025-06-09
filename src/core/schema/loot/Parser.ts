@@ -1,7 +1,7 @@
 import type { ParserParams } from "@/core/engine/Parser";
+import { extractUnknownFields } from "@/core/schema/utils";
 import type { LootGroup, LootItem, LootTableParser, LootTableProps, MinecraftLootEntry, MinecraftLootTable, PoolData } from "./types";
 import { KNOWN_ENTRY_FIELDS, KNOWN_POOL_FIELDS, KNOWN_TABLE_FIELDS } from "./types";
-import { extractUnknownFields } from "@/core/schema/utils";
 
 /**
  * Parse Minecraft LootTable to simplified Voxel format - Ultra-simplified version

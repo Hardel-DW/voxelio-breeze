@@ -1,16 +1,16 @@
+import type { IdentifierObject } from "@/core/Identifier";
 import type { Analysers } from "@/core/engine/Analyser";
+import { processElementTags } from "@/core/schema/utils";
 import type {
     CompilerResult,
-    StructureCompiler,
-    StructureProps,
-    MinecraftStructure,
-    MinecraftSpawnOverride,
     MinecraftPoolAlias,
-    MobCategory
+    MinecraftSpawnOverride,
+    MinecraftStructure,
+    MobCategory,
+    StructureCompiler,
+    StructureProps
 } from "./types";
 import { JIGSAW_STRUCTURE_TYPES } from "./types";
-import type { IdentifierObject } from "@/core/Identifier";
-import { processElementTags } from "@/core/schema/utils";
 
 /**
  * Compile Voxel format back to Minecraft Structure

@@ -1,9 +1,9 @@
 import type { ActionHandler } from "../../types";
+import { AddSpawnOverrideHandler } from "./AddSpawnOverrideHandler";
+import { SetBiomesHandler } from "./SetBiomesHandler";
+import { SetJigsawConfigHandler } from "./SetJigsawConfigHandler";
 import type { StructureAction } from "./types";
 import { createStructureHandlers } from "./types";
-import { SetBiomesHandler } from "./SetBiomesHandler";
-import { AddSpawnOverrideHandler } from "./AddSpawnOverrideHandler";
-import { SetJigsawConfigHandler } from "./SetJigsawConfigHandler";
 
 export default function register(): Map<string, ActionHandler<StructureAction>> {
     const handlerDefinitions = createStructureHandlers({

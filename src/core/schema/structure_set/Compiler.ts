@@ -1,16 +1,16 @@
+import type { IdentifierObject } from "@/core/Identifier";
 import type { Analysers } from "@/core/engine/Analyser";
+import { processElementTags } from "@/core/schema/utils";
 import type {
     CompilerResult,
-    StructureSetCompiler,
-    StructureSetProps,
+    MinecraftExclusionZone,
+    MinecraftStructurePlacement,
     MinecraftStructureSet,
     MinecraftStructureSetElement,
-    MinecraftStructurePlacement,
-    MinecraftExclusionZone
+    StructureSetCompiler,
+    StructureSetProps
 } from "./types";
 import { CONCENTRIC_RINGS_TYPES, RANDOM_SPREAD_TYPES } from "./types";
-import type { IdentifierObject } from "@/core/Identifier";
-import { processElementTags } from "@/core/schema/utils";
 
 /**
  * Compile Voxel format back to Minecraft Structure Set

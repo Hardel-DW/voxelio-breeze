@@ -1,4 +1,3 @@
-export * from "@/schema/enchantment/Enchantment";
-export * from "@/schema/enchantment/EnchantmentCost";
-export * from "@/schema/text/TextComponentType";
-export * from "@/schema/tag/TagType";
+export * from "@/schema/Enchantment";
+export * from "@/schema/TextComponentType";
+export * from "@/schema/TagType";

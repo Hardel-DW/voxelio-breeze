@@ -1,6 +1,6 @@
+import type { StructureSetProps } from "@/core/schema/structure_set/types";
 import type { ActionHandler } from "../../types";
 import type { StructureSetAction } from "./types";
-import type { StructureSetProps } from "@/core/schema/structure_set/types";
 
 export class SetPlacementConfigHandler implements ActionHandler<StructureSetAction> {
     execute(

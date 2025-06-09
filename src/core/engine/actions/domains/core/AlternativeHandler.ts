@@ -1,8 +1,8 @@
+import { checkCondition } from "../../../condition";
+import type { Condition } from "../../../condition/types";
+import type { ActionRegistry } from "../../registry";
 import type { ActionHandler } from "../../types";
 import type { CoreAction } from "./types";
-import type { ActionRegistry } from "../../registry";
-import type { Condition } from "../../../condition/types";
-import { checkCondition } from "../../../condition";
 
 export class AlternativeHandler implements ActionHandler<CoreAction> {
     constructor(private registry: ActionRegistry) {}

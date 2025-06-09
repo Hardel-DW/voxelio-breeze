@@ -1,8 +1,8 @@
 import type { ActionHandler } from "../../types";
+import { AddIngredientHandler, ClearSlotHandler, RemoveIngredientHandler, SwapSlotsHandler } from "./AddIngredientHandler";
+import { ConvertRecipeTypeHandler } from "./ConvertRecipeTypeHandler";
 import type { RecipeAction } from "./types";
 import { createRecipeHandlers } from "./types";
-import { AddIngredientHandler, RemoveIngredientHandler, ClearSlotHandler, SwapSlotsHandler } from "./AddIngredientHandler";
-import { ConvertRecipeTypeHandler } from "./ConvertRecipeTypeHandler";
 
 export default function register(): Map<string, ActionHandler<RecipeAction>> {
     const handlerDefinitions = createRecipeHandlers({

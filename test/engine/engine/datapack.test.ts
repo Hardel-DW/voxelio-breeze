@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { Datapack } from "@/core/Datapack";
-import type { TagType } from "@/schema/tag/TagType";
+import type { TagType } from "@/schema/TagType";
 import { DatapackError } from "@/core/DatapackError";
 import type { Compiler } from "@/core/engine/Compiler";
 import { attack_speed_element } from "@test/template/concept/enchant/VoxelDriven";

@@ -1,4 +1,5 @@
 import type { ParserParams } from "@/core/engine/Parser";
+import { extractUnknownFields } from "@/core/schema/utils";
 import type {
     CraftingTransmuteData,
     MinecraftRecipe,
@@ -11,7 +12,6 @@ import type {
     SmithingTrimData
 } from "./types";
 import { KNOWN_RECIPE_FIELDS, normalizeIngredient, positionToSlot } from "./types";
-import { extractUnknownFields } from "@/core/schema/utils";
 
 /**
  * Parse Minecraft Recipe to simplified Voxel format with slot-based system

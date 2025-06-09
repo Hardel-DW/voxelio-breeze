@@ -1,6 +1,6 @@
+import type { ActionRegistry } from "../../registry";
 import type { ActionHandler } from "../../types";
 import type { CoreAction } from "./types";
-import type { ActionRegistry } from "../../registry";
 
 export class SequentialHandler implements ActionHandler<CoreAction> {
     constructor(private registry?: ActionRegistry) {}

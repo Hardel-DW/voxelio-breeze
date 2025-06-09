@@ -1,5 +1,5 @@
-import type { ChangeSet } from "./types";
 import { deepDiff, normalizeValue } from "./differ";
+import type { ChangeSet } from "./types";
 
 export class Logger {
     private changes: ChangeSet[] = [];

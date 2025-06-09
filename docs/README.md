@@ -88,6 +88,11 @@ Le système d'actions est organisé en domaines :
 - [**Guide Structure**](./structure-guide.md) - Conversion des structures et
   système Jigsaw
 
+### 🎮 Guides des mécaniques de jeu
+
+- [**Mécaniques d'enchantement**](./enchantment-mechanics-guide.md) -
+  Fonctionnement complet du système d'enchantement data-driven de Minecraft 1.21
+
 ### ⚡ Documentation des actions
 
 #### Actions par domaine

@@ -1,4 +1,4 @@
-import { createHandlers, type AllExpectedHandlerKeys, type ValidateHandlerRegistry } from "../../types";
+import { type AllExpectedHandlerKeys, type ValidateHandlerRegistry, createHandlers } from "../../types";
 
 // Recipe domain action types
 export interface RecipeActions {

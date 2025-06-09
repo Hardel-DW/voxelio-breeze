@@ -1,6 +1,6 @@
+import type { StructureSetProps, StructureSetStructure } from "@/core/schema/structure_set/types";
 import type { ActionHandler } from "../../types";
 import type { StructureSetAction } from "./types";
-import type { StructureSetProps, StructureSetStructure } from "@/core/schema/structure_set/types";
 
 export class AddStructureHandler implements ActionHandler<StructureSetAction> {
     execute(

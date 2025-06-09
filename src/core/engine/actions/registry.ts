@@ -1,5 +1,5 @@
-import type { Action, ActionHandler } from "./types";
 import register from "./domains/core";
+import type { Action, ActionHandler } from "./types";
 
 const loadedDomains = new Set<string>();
 

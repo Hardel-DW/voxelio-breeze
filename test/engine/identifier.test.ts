@@ -29,6 +29,33 @@ describe("Identifier", () => {
                 resource: "sword/life_steal"
             });
         });
+
+        it("should auto-prefix with minecraft namespace when none provided", () => {
+            const result = Identifier.of("stone", "block");
+            expect(result.get()).toEqual({
+                namespace: "minecraft",
+                registry: "block",
+                resource: "stone"
+            });
+        });
+
+        it("should auto-prefix with minecraft namespace for tags", () => {
+            const result = Identifier.of("#sword", "tags/item");
+            expect(result.get()).toEqual({
+                namespace: "minecraft",
+                registry: "tags/item",
+                resource: "sword"
+            });
+        });
+
+        it("should respect explicit namespace when provided", () => {
+            const result = Identifier.of("modname:stone", "block");
+            expect(result.get()).toEqual({
+                namespace: "modname",
+                registry: "block",
+                resource: "stone"
+            });
+        });
     });
 
     describe("toString", () => {
@@ -131,6 +158,23 @@ describe("Identifier", () => {
         it("should format identifier string for display", () => {
             expect(Identifier.toDisplay("minecraft:stone")).toBe("Stone");
             expect(Identifier.toDisplay("minecraft:diamond_sword")).toBe("Diamond Sword");
+        });
+    });
+
+    describe("normalize", () => {
+        it("should auto-prefix identifiers without namespace", () => {
+            expect(Identifier.normalize("stone", "block")).toBe("minecraft:stone");
+            expect(Identifier.normalize("diamond_sword", "item")).toBe("minecraft:diamond_sword");
+        });
+
+        it("should preserve explicit namespaces", () => {
+            expect(Identifier.normalize("modname:stone", "block")).toBe("modname:stone");
+            expect(Identifier.normalize("minecraft:diamond_sword", "item")).toBe("minecraft:diamond_sword");
+        });
+
+        it("should handle tags correctly", () => {
+            expect(Identifier.normalize("sword", "tags/item")).toBe("#minecraft:sword");
+            expect(Identifier.normalize("modname:weapon", "tags/enchantment")).toBe("#modname:weapon");
         });
     });
 
