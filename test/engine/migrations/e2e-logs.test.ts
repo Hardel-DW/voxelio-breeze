@@ -39,13 +39,17 @@ describe("E2E Logs System", () => {
 
             // Export logs
             const logsJson = logger.exportJson();
-            expect(logsJson).toContain("voxel_studio_log");
+            expect(logsJson).toContain("logs");
             expect(logsJson).toContain("Modified Name");
+            expect(logsJson).toContain("datapack");
 
             // Parse logs and verify structure
             const parsedLogs = JSON.parse(logsJson);
-            expect(parsedLogs.voxel_studio_log.version).toBe("1.0.0");
-            expect(parsedLogs.voxel_studio_log.changes).toHaveLength(2);
+            expect(parsedLogs.id).toBeDefined();
+            expect(parsedLogs.generated_at).toBeDefined();
+            expect(parsedLogs.engine).toBe(2);
+            expect(parsedLogs.logs).toHaveLength(2);
+            expect(parsedLogs.datapack).toBeDefined();
         });
     });
 
@@ -53,18 +57,24 @@ describe("E2E Logs System", () => {
         it("should import existing logs, apply more actions, and export complete history", async () => {
             // Create initial logs
             const existingLogs = {
-                voxel_studio_log: {
-                    version: "1.0.0",
-                    generated_at: "2024-01-01T00:00:00.000Z",
-                    changes: [
-                        {
-                            element_id: "test:simple",
-                            element_type: "loot_table",
-                            differences: [{ type: "set", path: "pools.0.rolls", value: 5, origin_value: 1 }],
-                            timestamp: "2024-01-01T00:00:00.000Z"
-                        }
-                    ]
-                }
+                id: "test-id-123",
+                generated_at: "2024-01-01T00:00:00.000Z",
+                version: 48,
+                isModded: true,
+                engine: 2,
+                isMinified: false,
+                datapack: {
+                    name: "test-datapack",
+                    namespaces: ["test"]
+                },
+                logs: [
+                    {
+                        identifier: "test:simple",
+                        registry: "loot_table",
+                        differences: [{ type: "set", path: "pools.0.rolls", value: 5, origin_value: 1 }],
+                        timestamp: "2024-01-01T00:00:00.000Z"
+                    }
+                ]
             };
 
             // Prepare mock datapack with logs
@@ -78,7 +88,7 @@ describe("E2E Logs System", () => {
 
             // Verify existing logs were imported
             expect(logger.getChanges()).toHaveLength(1);
-            expect(logger.getChanges()[0].element_id).toBe("test:simple");
+            expect(logger.getChanges()[0].identifier).toBe("test:simple");
 
             // Apply new actions
             const elementKey = Array.from(result.elements.keys())[0];
@@ -95,10 +105,11 @@ describe("E2E Logs System", () => {
             expect(allChanges[0].differences[0].path).toBe("pools.0.rolls"); // Old change
             expect(allChanges[1].differences[0].path).toBe("pools.0.bonus_rolls"); // New change
 
-            // Export complete history
+            // Export complete history and verify ID preservation
             const fullLogsJson = logger.exportJson();
             const parsedFullLogs = JSON.parse(fullLogsJson);
-            expect(parsedFullLogs.voxel_studio_log.changes).toHaveLength(2);
+            expect(parsedFullLogs.id).toBe("test-id-123"); // ID should be preserved
+            expect(parsedFullLogs.logs).toHaveLength(2);
         });
     });
 
@@ -106,24 +117,30 @@ describe("E2E Logs System", () => {
         it("should parse logs, replay changes, and verify element modifications", async () => {
             // Create logs with specific changes based on what we actually have
             const replayLogs = {
-                voxel_studio_log: {
-                    version: "1.0.0",
-                    generated_at: "2024-01-01T00:00:00.000Z",
-                    changes: [
-                        {
-                            element_id: "test:test",
-                            element_type: "loot_table",
-                            differences: [{ type: "set", path: "pools.0.rolls", value: 10, origin_value: 0 }],
-                            timestamp: "2024-01-01T00:00:00.000Z"
-                        },
-                        {
-                            element_id: "enchantplus:sword/attack_speed",
-                            element_type: "enchantment",
-                            differences: [{ type: "set", path: "max_level", value: 20, origin_value: 5 }],
-                            timestamp: "2024-01-01T00:01:00.000Z"
-                        }
-                    ]
-                }
+                id: "replay-test-id",
+                generated_at: "2024-01-01T00:00:00.000Z",
+                version: 48,
+                isModded: true,
+                engine: 2,
+                isMinified: false,
+                datapack: {
+                    name: "replay-datapack",
+                    namespaces: ["test", "enchantplus"]
+                },
+                logs: [
+                    {
+                        identifier: "test:test",
+                        registry: "loot_table",
+                        differences: [{ type: "set", path: "pools.0.rolls", value: 10, origin_value: 0 }],
+                        timestamp: "2024-01-01T00:00:00.000Z"
+                    },
+                    {
+                        identifier: "enchantplus:sword/attack_speed",
+                        registry: "enchantment",
+                        differences: [{ type: "set", path: "max_level", value: 20, origin_value: 5 }],
+                        timestamp: "2024-01-01T00:01:00.000Z"
+                    }
+                ]
             };
 
             // Import logs into a new logger
@@ -133,17 +150,22 @@ describe("E2E Logs System", () => {
             expect(importedChanges).toHaveLength(2);
 
             // Verify log structure is correct
-            expect(importedChanges[0].element_id).toBe("test:test");
+            expect(importedChanges[0].identifier).toBe("test:test");
             expect(importedChanges[0].differences[0].path).toBe("pools.0.rolls");
             expect(importedChanges[0].differences[0].value).toBe(10);
 
-            expect(importedChanges[1].element_id).toBe("enchantplus:sword/attack_speed");
+            expect(importedChanges[1].identifier).toBe("enchantplus:sword/attack_speed");
             expect(importedChanges[1].differences[0].path).toBe("max_level");
             expect(importedChanges[1].differences[0].value).toBe(20);
 
             // Verify log structure is correct
-            expect(importedChanges[0].element_type).toBe("loot_table");
-            expect(importedChanges[1].element_type).toBe("enchantment");
+            expect(importedChanges[0].registry).toBe("loot_table");
+            expect(importedChanges[1].registry).toBe("enchantment");
+
+            // Verify ID was preserved
+            const exportedJson = replayLogger.exportJson();
+            const parsed = JSON.parse(exportedJson);
+            expect(parsed.id).toBe("replay-test-id");
         });
     });
 
@@ -155,6 +177,13 @@ describe("E2E Logs System", () => {
 
             // Create logger and apply changes
             const logger = new Logger();
+            logger.setDatapackInfo({
+                name: "test-datapack",
+                namespaces: ["test"],
+                version: 48,
+                isModded: false,
+                isMinified: false
+            });
 
             // Get original loot table
             const lootTables = originalDatapack.getRegistry("loot_table");
@@ -207,45 +236,51 @@ describe("E2E Logs System", () => {
 describe("E2E Logs Replay System", () => {
     it("should create logs, parse datapack, transform logs to actions and verify results", async () => {
         const testLogs = {
-            voxel_studio_log: {
-                version: "1.0.0",
-                generated_at: "2024-01-01T00:00:00.000Z",
-                changes: [
-                    {
-                        element_id: "test:test",
-                        element_type: "loot_table",
-                        differences: [
-                            { type: "set", path: "pools.0.rolls", value: 8, origin_value: 0 },
-                            { type: "set", path: "pools.0.bonus_rolls", value: 3, origin_value: undefined }
-                        ],
-                        timestamp: "2024-01-01T00:00:00.000Z"
-                    },
-                    {
-                        element_id: "test:test",
-                        element_type: "loot_table",
-                        differences: [{ type: "set", path: "type", value: "minecraft:chest", origin_value: "minecraft:entity" }],
-                        timestamp: "2024-01-01T00:01:00.000Z"
-                    },
-                    {
-                        element_id: "enchantplus:sword/attack_speed",
-                        element_type: "enchantment",
-                        differences: [{ type: "set", path: "max_level", value: 15, origin_value: 5 }],
-                        timestamp: "2024-01-01T00:02:00.000Z"
-                    },
-                    {
-                        element_id: "enchantplus:sword/attack_speed",
-                        element_type: "enchantment",
-                        differences: [{ type: "set", path: "min_cost.base", value: 25, origin_value: 10 }],
-                        timestamp: "2024-01-01T00:03:00.000Z"
-                    },
-                    {
-                        element_id: "test:advanced",
-                        element_type: "loot_table",
-                        differences: [{ type: "set", path: "pools.0.rolls", value: 5, origin_value: 2 }],
-                        timestamp: "2024-01-01T00:04:00.000Z"
-                    }
-                ]
-            }
+            id: "e2e-replay-test",
+            generated_at: "2024-01-01T00:00:00.000Z",
+            version: 48,
+            isModded: true,
+            engine: 2,
+            isMinified: false,
+            datapack: {
+                name: "E2E Test Datapack",
+                namespaces: ["test", "enchantplus"]
+            },
+            logs: [
+                {
+                    identifier: "test:test",
+                    registry: "loot_table",
+                    differences: [
+                        { type: "set", path: "pools.0.rolls", value: 8, origin_value: 0 },
+                        { type: "set", path: "pools.0.bonus_rolls", value: 3, origin_value: undefined }
+                    ],
+                    timestamp: "2024-01-01T00:00:00.000Z"
+                },
+                {
+                    identifier: "test:test",
+                    registry: "loot_table",
+                    differences: [{ type: "set", path: "type", value: "minecraft:chest", origin_value: "minecraft:entity" }],
+                    timestamp: "2024-01-01T00:01:00.000Z"
+                },
+                {
+                    identifier: "enchantplus:sword/attack_speed",
+                    registry: "enchantment",
+                    differences: [{ type: "set", path: "max_level", value: 15, origin_value: 5 }],
+                    timestamp: "2024-01-01T00:02:00.000Z"
+                },
+                {
+                    identifier: "enchantplus:sword/attack_speed",
+                    registry: "enchantment",
+                    differences: [{ type: "set", path: "min_cost.base", value: 25, origin_value: 10 }],
+                    timestamp: "2024-01-01T00:03:00.000Z"
+                },
+                {
+                    identifier: "test:advanced",
+                    registry: "loot_table",
+                    differences: [{ type: "set", path: "pools.0.rolls", value: 5, origin_value: 2 }],
+                    timestamp: "2024-01-01T00:04:00.000Z"
+                }
+            ]
         };
 
         const files = prepareFiles({ ...lootTableFile, ...enchantmentFile });
@@ -261,6 +296,11 @@ describe("E2E Logs Replay System", () => {
         // Verify imported logs
         expect(importedChanges).toHaveLength(5);
 
+        // Verify ID was preserved
+        const exportedJson = result.logger.exportJson();
+        const parsed = JSON.parse(exportedJson);
+        expect(parsed.id).toBe("e2e-replay-test");
+
         // Transform logs to actions and apply them
         const elementsMap = new Map<string, any>();
         for (const element of result.elements.values()) {
@@ -268,14 +308,14 @@ describe("E2E Logs Replay System", () => {
             elementsMap.set(id, element);
         }
 
-        // Group changes by element_id to apply them sequentially
+        // Group changes by identifier to apply them sequentially
         const changesByElement = new Map<string, typeof importedChanges>();
         for (const change of importedChanges) {
-            if (!change.element_id) continue;
-            if (!changesByElement.has(change.element_id)) {
-                changesByElement.set(change.element_id, []);
+            if (!change.identifier) continue;
+            if (!changesByElement.has(change.identifier)) {
+                changesByElement.set(change.identifier, []);
             }
-            const elementChanges = changesByElement.get(change.element_id);
+            const elementChanges = changesByElement.get(change.identifier);
             if (elementChanges) {
                 elementChanges.push(change);
             }
@@ -333,7 +373,7 @@ describe("E2E Logs Replay System", () => {
         expect(advancedLootTable.pools[0].rolls).toBe(5);
 
         // Verify values match the original test logs
-        const changes = testLogs.voxel_studio_log.changes;
+        const changes = testLogs.logs;
         expect(changes[0].differences[0].value).toBe(8);
         // @ts-ignore
         expect(testLootTable.pools[0].rolls).toBe(changes[0].differences[0].value);

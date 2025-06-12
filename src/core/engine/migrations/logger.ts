@@ -1,13 +1,39 @@
 import { deepDiff, normalizeValue } from "./differ";
-import type { ChangeSet } from "./types";
+import type { ChangeSet, DatapackInfo, LogsStructure } from "./types";
 
 export class Logger {
     private changes: ChangeSet[] = [];
+    private id: string | undefined;
+    private datapackInfo?: DatapackInfo;
+    private version?: number;
+    private isModded?: boolean;
+    private isMinified?: boolean;
 
     constructor(jsonData?: string) {
         if (jsonData) {
             this.importJson(jsonData);
         }
+    }
+
+    /**
+     * Set datapack information for export
+     */
+    setDatapackInfo(info: {
+        name: string;
+        description?: string;
+        namespaces: string[];
+        version: number;
+        isModded: boolean;
+        isMinified?: boolean;
+    }): void {
+        this.datapackInfo = {
+            name: info.name,
+            description: info.description,
+            namespaces: info.namespaces
+        };
+        this.version = info.version;
+        this.isModded = info.isModded;
+        this.isMinified = info.isMinified ?? false;
     }
 
     /**
@@ -31,27 +57,31 @@ export class Logger {
     /**
      * Syncs changes by comparing two states (for manual changes detection)
      */
-    sync<T extends Record<string, unknown>>(beforeState: T, afterState: T, elementId?: string, elementType?: string): void {
+    sync<T extends Record<string, unknown>>(beforeState: T, afterState: T, identifier?: string, registry?: string): void {
         const before = normalizeValue(beforeState) as Record<string, unknown>;
         const after = normalizeValue(afterState) as Record<string, unknown>;
-        this.addDiff(before, after, afterState, elementId, elementType);
+        this.addDiff(before, after, afterState, identifier, registry);
     }
 
     /**
      * Exports all changes as JSON
      */
     exportJson(): string {
-        return JSON.stringify(
-            {
-                voxel_studio_log: {
-                    version: "1.0.0",
-                    generated_at: new Date().toISOString(),
-                    changes: this.changes
-                }
+        const structure: LogsStructure = {
+            id: this.id ?? this.generateId(),
+            generated_at: new Date().toISOString(),
+            version: this.version ?? 0,
+            isModded: this.isModded ?? false,
+            engine: 2,
+            isMinified: this.isMinified ?? false,
+            datapack: this.datapackInfo ?? {
+                name: "unknown",
+                namespaces: []
             },
-            null,
-            2
-        );
+            logs: this.changes
+        };
+
+        return JSON.stringify(structure, null, 2);
     }
 
     /**
@@ -69,21 +99,28 @@ export class Logger {
     }
 
     /**
+     * Generate a random ID
+     */
+    private generateId(): string {
+        return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+    }
+
+    /**
      * Internal method to add differences
      */
     private addDiff(
         before: Record<string, unknown>,
         after: Record<string, unknown>,
         element: Record<string, unknown>,
-        elementId?: string,
-        elementType?: string
+        identifier?: string,
+        registry?: string
     ): void {
         const differences = deepDiff(before, after);
 
         if (differences.length > 0) {
             this.changes.push({
-                element_id: elementId || this.extractElementId(element),
-                element_type: elementType || this.extractElementType(element),
+                identifier: identifier || this.extractElementId(element),
+                registry: registry || this.extractElementType(element),
                 differences,
                 timestamp: new Date().toISOString()
             });
@@ -97,9 +134,9 @@ export class Logger {
         if (typeof element.id === "string") return element.id;
         if (typeof element._id === "string") return element._id;
 
-        const identifier = element.identifier as Record<string, unknown> | undefined;
-        if (identifier?.namespace && identifier?.resource) {
-            return `${identifier.namespace}:${identifier.resource}`;
+        const elementIdentifier = element.identifier as Record<string, unknown> | undefined;
+        if (elementIdentifier?.namespace && elementIdentifier?.resource) {
+            return `${elementIdentifier.namespace}:${elementIdentifier.resource}`;
         }
 
         return undefined;
@@ -112,9 +149,9 @@ export class Logger {
         if (typeof element.type === "string") return element.type;
         if (typeof element._type === "string") return element._type;
 
-        const identifier = element.identifier as Record<string, unknown> | undefined;
-        if (typeof identifier?.registry === "string") {
-            return identifier.registry;
+        const elementIdentifier = element.identifier as Record<string, unknown> | undefined;
+        if (typeof elementIdentifier?.registry === "string") {
+            return elementIdentifier.registry;
         }
 
         return undefined;
@@ -126,8 +163,15 @@ export class Logger {
     private importJson(json: string): void {
         try {
             const data = JSON.parse(json);
-            const changes = data.voxel_studio_log?.changes || data.changes || data;
-            this.changes = Array.isArray(changes) ? changes : [];
+
+            if (data.logs && Array.isArray(data.logs)) {
+                this.changes = data.logs;
+                this.id = data.id;
+                this.datapackInfo = data.datapack;
+                this.version = data.version;
+                this.isModded = data.isModded;
+                this.isMinified = data.isMinified;
+            }
         } catch (error) {
             throw new Error(`Failed to import changes: ${error}`);
         }

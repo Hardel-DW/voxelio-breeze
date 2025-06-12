@@ -28,8 +28,6 @@ export interface ParseDatapackResult<T extends VoxelElement> {
  * Parses a datapack and returns the elements.
  */
 export async function parseDatapack<T extends keyof Analysers>(file: File): Promise<ParseDatapackResult<GetAnalyserVoxel<T>>> {
-    const id = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-    const date = new Intl.DateTimeFormat("fr-FR", { year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date());
     const datapack = await Datapack.parse(file);
     const namespaces = datapack.getNamespaces();
     const version = datapack.getPackFormat();
@@ -63,5 +61,7 @@ export async function parseDatapack<T extends keyof Analysers>(file: File): Prom
     if (elements.size === 0) throw new DatapackError("tools.warning.no_elements");
     const logger = new Logger(logs ? new TextDecoder().decode(logs) : undefined);
 
+    // Set datapack information for the logger
+    logger.setDatapackInfo({ name, description, namespaces, version, isModded, isMinified: false });
     return { name, files, elements, version, isModded, logger };
 }

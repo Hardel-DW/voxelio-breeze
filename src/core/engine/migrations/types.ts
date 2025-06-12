@@ -8,8 +8,25 @@ export interface LogDifference {
 }
 
 export interface ChangeSet {
-    element_id?: string;
-    element_type?: string;
+    identifier?: string;
+    registry?: string;
     differences: LogDifference[];
     timestamp: string;
+}
+
+export interface DatapackInfo {
+    name: string;
+    description?: string;
+    namespaces: string[];
+}
+
+export interface LogsStructure {
+    id: string;
+    generated_at: string;
+    version: number;
+    isModded: boolean;
+    engine: number;
+    isMinified: boolean;
+    datapack: DatapackInfo;
+    logs: ChangeSet[];
 }

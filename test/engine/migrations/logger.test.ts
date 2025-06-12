@@ -7,6 +7,15 @@ describe("Logger System", () => {
 
     beforeEach(() => {
         testLogger = new Logger();
+        // Set datapack info for proper export structure
+        testLogger.setDatapackInfo({
+            name: "test-datapack",
+            description: "Test datapack",
+            namespaces: ["test"],
+            version: 48,
+            isModded: false,
+            isMinified: false
+        });
     });
 
     describe("trackChanges", () => {
@@ -68,8 +77,8 @@ describe("Logger System", () => {
             expect(testLogger.getChanges()).toHaveLength(1);
 
             const changes = testLogger.getChanges();
-            expect(changes[0].element_id).toBe("test:simple");
-            expect(changes[0].element_type).toBe("loot_table");
+            expect(changes[0].identifier).toBe("test:simple");
+            expect(changes[0].registry).toBe("loot_table");
         });
     });
 
@@ -82,8 +91,8 @@ describe("Logger System", () => {
 
             const changes = testLogger.getChanges();
             expect(changes).toHaveLength(1);
-            expect(changes[0].element_id).toBe("test_element");
-            expect(changes[0].element_type).toBe("recipe");
+            expect(changes[0].identifier).toBe("test_element");
+            expect(changes[0].registry).toBe("recipe");
             expect(changes[0].differences).toHaveLength(2);
         });
 
@@ -101,13 +110,13 @@ describe("Logger System", () => {
             testLogger.sync(before, after);
 
             const changes = testLogger.getChanges();
-            expect(changes[0].element_id).toBe("auto_element");
-            expect(changes[0].element_type).toBe("test_type");
+            expect(changes[0].identifier).toBe("auto_element");
+            expect(changes[0].registry).toBe("test_type");
         });
     });
 
     describe("export/import", () => {
-        it("should export and import JSON", async () => {
+        it("should export new JSON format with datapack info", async () => {
             const element = { name: "test", value: 42 };
 
             await testLogger.trackChanges(element, async (el) => {
@@ -118,38 +127,96 @@ describe("Logger System", () => {
             expect(typeof json).toBe("string");
 
             const parsed = JSON.parse(json);
-            expect(parsed.voxel_studio_log).toBeDefined();
-            expect(parsed.voxel_studio_log.version).toBe("1.0.0");
-            expect(parsed.voxel_studio_log.changes).toHaveLength(1);
-
-            const newLogger = new Logger(json);
-
-            expect(newLogger.getChanges()).toEqual(testLogger.getChanges());
+            expect(parsed.id).toBeDefined();
+            expect(parsed.generated_at).toBeDefined();
+            expect(parsed.version).toBe(48);
+            expect(parsed.isModded).toBe(false);
+            expect(parsed.engine).toBe(2);
+            expect(parsed.isMinified).toBe(false);
+            expect(parsed.datapack).toEqual({
+                name: "test-datapack",
+                description: "Test datapack",
+                namespaces: ["test"]
+            });
+            expect(parsed.logs).toHaveLength(1);
         });
 
-        it("should handle different JSON formats", () => {
-            const changes = [
-                {
-                    element_id: "test",
-                    element_type: "recipe",
-                    differences: [{ type: "set", path: "value", value: 100, origin_value: 42 }],
-                    timestamp: "2023-01-01T00:00:00.000Z"
-                }
-            ];
+        it("should preserve ID when importing existing logs", () => {
+            const existingLogs = {
+                id: "existing-id-123",
+                generated_at: "2023-01-01T00:00:00.000Z",
+                version: 48,
+                isModded: true,
+                engine: 2,
+                isMinified: false,
+                datapack: {
+                    name: "imported-datapack",
+                    namespaces: ["imported"]
+                },
+                logs: [
+                    {
+                        identifier: "test:item",
+                        registry: "recipe",
+                        differences: [{ type: "set", path: "value", value: 100, origin_value: 42 }],
+                        timestamp: "2023-01-01T00:00:00.000Z"
+                    }
+                ]
+            };
 
-            // Direct changes array
-            const testLogger1 = new Logger(JSON.stringify(changes));
-            expect(testLogger1.getChanges()).toHaveLength(1);
+            const newLogger = new Logger(JSON.stringify(existingLogs));
 
-            // Legacy format
-            const testLogger2 = new Logger(JSON.stringify({ changes }));
-            expect(testLogger2.getChanges()).toHaveLength(1);
+            expect(newLogger.getChanges()).toHaveLength(1);
+            expect(newLogger.getChanges()[0].identifier).toBe("test:item");
+            expect(newLogger.getChanges()[0].registry).toBe("recipe");
+
+            const exportedJson = newLogger.exportJson();
+            const parsed = JSON.parse(exportedJson);
+            expect(parsed.id).toBe("existing-id-123");
+            expect(parsed.version).toBe(48);
+            expect(parsed.isModded).toBe(true);
+            expect(parsed.datapack.name).toBe("imported-datapack");
+        });
+
+        it("should generate new ID when no logs provided", () => {
+            const logger1 = new Logger();
+            const logger2 = new Logger();
+
+            const json1 = logger1.exportJson();
+            const json2 = logger2.exportJson();
+
+            const parsed1 = JSON.parse(json1);
+            const parsed2 = JSON.parse(json2);
+
+            expect(parsed1.id).toBeDefined();
+            expect(parsed2.id).toBeDefined();
+            expect(parsed1.id).not.toBe(parsed2.id);
         });
     });
 
-    describe("global logger", () => {
-        it("should provide a global instance", () => {
-            expect(testLogger).toBeInstanceOf(Logger);
+    describe("datapack info", () => {
+        it("should store and export datapack information", () => {
+            const datapackInfo = {
+                name: "my-datapack",
+                description: "My custom datapack",
+                namespaces: ["custom", "mod"],
+                version: 71,
+                isModded: true,
+                isMinified: true
+            };
+
+            testLogger.setDatapackInfo(datapackInfo);
+
+            const json = testLogger.exportJson();
+            const parsed = JSON.parse(json);
+
+            expect(parsed.version).toBe(71);
+            expect(parsed.isModded).toBe(true);
+            expect(parsed.isMinified).toBe(true);
+            expect(parsed.datapack).toEqual({
+                name: "my-datapack",
+                description: "My custom datapack",
+                namespaces: ["custom", "mod"]
+            });
         });
     });
 
@@ -164,8 +231,8 @@ describe("Logger System", () => {
             testLogger.sync({ id: "test2", value: 10 }, { id: "test2", value: 20 });
 
             expect(testLogger.getChanges()).toHaveLength(2);
-            expect(testLogger.getChanges()[0].element_id).toBe("test1");
-            expect(testLogger.getChanges()[1].element_id).toBe("test2");
+            expect(testLogger.getChanges()[0].identifier).toBe("test1");
+            expect(testLogger.getChanges()[1].identifier).toBe("test2");
         });
     });
 });
