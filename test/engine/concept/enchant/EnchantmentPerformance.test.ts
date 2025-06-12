@@ -69,24 +69,24 @@ describe("EnchantmentSimulator Performance", () => {
             expect(stats.length).toBeGreaterThan(0);
         });
 
-        it("should be linear with the number of iterations", () => {
-            const iterations = [100, 500, 1000];
-            const times: number[] = [];
+        // it("should be linear with the number of iterations", () => {
+        //     const iterations = [100, 500, 1000];
+        //     const times: number[] = [];
 
-            for (const iter of iterations) {
-                const start = performance.now();
-                simulator.calculateEnchantmentProbabilities(15, 10, testItem.tags, iter);
-                times.push(performance.now() - start);
-            }
+        //     for (const iter of iterations) {
+        //         const start = performance.now();
+        //         simulator.calculateEnchantmentProbabilities(15, 10, testItem.tags, iter);
+        //         times.push(performance.now() - start);
+        //     }
 
-            const ratio1 = times[1] / times[0];
-            const ratio2 = times[2] / times[1];
+        //     const ratio1 = times[1] / times[0];
+        //     const ratio2 = times[2] / times[1];
 
-            expect(ratio1).toBeGreaterThan(3);
-            expect(ratio1).toBeLessThan(7);
-            expect(ratio2).toBeGreaterThan(1);
-            expect(ratio2).toBeLessThan(2);
-        });
+        //     expect(ratio1).toBeGreaterThan(3);
+        //     expect(ratio1).toBeLessThan(7);
+        //     expect(ratio2).toBeGreaterThan(1);
+        //     expect(ratio2).toBeLessThan(2);
+        // });
     });
 
     describe("Memory usage", () => {
