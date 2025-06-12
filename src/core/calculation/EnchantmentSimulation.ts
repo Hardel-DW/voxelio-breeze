@@ -1,6 +1,6 @@
 import type { DataDrivenRegistryElement } from "@/core/Element";
 import { Identifier } from "@/core/Identifier";
-import TagsComparator from "@/core/TagComparator";
+import { TagsComparator } from "@/core/TagComparator";
 import type { Enchantment } from "@/schema/Enchantment";
 import type { TagType } from "@/schema/TagType";
 

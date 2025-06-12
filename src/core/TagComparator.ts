@@ -6,7 +6,7 @@ import type { OptionalTag, TagType } from "@/schema/TagType";
  * A utility class for comparing and processing Minecraft tags.
  * Used to handle tag references and resolve recursive tag values.
  */
-export default class TagsComparator {
+export class TagsComparator {
     private readonly registry: string;
     private readonly tagMap: Map<string, DataDrivenRegistryElement<TagType>>;
 
