@@ -18,6 +18,228 @@ describe("Logger System", () => {
         });
     });
 
+    describe("constructor", () => {
+        it("should accept string JSON data", () => {
+            const existingLogs = {
+                id: "test-id",
+                generated_at: "2024-01-01T00:00:00.000Z",
+                version: 48,
+                isModded: true,
+                engine: 2,
+                isMinified: true,
+                datapack: { name: "test", namespaces: ["test"] },
+                logs: [
+                    {
+                        identifier: "test:item",
+                        registry: "recipe",
+                        differences: [{ type: "set", path: "value", value: 100, origin_value: 42 }],
+                        timestamp: "2024-01-01T00:00:00.000Z"
+                    }
+                ]
+            };
+
+            const logger = new Logger(JSON.stringify(existingLogs));
+            expect(logger.getChanges()).toHaveLength(1);
+            expect(logger.isMinified).toBe(true);
+        });
+
+        it("should accept Uint8Array data", () => {
+            const existingLogs = {
+                id: "test-id",
+                generated_at: "2024-01-01T00:00:00.000Z",
+                version: 48,
+                isModded: true,
+                engine: 2,
+                isMinified: false,
+                datapack: { name: "test", namespaces: ["test"] },
+                logs: [
+                    {
+                        identifier: "test:item",
+                        registry: "recipe",
+                        differences: [{ type: "set", path: "value", value: 100, origin_value: 42 }],
+                        timestamp: "2024-01-01T00:00:00.000Z"
+                    }
+                ]
+            };
+
+            const uint8Array = new TextEncoder().encode(JSON.stringify(existingLogs));
+            const logger = new Logger(uint8Array);
+            expect(logger.getChanges()).toHaveLength(1);
+            expect(logger.isMinified).toBe(false);
+        });
+    });
+
+    describe("isMinified getter", () => {
+        it("should return false by default", () => {
+            const logger = new Logger();
+            expect(logger.isMinified).toBe(false);
+        });
+
+        it("should return correct value from imported logs", () => {
+            const logs = {
+                id: "test",
+                generated_at: "2024-01-01T00:00:00.000Z",
+                version: 48,
+                isModded: false,
+                engine: 2,
+                isMinified: true,
+                datapack: { name: "test", namespaces: ["test"] },
+                logs: []
+            };
+
+            const logger = new Logger(JSON.stringify(logs));
+            expect(logger.isMinified).toBe(true);
+        });
+
+        it("should return correct value from setDatapackInfo", () => {
+            const logger = new Logger();
+            logger.setDatapackInfo({
+                name: "test",
+                namespaces: ["test"],
+                version: 48,
+                isModded: false,
+                isMinified: true
+            });
+            expect(logger.isMinified).toBe(true);
+        });
+    });
+
+    describe("replay", () => {
+        it("should replay changes on target elements", async () => {
+            // Create source logger with changes
+            const sourceLogger = new Logger();
+            sourceLogger.setDatapackInfo({
+                name: "source",
+                namespaces: ["test"],
+                version: 48,
+                isModded: false,
+                isMinified: false
+            });
+
+            const element = { 
+                identifier: { namespace: "test", resource: "item" },
+                name: "Original", 
+                value: 42 
+            };
+
+            await sourceLogger.trackChanges(element, async (el) => {
+                return { ...el, name: "Modified", value: 100 };
+            });
+
+            // Create target elements with proper registry suffix keys
+            const targetElements = new Map();
+            targetElements.set("test:item$recipe", { 
+                identifier: { namespace: "test", resource: "item" },
+                name: "Target Original", 
+                value: 1 
+            });
+
+            // Export and import logs to simulate migration
+            const logsJson = sourceLogger.exportJson();
+            const replayLogger = new Logger(logsJson);
+
+            // Replay changes
+            const modifiedElements = await replayLogger.replay(targetElements, 48);
+
+            // Verify original elements unchanged
+            expect(targetElements.get("test:item$recipe").name).toBe("Target Original");
+            expect(targetElements.get("test:item$recipe").value).toBe(1);
+
+            // Verify replayed elements have changes applied
+            const modifiedElement = modifiedElements.get("test:item$recipe");
+            expect(modifiedElement).toBeDefined();
+            expect(modifiedElement.name).toBe("Modified");
+            expect(modifiedElement.value).toBe(100);
+        });
+
+        it("should handle multiple elements and changes", async () => {
+            const logs = {
+                id: "test",
+                generated_at: "2024-01-01T00:00:00.000Z",
+                version: 48,
+                isModded: false,
+                engine: 2,
+                isMinified: false,
+                datapack: { name: "test", namespaces: ["test"] },
+                logs: [
+                    {
+                        identifier: "test:item1",
+                        registry: "recipe",
+                        differences: [
+                            { type: "set", path: "name", value: "Modified Item 1", origin_value: "Item 1" },
+                            { type: "set", path: "value", value: 100, origin_value: 10 }
+                        ],
+                        timestamp: "2024-01-01T00:00:00.000Z"
+                    },
+                    {
+                        identifier: "test:item2",
+                        registry: "recipe",
+                        differences: [
+                            { type: "set", path: "enabled", value: false, origin_value: true }
+                        ],
+                        timestamp: "2024-01-01T00:01:00.000Z"
+                    }
+                ]
+            };
+
+            const logger = new Logger(JSON.stringify(logs));
+
+            const targetElements = new Map();
+            targetElements.set("test:item1$recipe", { name: "Original Item 1", value: 50 });
+            targetElements.set("test:item2$recipe", { enabled: true, count: 5 });
+            targetElements.set("test:item3$recipe", { name: "Unchanged" }); // Should remain unchanged
+
+            const modifiedElements = await logger.replay(targetElements, 48);
+
+            // Verify changes applied correctly
+            expect(modifiedElements.get("test:item1$recipe").name).toBe("Modified Item 1");
+            expect(modifiedElements.get("test:item1$recipe").value).toBe(100);
+            expect(modifiedElements.get("test:item2$recipe").enabled).toBe(false);
+            expect(modifiedElements.get("test:item2$recipe").count).toBe(5); // Unchanged field
+            expect(modifiedElements.get("test:item3$recipe").name).toBe("Unchanged"); // Element not in logs
+        });
+
+        it("should skip elements not found in target", async () => {
+            const logs = {
+                id: "test",
+                generated_at: "2024-01-01T00:00:00.000Z",
+                version: 48,
+                isModded: false,
+                engine: 2,
+                isMinified: false,
+                datapack: { name: "test", namespaces: ["test"] },
+                logs: [
+                    {
+                        identifier: "test:missing",
+                        registry: "recipe",
+                        differences: [{ type: "set", path: "value", value: 100, origin_value: 10 }],
+                        timestamp: "2024-01-01T00:00:00.000Z"
+                    }
+                ]
+            };
+
+            const logger = new Logger(JSON.stringify(logs));
+            const targetElements = new Map();
+            targetElements.set("test:existing$recipe", { name: "Existing" });
+
+            const modifiedElements = await logger.replay(targetElements, 48);
+
+            // Should return elements unchanged since "test:missing" doesn't exist
+            expect(modifiedElements.get("test:existing$recipe").name).toBe("Existing");
+            expect(modifiedElements.has("test:missing$recipe")).toBe(false);
+        });
+
+        it("should handle empty logs", async () => {
+            const logger = new Logger();
+            const targetElements = new Map();
+            targetElements.set("test:item$recipe", { name: "Original" });
+
+            const modifiedElements = await logger.replay(targetElements, 48);
+
+            expect(modifiedElements.get("test:item$recipe").name).toBe("Original");
+        });
+    });
+
     describe("trackChanges", () => {
         it("should track changes when element is modified", async () => {
             const element = { name: "test", value: 42 };

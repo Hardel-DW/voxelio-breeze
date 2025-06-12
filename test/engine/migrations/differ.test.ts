@@ -192,5 +192,75 @@ describe("Differ System", () => {
                 origin_value: { a: 1, b: 2 }
             });
         });
+
+        it("should handle realistic migration scenario with loot table changes", () => {
+            const beforeLootTable = {
+                identifier: { namespace: "test", resource: "chest" },
+                type: "minecraft:entity",
+                pools: [
+                    {
+                        rolls: 1,
+                        bonus_rolls: 0,
+                        entries: [
+                            { type: "minecraft:item", name: "minecraft:diamond", weight: 10 }
+                        ]
+                    }
+                ]
+            };
+
+            const afterLootTable = {
+                identifier: { namespace: "test", resource: "chest" },
+                type: "minecraft:chest",
+                pools: [
+                    {
+                        rolls: 3,
+                        bonus_rolls: 1,
+                        entries: [
+                            { type: "minecraft:item", name: "minecraft:diamond", weight: 10 },
+                            { type: "minecraft:item", name: "minecraft:emerald", weight: 5 }
+                        ]
+                    }
+                ]
+            };
+
+            const differences = deepDiff(beforeLootTable, afterLootTable);
+
+            expect(differences).toHaveLength(4);
+            
+            // Should detect type change
+            const typeChange = differences.find(d => d.path === "type");
+            expect(typeChange).toEqual({
+                type: "set",
+                path: "type",
+                value: "minecraft:chest",
+                origin_value: "minecraft:entity"
+            });
+
+            // Should detect rolls change
+            const rollsChange = differences.find(d => d.path === "pools.0.rolls");
+            expect(rollsChange).toEqual({
+                type: "set",
+                path: "pools.0.rolls",
+                value: 3,
+                origin_value: 1
+            });
+
+            // Should detect bonus_rolls change
+            const bonusRollsChange = differences.find(d => d.path === "pools.0.bonus_rolls");
+            expect(bonusRollsChange).toEqual({
+                type: "set",
+                path: "pools.0.bonus_rolls",
+                value: 1,
+                origin_value: 0
+            });
+
+            // Should detect new entry addition
+            const newEntryChange = differences.find(d => d.path === "pools.0.entries.1");
+            expect(newEntryChange).toEqual({
+                type: "add",
+                path: "pools.0.entries.1",
+                value: { type: "minecraft:item", name: "minecraft:emerald", weight: 5 }
+            });
+        });
     });
 });

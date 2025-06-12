@@ -234,6 +234,98 @@ describe("E2E Logs System", () => {
 });
 
 describe("E2E Logs Replay System", () => {
+    it("should use new Logger.replay() API for migration", async () => {
+        // Create source datapack with logs
+        const sourceFiles = prepareFiles({ ...lootTableFile, ...enchantmentFile });
+        const sourceLogger = new Logger();
+        sourceLogger.setDatapackInfo({
+            name: "source-datapack",
+            namespaces: ["test", "enchantplus"],
+            version: 48,
+            isModded: true,
+            isMinified: false
+        });
+
+        // Simulate some changes being tracked using realistic elements
+        const element1 = {
+            identifier: { namespace: "test", resource: "test" },
+            pools: [{ rolls: 1, entries: [] }],
+            type: "minecraft:entity"
+        };
+
+        const element2 = {
+            identifier: { namespace: "enchantplus", resource: "sword/attack_speed" },
+            max_level: 5,
+            min_cost: { base: 10, per_level: 5 }
+        };
+
+        await sourceLogger.trackChanges(element1, async (el) => {
+            return { ...el, pools: [{ rolls: 8, entries: [] }], type: "minecraft:chest" };
+        });
+
+        await sourceLogger.trackChanges(element2, async (el) => {
+            return { ...el, max_level: 15, min_cost: { base: 25, per_level: 5 } };
+        });
+
+        // Add logs to source datapack
+        const logsJson = sourceLogger.exportJson();
+        sourceFiles["voxel/logs.json"] = new TextEncoder().encode(logsJson);
+        const sourceDatapackFile = await createZipFile(sourceFiles);
+
+        // Create target datapack
+        const targetFiles = prepareFiles({ ...lootTableFile, ...enchantmentFile });
+        const targetDatapackFile = await createZipFile(targetFiles);
+
+        // Parse both datapacks
+        const source = await parseDatapack(sourceDatapackFile);
+        const target = await parseDatapack(targetDatapackFile);
+
+        // Verify source has logs
+        const sourceLogFile = source.files["voxel/logs.json"];
+        expect(sourceLogFile).toBeDefined();
+
+        // Use new migration API
+        const logger = new Logger(sourceLogFile);
+        const modifiedElements = await logger.replay(target.elements, target.version);
+
+        // Map log identifiers to target keys (they have registry suffix)
+        const lootTableKey = "test:test$loot_table";
+        const enchantmentKey = "enchantplus:sword/attack_speed$enchantment";
+
+        // Verify these keys exist in target
+        expect(target.elements.has(lootTableKey)).toBe(true);
+        expect(target.elements.has(enchantmentKey)).toBe(true);
+
+        // Verify changes were applied
+        const modifiedLootTable = modifiedElements.get(lootTableKey);
+        const modifiedEnchantment = modifiedElements.get(enchantmentKey);
+
+        expect(modifiedLootTable).toBeDefined();
+        expect(modifiedEnchantment).toBeDefined();
+
+        // @ts-ignore - for test access
+        expect(modifiedLootTable.pools[0].rolls).toBe(8);
+        // @ts-ignore - for test access
+        expect(modifiedLootTable.type).toBe("minecraft:chest");
+        // @ts-ignore - for test access
+        expect(modifiedEnchantment.max_level).toBe(15);
+        // @ts-ignore - for test access
+        expect(modifiedEnchantment.min_cost.base).toBe(25);
+
+        // Verify original target elements unchanged
+        const originalLootTable = target.elements.get(lootTableKey);
+        const originalEnchantment = target.elements.get(enchantmentKey);
+
+        // @ts-ignore - for test access
+        expect(originalLootTable.pools[0].rolls).not.toBe(8); // Should be original value
+        // @ts-ignore - for test access
+        expect(originalEnchantment.max_level).not.toBe(15); // Should be original value
+
+        // Verify logger properties
+        expect(logger.isMinified).toBe(false);
+        expect(logger.getChanges()).toHaveLength(2);
+    });
+
     it("should create logs, parse datapack, transform logs to actions and verify results", async () => {
         const testLogs = {
             id: "e2e-replay-test",

@@ -1,3 +1,4 @@
+import { updateData } from "../actions";
 import { deepDiff, normalizeValue } from "./differ";
 import type { ChangeSet, DatapackInfo, LogsStructure } from "./types";
 
@@ -7,12 +8,59 @@ export class Logger {
     private datapackInfo?: DatapackInfo;
     private version?: number;
     private isModded?: boolean;
-    private isMinified?: boolean;
+    private _isMinified?: boolean;
 
-    constructor(jsonData?: string) {
+    constructor(jsonData?: string | Uint8Array) {
         if (jsonData) {
-            this.importJson(jsonData);
+            const jsonString = typeof jsonData === "string" ? jsonData : new TextDecoder().decode(jsonData);
+            this.importJson(jsonString);
         }
+    }
+
+    /**
+     * Getter for isMinified
+     */
+    get isMinified(): boolean {
+        return this._isMinified ?? false;
+    }
+
+    /**
+     * Replay logged changes on target elements
+     */
+    async replay<T extends Record<string, unknown>>(elements: Map<string, T>, version: number): Promise<Map<string, T>> {
+        const clonedElements = new Map(elements);
+
+        for (const change of this.changes) {
+            if (!change.identifier) continue;
+
+            // Find the target element key that matches the log identifier
+            // Log identifier: "test:test", Target key: "test:test$loot_table"
+            const targetKey = Array.from(clonedElements.keys()).find((key) => key.startsWith(`${change.identifier}$`));
+
+            if (!targetKey) continue;
+
+            let element = clonedElements.get(targetKey);
+            if (!element) continue;
+
+            for (const difference of change.differences) {
+                const result = await updateData(
+                    {
+                        type: "core.set_value",
+                        path: difference.path,
+                        value: difference.value
+                    },
+                    element,
+                    version
+                );
+
+                if (result) {
+                    element = result as T;
+                    clonedElements.set(targetKey, element);
+                }
+            }
+        }
+
+        return clonedElements;
     }
 
     /**
@@ -33,7 +81,7 @@ export class Logger {
         };
         this.version = info.version;
         this.isModded = info.isModded;
-        this.isMinified = info.isMinified ?? false;
+        this._isMinified = info.isMinified ?? false;
     }
 
     /**
@@ -73,7 +121,7 @@ export class Logger {
             version: this.version ?? 0,
             isModded: this.isModded ?? false,
             engine: 2,
-            isMinified: this.isMinified ?? false,
+            isMinified: this.isMinified,
             datapack: this.datapackInfo ?? {
                 name: "unknown",
                 namespaces: []
@@ -170,7 +218,7 @@ export class Logger {
                 this.datapackInfo = data.datapack;
                 this.version = data.version;
                 this.isModded = data.isModded;
-                this.isMinified = data.isMinified;
+                this._isMinified = data.isMinified;
             }
         } catch (error) {
             throw new Error(`Failed to import changes: ${error}`);
