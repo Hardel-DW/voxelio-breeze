@@ -21,3 +21,10 @@ export * from "@/core/engine/condition/types";
 export * from "@/VoxelDatapack";
 
 export * from "@/core/calculation/EnchantmentSimulation";
+export * from "@/core/calculation/LootTableProbability";
+
+export * from "@/core/engine/migrations/differ";
+export * from "@/core/engine/migrations/types";
+export * from "@/core/engine/migrations/logger";
+
+export * from "@/Roman";
