@@ -1,6 +1,7 @@
 export * from "@/core/Element";
 export * from "@/core/Identifier";
 export * from "@/core/Tag";
+export * from "@/core/TagComparator";
 export * from "@/core/Datapack";
 export * from "@/core/Version";
 
