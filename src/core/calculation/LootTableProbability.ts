@@ -1,4 +1,4 @@
-import type { LootGroup, LootItem, LootTableProps, PoolData } from "@/core/schema/loot/types";
+import type { LootGroup, LootItem, LootTableProps } from "@/core/schema/loot/types";
 
 export interface ProbabilityResult {
     itemId: string;
@@ -15,133 +15,95 @@ export interface ProbabilityOptions {
     excludeConditionTypes?: string[];
 }
 
+type PoolEntry = { item?: LootItem; group?: LootGroup; itemIndex?: number };
+
 export class LootTableProbabilityCalculator {
-    private lootTable: LootTableProps;
     private itemMap: Map<string, LootItem & { index: number }>;
     private groupMap: Map<string, LootGroup>;
-    private poolMap: Map<number, PoolData>;
+    private itemsInGroups: Set<string>;
+    private childGroups: Set<string>;
 
-    constructor(lootTable: LootTableProps) {
-        this.lootTable = lootTable;
+    constructor(private lootTable: LootTableProps) {
         this.itemMap = new Map(lootTable.items.map((item, index) => [item.id, { ...item, index }]));
         this.groupMap = new Map(lootTable.groups.map((group) => [group.id, group]));
-        this.poolMap = new Map((lootTable.pools || []).map((pool) => [pool.poolIndex, pool]));
+        this.itemsInGroups = new Set(lootTable.groups.flatMap((g) => g.items));
+        this.childGroups = new Set(lootTable.groups.flatMap((g) => g.items).filter((id) => this.groupMap.has(id)));
     }
 
-    public calculateProbabilities(options: ProbabilityOptions = {}): ProbabilityResult[] {
+    calculateProbabilities(options: ProbabilityOptions = {}): ProbabilityResult[] {
         const { luck = 0, excludedItemIds = [], excludeConditionTypes = [] } = options;
-        const results: ProbabilityResult[] = [];
+        const poolItems = this.groupItemsByPool();
 
-        // Group items and groups by pool
-        const poolItems = new Map<number, Array<{ item?: LootItem; group?: LootGroup; itemIndex?: number }>>();
+        return Array.from(poolItems.entries()).flatMap(([, entries]) =>
+            this.calculatePoolProbabilities(entries, luck, excludedItemIds, excludeConditionTypes)
+        );
+    }
 
-        // Add standalone items (not in groups)
-        const itemsInGroups = new Set(this.lootTable.groups.flatMap((g) => g.items));
-
-        for (const [itemIndex, item] of this.lootTable.items.entries()) {
-            if (!itemsInGroups.has(item.id)) {
-                if (!poolItems.has(item.poolIndex)) {
-                    poolItems.set(item.poolIndex, []);
-                }
-                const poolEntries = poolItems.get(item.poolIndex);
-                if (poolEntries) {
-                    poolEntries.push({ item, itemIndex });
-                }
+    private groupItemsByPool(): Map<number, PoolEntry[]> {
+        const poolItems = new Map<number, PoolEntry[]>();
+        for (const [index, item] of this.lootTable.items.entries()) {
+            if (!this.itemsInGroups.has(item.id)) {
+                this.addToPool(poolItems, item.poolIndex, { item, itemIndex: index });
             }
         }
-
-        // Add groups
-        const childGroups = new Set(this.lootTable.groups.flatMap((g) => g.items).filter((id) => this.groupMap.has(id)));
 
         for (const group of this.lootTable.groups) {
-            if (!childGroups.has(group.id)) {
-                if (!poolItems.has(group.poolIndex)) {
-                    poolItems.set(group.poolIndex, []);
-                }
-                const poolEntries = poolItems.get(group.poolIndex);
-                if (poolEntries) {
-                    poolEntries.push({ group });
-                }
+            if (!this.childGroups.has(group.id)) {
+                this.addToPool(poolItems, group.poolIndex, { group });
             }
         }
 
-        // Calculate probabilities for each pool
-        for (const [poolIndex, entries] of poolItems) {
-            const poolData = this.poolMap.get(poolIndex);
-            const poolResults = this.calculatePoolProbabilities(entries, poolData, luck, excludedItemIds, excludeConditionTypes);
-            results.push(...poolResults);
-        }
+        return poolItems;
+    }
 
-        return results;
+    private addToPool(poolItems: Map<number, PoolEntry[]>, poolIndex: number, entry: PoolEntry): void {
+        poolItems.set(poolIndex, [...(poolItems.get(poolIndex) ?? []), entry]);
     }
 
     private calculatePoolProbabilities(
-        entries: Array<{ item?: LootItem; group?: LootGroup; itemIndex?: number }>,
-        poolData: PoolData | undefined,
+        entries: PoolEntry[],
         luck: number,
         excludedItemIds: string[],
         excludeConditionTypes: string[]
     ): ProbabilityResult[] {
-        const results: ProbabilityResult[] = [];
+        const validEntries = entries.filter((entry) => this.isValidEntry(entry, excludedItemIds, excludeConditionTypes));
+        if (!validEntries.length) return [];
 
-        // Filter out excluded entries and those with excluded conditions
-        const validEntries = entries.filter((entry) => {
-            if (entry.item) {
-                if (excludedItemIds.includes(entry.item.id)) return false;
-                if (this.hasExcludedCondition(entry.item.conditions, excludeConditionTypes)) return false;
-            }
-            if (entry.group) {
-                if (this.hasExcludedCondition(entry.group.conditions, excludeConditionTypes)) return false;
-            }
-            return true;
-        });
+        const weights = validEntries.map((entry) => this.calculateWeight(entry, luck));
+        const totalWeight = weights.reduce((sum, weight) => sum + weight, 0);
 
-        // Calculate total weight with luck adjustment
-        let totalWeight = 0;
-        const weights: number[] = [];
+        if (totalWeight === 0) return [];
 
-        for (const entry of validEntries) {
-            let weight = 1;
-            let quality = 0;
-
-            if (entry.item) {
-                weight = entry.item.weight || 1;
-                quality = entry.item.quality || 0;
-            }
-
-            const adjustedWeight = Math.floor(weight + quality * luck);
-            weights.push(adjustedWeight);
-            totalWeight += adjustedWeight;
-        }
-
-        if (totalWeight === 0) return results;
-
-        // Calculate probabilities
-        for (const [index, entry] of validEntries.entries()) {
+        return validEntries.flatMap((entry, index) => {
             const probability = weights[index] / totalWeight;
+            return this.processEntry(entry, probability, luck, excludedItemIds, excludeConditionTypes);
+        });
+    }
 
-            if (entry.item && entry.itemIndex !== undefined) {
-                results.push({
-                    itemId: entry.item.id,
-                    itemIndex: entry.itemIndex,
-                    poolIndex: entry.item.poolIndex,
-                    probability,
-                    name: entry.item.name,
-                    entryType: entry.item.entryType
-                });
-            } else if (entry.group) {
-                const groupResults = this.calculateGroupProbabilities(
-                    entry.group,
-                    probability,
-                    luck,
-                    excludedItemIds,
-                    excludeConditionTypes
-                );
-                results.push(...groupResults);
-            }
+    private isValidEntry(entry: PoolEntry, excludedItemIds: string[], excludeConditionTypes: string[]): boolean {
+        if (entry.item?.id && excludedItemIds.includes(entry.item.id)) return false;
+        return !this.hasExcludedCondition(entry.item?.conditions ?? entry.group?.conditions ?? [], excludeConditionTypes);
+    }
+
+    private calculateWeight(entry: PoolEntry, luck: number): number {
+        const weight = entry.item?.weight ?? 1;
+        const quality = entry.item?.quality ?? 0;
+        return Math.floor(weight + quality * luck);
+    }
+
+    private processEntry(
+        entry: PoolEntry,
+        probability: number,
+        luck: number,
+        excludedItemIds: string[],
+        excludeConditionTypes: string[]
+    ): ProbabilityResult[] {
+        if (entry.item && entry.itemIndex !== undefined) {
+            const { id, poolIndex, name, entryType } = entry.item;
+            return [{ itemId: id, itemIndex: entry.itemIndex, poolIndex, probability, name, entryType }];
         }
 
-        return results;
+        return entry.group ? this.calculateGroupProbabilities(entry.group, probability, luck, excludedItemIds, excludeConditionTypes) : [];
     }
 
     private calculateGroupProbabilities(
@@ -151,129 +113,81 @@ export class LootTableProbabilityCalculator {
         excludedItemIds: string[],
         excludeConditionTypes: string[]
     ): ProbabilityResult[] {
-        const results: ProbabilityResult[] = [];
+        const validItems = group.items.filter((itemId) => this.isValidItem(itemId, excludedItemIds, excludeConditionTypes));
+        if (!validItems.length) return [];
 
-        if (group.type === "alternatives") {
-            // For alternatives, only one item is chosen
-            const validItems = group.items.filter((itemId) => {
-                if (excludedItemIds.includes(itemId)) return false;
-                const item = this.itemMap.get(itemId);
-                const nestedGroup = this.groupMap.get(itemId);
-
-                if (item && this.hasExcludedCondition(item.conditions, excludeConditionTypes)) return false;
-                if (nestedGroup && this.hasExcludedCondition(nestedGroup.conditions, excludeConditionTypes)) return false;
-
-                return true;
-            });
-
-            let totalWeight = 0;
-            const weights: number[] = [];
-
-            for (const itemId of validItems) {
-                let weight = 1;
-                let quality = 0;
-
-                const item = this.itemMap.get(itemId);
-                if (item) {
-                    weight = item.weight || 1;
-                    quality = item.quality || 0;
-                }
-
-                const adjustedWeight = Math.floor(weight + quality * luck);
-                weights.push(adjustedWeight);
-                totalWeight += adjustedWeight;
-            }
-
-            if (totalWeight > 0) {
-                for (const [index, itemId] of validItems.entries()) {
-                    const itemProbability = (weights[index] / totalWeight) * groupProbability;
-
-                    const item = this.itemMap.get(itemId);
-                    const nestedGroup = this.groupMap.get(itemId);
-
-                    if (item) {
-                        const itemIndex = this.lootTable.items.findIndex((i) => i.id === itemId);
-                        results.push({
-                            itemId: item.id,
-                            itemIndex,
-                            poolIndex: item.poolIndex,
-                            probability: itemProbability,
-                            name: item.name,
-                            entryType: item.entryType
-                        });
-                    } else if (nestedGroup) {
-                        const nestedResults = this.calculateGroupProbabilities(
-                            nestedGroup,
-                            itemProbability,
-                            luck,
-                            excludedItemIds,
-                            excludeConditionTypes
-                        );
-                        results.push(...nestedResults);
-                    }
-                }
-            }
-        } else if (group.type === "group" || group.type === "sequence") {
-            // For group/sequence, all valid items are chosen
-            for (const itemId of group.items) {
-                if (excludedItemIds.includes(itemId)) continue;
-
-                const item = this.itemMap.get(itemId);
-                const nestedGroup = this.groupMap.get(itemId);
-
-                if (item) {
-                    if (this.hasExcludedCondition(item.conditions, excludeConditionTypes)) continue;
-
-                    const itemIndex = this.lootTable.items.findIndex((i) => i.id === itemId);
-                    results.push({
-                        itemId: item.id,
-                        itemIndex,
-                        poolIndex: item.poolIndex,
-                        probability: groupProbability,
-                        name: item.name,
-                        entryType: item.entryType
-                    });
-                } else if (nestedGroup) {
-                    if (this.hasExcludedCondition(nestedGroup.conditions, excludeConditionTypes)) continue;
-
-                    const nestedResults = this.calculateGroupProbabilities(
-                        nestedGroup,
-                        groupProbability,
-                        luck,
-                        excludedItemIds,
-                        excludeConditionTypes
-                    );
-                    results.push(...nestedResults);
-                }
-            }
-        }
-
-        return results;
+        return group.type === "alternatives"
+            ? this.processAlternatives(validItems, groupProbability, luck, excludedItemIds, excludeConditionTypes)
+            : this.processGroupSequence(validItems, groupProbability, luck, excludedItemIds, excludeConditionTypes);
     }
 
-    private hasExcludedCondition(conditions: any[] | undefined, excludeConditionTypes: string[]): boolean {
-        if (!conditions || excludeConditionTypes.length === 0) return false;
+    private isValidItem(itemId: string, excludedItemIds: string[], excludeConditionTypes: string[]): boolean {
+        if (excludedItemIds.includes(itemId)) return false;
 
-        return conditions.some((condition) => {
-            if (typeof condition === "object" && condition.condition) {
-                return excludeConditionTypes.includes(condition.condition);
-            }
-            if (typeof condition === "string") {
-                return excludeConditionTypes.includes(condition);
-            }
-            return false;
+        const item = this.itemMap.get(itemId);
+        const nestedGroup = this.groupMap.get(itemId);
+
+        return !this.hasExcludedCondition(item?.conditions ?? nestedGroup?.conditions ?? [], excludeConditionTypes);
+    }
+
+    private processAlternatives(
+        validItems: string[],
+        groupProbability: number,
+        luck: number,
+        excludedItemIds: string[],
+        excludeConditionTypes: string[]
+    ): ProbabilityResult[] {
+        const weights = validItems.map((itemId) => {
+            const item = this.itemMap.get(itemId);
+            return this.calculateWeight({ item }, luck);
+        });
+
+        const totalWeight = weights.reduce((sum, weight) => sum + weight, 0);
+        if (totalWeight === 0) return [];
+
+        return validItems.flatMap((itemId, index) => {
+            const probability = (weights[index] / totalWeight) * groupProbability;
+            return this.processItemOrGroup(itemId, probability, luck, excludedItemIds, excludeConditionTypes);
         });
     }
 
-    public getItemById(itemId: string): LootItem | undefined {
-        return this.itemMap.get(itemId);
+    private processGroupSequence(
+        validItems: string[],
+        groupProbability: number,
+        luck: number,
+        excludedItemIds: string[],
+        excludeConditionTypes: string[]
+    ): ProbabilityResult[] {
+        return validItems.flatMap((itemId) =>
+            this.processItemOrGroup(itemId, groupProbability, luck, excludedItemIds, excludeConditionTypes)
+        );
     }
 
-    public getItemByIndex(index: number): LootItem | undefined {
-        return this.lootTable.items[index];
+    private processItemOrGroup(
+        itemId: string,
+        probability: number,
+        luck: number,
+        excludedItemIds: string[],
+        excludeConditionTypes: string[]
+    ): ProbabilityResult[] {
+        const item = this.itemMap.get(itemId);
+        const itemIndex = this.lootTable.items.findIndex((i) => i.id === itemId);
+        if (item) {
+            return [{ itemId: item.id, itemIndex, poolIndex: item.poolIndex, probability, name: item.name, entryType: item.entryType }];
+        }
+
+        const nestedGroup = this.groupMap.get(itemId);
+        return nestedGroup ? this.calculateGroupProbabilities(nestedGroup, probability, luck, excludedItemIds, excludeConditionTypes) : [];
     }
 
-    public getGroupById(groupId: string): LootGroup | undefined {
-        return this.groupMap.get(groupId);
+    private hasExcludedCondition(conditions: any[], excludeConditionTypes: string[]): boolean {
+        return conditions.some((condition) => {
+            const conditionType = typeof condition === "object" ? condition.condition : condition;
+            return typeof conditionType === "string" && excludeConditionTypes.includes(conditionType);
+        });
     }
+
+    getItemById = (itemId: string) => this.itemMap.get(itemId);
+    getItemByIndex = (index: number) => this.lootTable.items[index];
+    getGroupById = (groupId: string) => this.groupMap.get(groupId);
 }
