@@ -133,11 +133,18 @@ export class Datapack {
     /**
      * Get the registry of the datapack. Find all jsons for a registry.
      * @param registry - The registry of the datapack.
+     * @param path - Optional path filter for resources.
+     * @param excludeNamespaces - Optional array of namespaces to exclude.
      * @returns The registry of the datapack.
      * @example
      * getRegistry("enchantment") // Returns all the enchantments of the datapack like Fire Aspect, Looting, etc.
+     * getRegistry("enchantment", "combat/", ["minecraft"]) // Returns combat enchantments excluding minecraft namespace
      */
-    getRegistry<T extends DataDrivenElement>(registry: string | undefined): DataDrivenRegistryElement<T>[] {
+    getRegistry<T extends DataDrivenElement>(
+        registry: string | undefined,
+        path?: string,
+        excludeNamespaces?: string[]
+    ): DataDrivenRegistryElement<T>[] {
         const registries: DataDrivenRegistryElement<T>[] = [];
         if (!registry) return registries;
 
@@ -154,6 +161,9 @@ export class Datapack {
 
             const resource = compressedPath.slice(registry.length + 1);
             if (!resource || !namespace || !registry) continue;
+
+            if (path && !resource.startsWith(path)) continue;
+            if (excludeNamespaces && excludeNamespaces.length > 0 && excludeNamespaces.includes(namespace)) continue;
 
             registries.push({
                 identifier: { namespace, registry, resource },
