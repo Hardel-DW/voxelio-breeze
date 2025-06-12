@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import Tags, { tagsToIdentifiers, isTag, mergeTags, createTagFromElement, isRegistryTag } from "@/core/Tag";
+import { Tags, tagsToIdentifiers, isTag, mergeTags, createTagFromElement, isRegistryTag } from "@/core/Tag";
 import type { DataDrivenRegistryElement } from "@/core/Element";
 import type { Compiler } from "@/core/engine/Compiler";
 import type { TagType } from "@/schema/TagType";

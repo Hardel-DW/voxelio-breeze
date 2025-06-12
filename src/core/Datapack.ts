@@ -1,7 +1,7 @@
 import { DatapackError } from "@/core/DatapackError";
 import type { DataDrivenElement, DataDrivenRegistryElement, LabeledElement } from "@/core/Element";
 import { Identifier, type IdentifierObject } from "@/core/Identifier";
-import Tags, { createTagFromElement, mergeDataDrivenRegistryElement } from "@/core/Tag";
+import { Tags, createTagFromElement, mergeDataDrivenRegistryElement } from "@/core/Tag";
 import { getMinecraftVersion } from "@/core/Version";
 import type { Analysers, GetAnalyserMinecraft } from "@/core/engine/Analyser";
 import type { Compiler } from "@/core/engine/Compiler";

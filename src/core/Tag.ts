@@ -8,7 +8,7 @@ import type { TagType } from "@/schema/TagType";
  * Represents a Minecraft tag system that can contain multiple values.
  * Tags are used to group blocks, items, entities, or functions together.
  */
-export default class Tags {
+export class Tags {
     /**
      * Creates a new Tags instance
      * @param tags The tag data containing values and optional replace property
