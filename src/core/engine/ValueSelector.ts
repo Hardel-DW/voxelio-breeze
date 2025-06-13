@@ -8,6 +8,11 @@ export class ValueSelector {
     private currentCondition: ((el: Record<string, unknown>) => boolean) | null = null;
     private hasFinalElse = false;
     private usedFields: Set<string> = new Set();
+    private element?: Record<string, unknown>;
+
+    constructor(element?: Record<string, unknown>) {
+        this.element = element;
+    }
 
     if(cond: (el: Record<string, unknown>) => boolean) {
         this.currentCondition = cond;
@@ -46,7 +51,14 @@ export class ValueSelector {
         return this;
     }
 
-    get(element: Record<string, unknown>) {
+    get(): any;
+    get(element: Record<string, unknown>): any;
+    get(element?: Record<string, unknown>) {
+        const targetElement = element || this.element;
+        if (!targetElement) {
+            throw new Error("No element provided to ValueSelector");
+        }
+
         if (this.currentCondition && this.hasFinalElse) {
             this.cases.push({
                 condition: this.currentCondition,
@@ -55,7 +67,7 @@ export class ValueSelector {
             this.currentCondition = null;
         }
         for (const c of this.cases) {
-            if (c.condition(element)) return c.getValue(element);
+            if (c.condition(targetElement)) return c.getValue(targetElement);
         }
         throw new Error("No matching case in ValueSelector");
     }
