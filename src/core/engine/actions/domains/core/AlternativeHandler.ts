@@ -1,5 +1,4 @@
-import { checkCondition } from "../../../condition";
-import type { Condition } from "../../../condition/types";
+import type { Condition } from "@/core/engine/Condition";
 import type { ActionRegistry } from "../../registry";
 import type { ActionHandler } from "../../types";
 import type { CoreAction } from "./types";
@@ -12,7 +11,7 @@ export class AlternativeHandler implements ActionHandler<CoreAction> {
         element: Record<string, unknown>,
         version?: number
     ): Promise<Record<string, unknown> | undefined> {
-        const conditionResult = this.evaluateCondition(action.condition, element);
+        const conditionResult = this.evaluateCondition(action.condition);
         if (conditionResult) {
             return await this.registry.execute(action.ifTrue, element, version);
         }
@@ -24,15 +23,8 @@ export class AlternativeHandler implements ActionHandler<CoreAction> {
         return element;
     }
 
-    private evaluateCondition(condition: boolean | Condition, element: Record<string, unknown>): boolean {
-        if (typeof condition === "boolean") {
-            return condition;
-        }
-
-        if (condition && typeof condition === "object" && "condition" in condition) {
-            return checkCondition(condition as Condition, element);
-        }
-
-        return Boolean(condition);
+    private evaluateCondition(condition: boolean | Condition): boolean {
+        if (typeof condition === "boolean") return condition;
+        return condition.result();
     }
 }

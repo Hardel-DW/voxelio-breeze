@@ -2,6 +2,7 @@ import { updateData } from "@/core/engine/actions";
 import type { CoreAction } from "@/core/engine/actions/domains/core/types";
 import { describe, expect, it, beforeEach } from "vitest";
 import { createComplexMockElement, createMockEnchantmentElement } from "@test/template/concept/enchant/VoxelDriven";
+import { Condition } from "@/index";
 
 describe("Action System", () => {
     let mockElement: ReturnType<typeof createMockEnchantmentElement>;
@@ -186,10 +187,7 @@ describe("Action System", () => {
 
             const action: CoreAction = {
                 type: "core.alternative",
-                condition: {
-                    condition: "if_field_is_undefined",
-                    field: "weight"
-                },
+                condition: new Condition(element.data).isUndefined("weight").result(),
                 ifTrue: {
                     type: "core.set_value",
                     path: "weight",
@@ -217,11 +215,7 @@ describe("Action System", () => {
 
             const action: CoreAction = {
                 type: "core.alternative",
-                condition: {
-                    condition: "compare_value_to_field_value",
-                    field: "minCostBase",
-                    value: "maxCostBase"
-                },
+                condition: new Condition(element.data).equalsFieldValue("minCostBase", "maxCostBase").result(),
                 ifTrue: {
                     type: "core.set_value",
                     path: "balanced",
@@ -249,21 +243,10 @@ describe("Action System", () => {
 
             const action: CoreAction = {
                 type: "core.alternative",
-                condition: {
-                    condition: "all_of",
-                    terms: [
-                        {
-                            condition: "compare_to_value",
-                            compare: "weight",
-                            value: 10
-                        },
-                        {
-                            condition: "compare_to_value",
-                            compare: "mode",
-                            value: "normal"
-                        }
-                    ]
-                },
+                condition: new Condition(element.data)
+                    .equals("weight", 10)
+                    .allOf((c) => c.equals("mode", "normal"))
+                    .result(),
                 ifTrue: {
                     type: "core.set_value",
                     path: "weight",
@@ -291,21 +274,10 @@ describe("Action System", () => {
 
             const action: CoreAction = {
                 type: "core.alternative",
-                condition: {
-                    condition: "any_of",
-                    terms: [
-                        {
-                            condition: "compare_to_value",
-                            compare: "weight",
-                            value: "10"
-                        },
-                        {
-                            condition: "compare_to_value",
-                            compare: "mode",
-                            value: "only_creative"
-                        }
-                    ]
-                },
+                condition: new Condition(element.data)
+                    .equals("weight", "10")
+                    .anyOf((c) => c.equals("mode", "only_creative"))
+                    .result(),
                 ifTrue: {
                     type: "core.set_value",
                     path: "mode",
@@ -332,14 +304,7 @@ describe("Action System", () => {
 
             const action: CoreAction = {
                 type: "core.alternative",
-                condition: {
-                    condition: "inverted",
-                    terms: {
-                        condition: "compare_to_value",
-                        compare: "mode",
-                        value: "only_creative"
-                    }
-                },
+                condition: new Condition(element.data).not((c) => c.equals("mode", "only_creative").result()).result(),
                 ifTrue: {
                     type: "core.set_value",
                     path: "notCreative",
@@ -366,11 +331,7 @@ describe("Action System", () => {
 
             const action: CoreAction = {
                 type: "core.alternative",
-                condition: {
-                    condition: "contains",
-                    field: "tags",
-                    values: ["minecraft:curse"]
-                },
+                condition: new Condition(element.data).contains("tags", ["minecraft:curse"]).result(),
                 ifTrue: {
                     type: "core.set_value",
                     path: "isCurse",

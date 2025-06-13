@@ -1,4 +1,4 @@
-import type { Condition } from "@/core/engine/condition/types";
+import type { Condition } from "@/core/engine/Condition";
 import { type AllExpectedHandlerKeys, type ValidateHandlerRegistry, createHandlers } from "../../types";
 
 export interface CoreActions {
