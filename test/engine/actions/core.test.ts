@@ -2,7 +2,6 @@ import { updateData } from "@/core/engine/actions";
 import type { CoreAction } from "@/core/engine/actions/domains/core/types";
 import { describe, expect, it, beforeEach } from "vitest";
 import { createComplexMockElement, createMockEnchantmentElement } from "@test/template/concept/enchant/VoxelDriven";
-import { Condition } from "@/index";
 
 describe("Action System", () => {
     let mockElement: ReturnType<typeof createMockEnchantmentElement>;
@@ -187,7 +186,7 @@ describe("Action System", () => {
 
             const action: CoreAction = {
                 type: "core.alternative",
-                condition: new Condition(element.data).isUndefined("weight").result(),
+                condition: element.data.weight === undefined,
                 ifTrue: {
                     type: "core.set_value",
                     path: "weight",
@@ -215,7 +214,7 @@ describe("Action System", () => {
 
             const action: CoreAction = {
                 type: "core.alternative",
-                condition: new Condition(element.data).equalsFieldValue("minCostBase", "maxCostBase").result(),
+                condition: element.data.minCostBase === element.data.maxCostBase,
                 ifTrue: {
                     type: "core.set_value",
                     path: "balanced",
@@ -243,10 +242,7 @@ describe("Action System", () => {
 
             const action: CoreAction = {
                 type: "core.alternative",
-                condition: new Condition(element.data)
-                    .equals("weight", 10)
-                    .allOf((c) => c.equals("mode", "normal"))
-                    .result(),
+                condition: element.data.weight === 10 && element.data.mode === "normal",
                 ifTrue: {
                     type: "core.set_value",
                     path: "weight",
@@ -274,10 +270,7 @@ describe("Action System", () => {
 
             const action: CoreAction = {
                 type: "core.alternative",
-                condition: new Condition(element.data)
-                    .equals("weight", "10")
-                    .anyOf((c) => c.equals("mode", "only_creative"))
-                    .result(),
+                condition: element.data.weight === 10 || element.data.mode === "only_creative",
                 ifTrue: {
                     type: "core.set_value",
                     path: "mode",
@@ -292,7 +285,7 @@ describe("Action System", () => {
 
             const result = await updateData(action, element.data, 48);
             expect(result).toBeDefined();
-            expect(result?.mode).toBe("normal"); // Au moins une condition vraie (mode=only_creative)
+            expect(result?.mode).toBe("normal");
             expect(element.data.mode).toBe("only_creative");
             expect(result).not.toBe(element.data);
         });
@@ -304,7 +297,7 @@ describe("Action System", () => {
 
             const action: CoreAction = {
                 type: "core.alternative",
-                condition: new Condition(element.data).not((c) => c.equals("mode", "only_creative").result()).result(),
+                condition: element.data.mode !== "only_creative",
                 ifTrue: {
                     type: "core.set_value",
                     path: "notCreative",
@@ -331,7 +324,7 @@ describe("Action System", () => {
 
             const action: CoreAction = {
                 type: "core.alternative",
-                condition: new Condition(element.data).contains("tags", ["minecraft:curse"]).result(),
+                condition: element.data.tags.includes("minecraft:curse"),
                 ifTrue: {
                     type: "core.set_value",
                     path: "isCurse",

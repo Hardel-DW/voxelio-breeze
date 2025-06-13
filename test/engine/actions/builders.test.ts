@@ -1,7 +1,6 @@
 import { updateData } from "@/core/engine/actions";
 import { Actions, LootTableActionBuilder, RecipeActionBuilder } from "@/core/engine/actions/builders";
 import type { CoreAction } from "@/core/engine/actions/domains/core/types";
-import { Condition } from "@/core/engine/Condition";
 import { describe, it, expect } from "vitest";
 
 describe("Action Builders", () => {
@@ -191,13 +190,10 @@ describe("Action Builders", () => {
 
         it("should work with Condition objects", () => {
             const element = { test: undefined };
-            const condition = new Condition(element).isUndefined("test");
-
-            const action = new Actions().alternative(condition).ifTrue(new Actions().setValue("result", "was_undefined"));
-
+            const action = new Actions().alternative(element.test === undefined).ifTrue(new Actions().setValue("result", "was_undefined"));
             const built = action.build();
 
-            expect(built.condition).toBe(condition);
+            expect(built.condition).toBe(true);
             expect(built.ifTrue).toEqual({
                 type: "core.set_value",
                 path: "result",
