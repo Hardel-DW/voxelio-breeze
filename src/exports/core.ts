@@ -14,6 +14,7 @@ export * from "@/core/DatapackError";
 export * from "@/core/engine/actions/index";
 export * from "@/core/engine/actions/utils";
 export * from "@/core/engine/actions/types";
+export * from "@/core/engine/actions/builders";
 
 export * from "@/core/engine/Condition";
 export * from "@/core/engine/ValueSelector";
