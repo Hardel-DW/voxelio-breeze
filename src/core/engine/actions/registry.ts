@@ -32,8 +32,23 @@ export class ActionRegistry {
     private async ensureDomainLoaded(domain: string): Promise<void> {
         if (loadedDomains.has(domain)) return;
 
+        // Mapping explicite des domains pour éviter les imports dynamiques
+        const domainMap: Record<string, () => Promise<DomainModule>> = {
+            core: () => import("./domains/core"),
+            loot_table: () => import("./domains/loot_table"),
+            recipe: () => import("./domains/recipe"),
+            structure: () => import("./domains/structure"),
+            structure_set: () => import("./domains/structure_set"),
+            enchantment: () => import("./domains/enchantment")
+        };
+
+        const domainLoader = domainMap[domain];
+        if (!domainLoader) {
+            throw new Error(`Unknown domain: ${domain}`);
+        }
+
         try {
-            const domainModule: DomainModule = await import(`./domains/${domain}`);
+            const domainModule: DomainModule = await domainLoader();
             if (!domainModule.default) {
                 throw new Error(`Domain ${domain} must export a default register function`);
             }
