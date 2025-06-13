@@ -132,5 +132,3 @@ class SetJigsawConfigBuilder extends ActionBuilder<Extract<StructureAction, { ty
         };
     }
 }
-
-export const structure = new StructureActionBuilder();

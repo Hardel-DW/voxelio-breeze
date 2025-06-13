@@ -5,7 +5,7 @@ import { ActionBuilder } from "./ActionBuilder";
 /**
  * Builder for core actions with fluent API
  */
-export class CoreActionBuilder extends ActionBuilder<CoreAction> {
+export class Actions extends ActionBuilder<CoreAction> {
     /**
      * Set a value at a specific path
      */
@@ -168,6 +168,3 @@ class AlternativeBuilder extends ActionBuilder<Extract<CoreAction, { type: "core
         return result;
     }
 }
-
-// Factory function for easier usage
-export const core = new CoreActionBuilder();

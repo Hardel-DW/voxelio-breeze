@@ -160,6 +160,3 @@ class ConvertRecipeTypeBuilder extends ActionBuilder<Extract<RecipeAction, { typ
         };
     }
 }
-
-// Factory function for easier usage
-export const recipe = new RecipeActionBuilder();

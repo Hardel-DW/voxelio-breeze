@@ -147,5 +147,3 @@ class ConfigurePlacementBuilder extends ActionBuilder<Extract<StructureSetAction
         };
     }
 }
-
-export const structureSet = new StructureSetActionBuilder();

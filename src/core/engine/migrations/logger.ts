@@ -1,4 +1,5 @@
 import { updateData } from "../actions";
+import { Actions } from "../actions/builders";
 import { deepDiff, normalizeValue } from "./differ";
 import type { ChangeSet, DatapackInfo, LogsStructure } from "./types";
 
@@ -43,15 +44,7 @@ export class Logger {
             if (!element) continue;
 
             for (const difference of change.differences) {
-                const result = await updateData(
-                    {
-                        type: "core.set_value",
-                        path: difference.path,
-                        value: difference.value
-                    },
-                    element,
-                    version
-                );
+                const result = await updateData(new Actions().setValue(difference.path, difference.value).build(), element, version);
 
                 if (result) {
                     element = result as T;

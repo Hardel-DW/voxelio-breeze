@@ -28,5 +28,3 @@ class SetComputedSlotBuilder extends ActionBuilder<Extract<EnchantmentAction, { 
         };
     }
 }
-
-export const enchantment = new EnchantmentActionBuilder();

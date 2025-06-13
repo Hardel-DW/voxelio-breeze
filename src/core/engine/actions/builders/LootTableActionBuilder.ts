@@ -328,6 +328,3 @@ class BalanceWeightsBuilder extends ActionBuilder<Extract<LootTableAction, { typ
         };
     }
 }
-
-// Factory function for easier usage
-export const lootTable = new LootTableActionBuilder();

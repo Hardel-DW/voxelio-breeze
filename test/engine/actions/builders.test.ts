@@ -1,5 +1,5 @@
 import { updateData } from "@/core/engine/actions";
-import { core, lootTable, recipe } from "@/core/engine/actions/builders";
+import { Actions, LootTableActionBuilder, RecipeActionBuilder } from "@/core/engine/actions/builders";
 import type { CoreAction } from "@/core/engine/actions/domains/core/types";
 import { Condition } from "@/core/engine/Condition";
 import { describe, it, expect } from "vitest";
@@ -7,7 +7,7 @@ import { describe, it, expect } from "vitest";
 describe("Action Builders", () => {
     describe("Core Actions Builder", () => {
         it("should create setValue action", () => {
-            const built = core.setValue("test.path", 42).build();
+            const built = new Actions().setValue("test.path", 42).build();
 
             expect(built).toEqual({
                 type: "core.set_value",
@@ -17,7 +17,7 @@ describe("Action Builders", () => {
         });
 
         it("should create toggleValue action", () => {
-            const built = core.toggleValue("enabled", true).build();
+            const built = new Actions().toggleValue("enabled", true).build();
 
             expect(built).toEqual({
                 type: "core.toggle_value",
@@ -27,7 +27,7 @@ describe("Action Builders", () => {
         });
 
         it("should create sequential action", () => {
-            const built = core.sequential(core.setValue("a", 1), core.setValue("b", 2)).build();
+            const built = new Actions().sequential(new Actions().setValue("a", 1), new Actions().setValue("b", 2)).build();
 
             expect(built).toEqual({
                 type: "core.sequential",
@@ -40,10 +40,10 @@ describe("Action Builders", () => {
 
         it("should create alternative action with then/else", () => {
             const condition = true;
-            const built = core
+            const built = new Actions()
                 .alternative(condition)
-                .ifTrue(core.setValue("success", true))
-                .ifFalse(core.setValue("success", false))
+                .ifTrue(new Actions().setValue("success", true))
+                .ifFalse(new Actions().setValue("success", false))
                 .build();
 
             expect(built).toEqual({
@@ -56,7 +56,7 @@ describe("Action Builders", () => {
 
         it("should work with actual updateData", async () => {
             const element = { test: 0 };
-            const action = core.setValue("test", 42);
+            const action = new Actions().setValue("test", 42);
 
             const result = await updateData(action.build(), element, 48);
 
@@ -67,7 +67,7 @@ describe("Action Builders", () => {
 
     describe("LootTable Actions Builder", () => {
         it("should create addItem action with fluent API", () => {
-            const action = lootTable
+            const action = new LootTableActionBuilder()
                 .addItem(0)
                 .name("minecraft:diamond")
                 .weight(10)
@@ -91,7 +91,7 @@ describe("Action Builders", () => {
         });
 
         it("should create modifyItem action", () => {
-            const action = lootTable.modifyItem("item_1").weight(15);
+            const action = new LootTableActionBuilder().modifyItem("item_1").weight(15);
 
             const built = action.build();
 
@@ -104,7 +104,7 @@ describe("Action Builders", () => {
         });
 
         it("should create createGroup action", () => {
-            const action = lootTable.createGroup("alternatives", 0).items("item_1", "item_2").entryIndex(2);
+            const action = new LootTableActionBuilder().createGroup("alternatives", 0).items("item_1", "item_2").entryIndex(2);
 
             const built = action.build();
 
@@ -118,7 +118,7 @@ describe("Action Builders", () => {
         });
 
         it("should throw error when required fields missing", () => {
-            const action = lootTable.addItem(0); // No name set
+            const action = new LootTableActionBuilder().addItem(0); // No name set
 
             expect(() => action.build()).toThrow("Item name is required");
         });
@@ -126,7 +126,10 @@ describe("Action Builders", () => {
 
     describe("Recipe Actions Builder", () => {
         it("should create addIngredient action", () => {
-            const action = recipe.addIngredient("0").items("minecraft:iron_ingot", "minecraft:gold_ingot").replaceExisting();
+            const action = new RecipeActionBuilder()
+                .addIngredient("0")
+                .items("minecraft:iron_ingot", "minecraft:gold_ingot")
+                .replaceExisting();
 
             const built = action.build();
 
@@ -139,7 +142,7 @@ describe("Action Builders", () => {
         });
 
         it("should create swapSlots action", () => {
-            const action = recipe.swapSlots("0", "1");
+            const action = new RecipeActionBuilder().swapSlots("0", "1");
             const built = action.build();
 
             expect(built).toEqual({
@@ -150,7 +153,7 @@ describe("Action Builders", () => {
         });
 
         it("should create convertType action", () => {
-            const action = recipe.convertType("minecraft:smelting").clearIngredients();
+            const action = new RecipeActionBuilder().convertType("minecraft:smelting").clearIngredients();
 
             const built = action.build();
 
@@ -164,7 +167,7 @@ describe("Action Builders", () => {
 
     describe("JSON Compatibility", () => {
         it("should convert builder to JSON", () => {
-            const action = core.setValue("test", 123);
+            const action = new Actions().setValue("test", 123);
             const json = action.toJSON();
 
             expect(json).toEqual({
@@ -176,9 +179,8 @@ describe("Action Builders", () => {
 
         it("should accept JSON actions in sequential", () => {
             const jsonAction: CoreAction = { type: "core.set_value", path: "json", value: 1 };
-            const builderAction = core.setValue("builder", 2);
-
-            const sequential = core.sequential(jsonAction, builderAction);
+            const builderAction = new Actions().setValue("builder", 2);
+            const sequential = new Actions().sequential(jsonAction, builderAction);
             const built = sequential.build();
 
             expect(built.actions).toEqual([
@@ -191,7 +193,7 @@ describe("Action Builders", () => {
             const element = { test: undefined };
             const condition = new Condition(element).isUndefined("test");
 
-            const action = core.alternative(condition).ifTrue(core.setValue("result", "was_undefined"));
+            const action = new Actions().alternative(condition).ifTrue(new Actions().setValue("result", "was_undefined"));
 
             const built = action.build();
 
@@ -206,19 +208,19 @@ describe("Action Builders", () => {
 
     describe("Error Handling", () => {
         it("should throw error for incomplete alternative", () => {
-            const action = core.alternative(true); // No ifTrue() called
+            const action = new Actions().alternative(true); // No ifTrue() called
 
             expect(() => action.build()).toThrow("Alternative action requires an 'ifTrue' action");
         });
 
         it("should throw error for incomplete modify action", () => {
-            const action = lootTable.modifyItem("item_1"); // No property set
+            const action = new LootTableActionBuilder().modifyItem("item_1"); // No property set
 
             expect(() => action.build()).toThrow("Property and value must be set");
         });
 
         it("should throw error when calling build on base builder", () => {
-            expect(() => core.build()).toThrow("Use specific builder methods to create actions");
+            expect(() => new Actions().build()).toThrow("Use specific builder methods to create actions");
         });
     });
 });
