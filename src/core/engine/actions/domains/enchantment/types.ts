@@ -6,6 +6,12 @@ export interface EnchantmentActions {
         path: string;
         slot: SlotRegistryType;
     };
+    toggle_enchantment_to_exclusive_set: {
+        enchantment: string;
+    };
+    set_exclusive_set_with_tags: {
+        value: string;
+    };
 }
 
 export type EnchantmentAction = {
