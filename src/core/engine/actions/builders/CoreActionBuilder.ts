@@ -21,6 +21,20 @@ export class Actions extends ActionBuilder<CoreAction> {
     }
 
     /**
+     * Toggle a value in a list/array at a specific path
+     */
+    toggleValueInList(path: string, value: unknown): ToggleValueInListBuilder {
+        return new ToggleValueInListBuilder(path, value);
+    }
+
+    /**
+     * Toggle all values in a list/array at a specific path
+     */
+    toggleAllValuesInList(path: string, values: any[]): ToggleAllValuesInListBuilder {
+        return new ToggleAllValuesInListBuilder(path, values);
+    }
+
+    /**
      * Set a path to undefined
      */
     setUndefined(path: string): UndefinedBuilder {
@@ -83,6 +97,40 @@ class ToggleValueBuilder extends ActionBuilder<Extract<CoreAction, { type: "core
             type: "core.toggle_value" as const,
             path: this.path,
             value: this.value
+        };
+    }
+}
+
+class ToggleValueInListBuilder extends ActionBuilder<Extract<CoreAction, { type: "core.toggle_value_in_list" }>> {
+    constructor(
+        private path: string,
+        private value: unknown
+    ) {
+        super();
+    }
+
+    build() {
+        return {
+            type: "core.toggle_value_in_list" as const,
+            path: this.path,
+            value: this.value
+        };
+    }
+}
+
+class ToggleAllValuesInListBuilder extends ActionBuilder<Extract<CoreAction, { type: "core.toggle_all_values_in_list" }>> {
+    constructor(
+        private path: string,
+        private values: any[]
+    ) {
+        super();
+    }
+
+    build() {
+        return {
+            type: "core.toggle_all_values_in_list" as const,
+            path: this.path,
+            values: this.values
         };
     }
 }

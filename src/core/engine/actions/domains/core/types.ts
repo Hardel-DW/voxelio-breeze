@@ -10,6 +10,14 @@ export interface CoreActions {
         path: string;
         value: unknown;
     };
+    toggle_value_in_list: {
+        path: string;
+        value: unknown;
+    };
+    toggle_all_values_in_list: {
+        path: string;
+        values: any[];
+    };
     set_undefined: {
         path: string;
     };
