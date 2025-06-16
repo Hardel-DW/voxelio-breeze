@@ -20,8 +20,17 @@ class ToggleEnchantmentToExclusiveSetHandler implements ActionHandler<Enchantmen
         element: Record<string, unknown>
     ) {
         const props = { ...element } as EnchantmentProps;
-        if (typeof props.exclusiveSet === "string" && props.exclusiveSet.startsWith("#")) {
-            props.tags = props.tags.filter((tag) => tag !== props.exclusiveSet);
+        if (typeof props.exclusiveSet === "string") {
+            if (props.exclusiveSet.startsWith("#")) {
+                props.tags = props.tags.filter((tag) => tag !== props.exclusiveSet);
+                props.exclusiveSet = [action.enchantment];
+            } else {
+                if (props.exclusiveSet === action.enchantment) {
+                    props.exclusiveSet = undefined;
+                } else {
+                    props.exclusiveSet = [props.exclusiveSet, action.enchantment];
+                }
+            }
         }
 
         const currentSet = Array.isArray(props.exclusiveSet) ? props.exclusiveSet : [];
