@@ -11,7 +11,7 @@
   },
   "homepage": "https://voxel.hardel.io",
   "license": "MIT",
-  "version": "1.2.7",
+  "version": "1.2.8",
   "type": "module",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
