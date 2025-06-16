@@ -27,7 +27,7 @@ export const VoxelToEnchantmentDataDriven: Compiler<EnchantmentProps, Enchantmen
     enchantment.anvil_cost = element.anvilCost;
     enchantment.supported_items = element.supportedItems;
     enchantment.slots = element.slots;
-    enchantment.effects = element.effects;
+    enchantment.effects = element.effects ? structuredClone(element.effects) : undefined;
 
     enchantment.min_cost = {
         base: element.minCostBase,
@@ -57,6 +57,10 @@ export const VoxelToEnchantmentDataDriven: Compiler<EnchantmentProps, Enchantmen
             const tagRegistry = `tags/${config}`;
             tags.push(Identifier.of(element.exclusiveSet, tagRegistry));
         }
+    }
+
+    if (Array.isArray(enchantment.exclusive_set) && enchantment.exclusive_set.length === 0) {
+        enchantment.exclusive_set = undefined;
     }
 
     if (element.disabledEffects.length > 0 && enchantment.effects) {
