@@ -35,7 +35,7 @@ class ToggleEnchantmentToExclusiveSetHandler implements ActionHandler<Enchantmen
 
 class SetExclusiveSetWithTagsHandler implements ActionHandler<EnchantmentAction> {
     execute(action: Extract<EnchantmentAction, { type: "enchantment.set_exclusive_set_with_tags" }>, element: Record<string, unknown>) {
-        const props = element as EnchantmentProps;
+        const props = { ...element } as EnchantmentProps;
         if (!action.value.startsWith("#")) {
             return props;
         }

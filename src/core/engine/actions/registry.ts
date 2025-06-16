@@ -1,9 +1,4 @@
 import register from "./domains/core";
-import enchantmentRegister from "./domains/enchantment";
-import lootTableRegister from "./domains/loot_table";
-import recipeRegister from "./domains/recipe";
-import structureRegister from "./domains/structure";
-import structureSetRegister from "./domains/structure_set";
 import type { Action, ActionHandler } from "./types";
 
 const loadedDomains = new Set<string>();
@@ -28,35 +23,6 @@ export class ActionRegistry {
 
     constructor() {
         register(this);
-
-        // Preload all domains to avoid dynamic import issues
-        const enchantmentHandlers = enchantmentRegister();
-        const lootTableHandlers = lootTableRegister();
-        const recipeHandlers = recipeRegister();
-        const structureHandlers = structureRegister();
-        const structureSetHandlers = structureSetRegister();
-
-        for (const [type, handler] of enchantmentHandlers) {
-            this.register(type, handler);
-        }
-        for (const [type, handler] of lootTableHandlers) {
-            this.register(type, handler);
-        }
-        for (const [type, handler] of recipeHandlers) {
-            this.register(type, handler);
-        }
-        for (const [type, handler] of structureHandlers) {
-            this.register(type, handler);
-        }
-        for (const [type, handler] of structureSetHandlers) {
-            this.register(type, handler);
-        }
-
-        loadedDomains.add("enchantment");
-        loadedDomains.add("loot_table");
-        loadedDomains.add("recipe");
-        loadedDomains.add("structure");
-        loadedDomains.add("structure_set");
     }
 
     register = (type: string, handler: ActionHandler) => {
