@@ -32,21 +32,6 @@ export function isVoxelElement<T extends keyof Analysers>(element: any): element
 }
 
 /**
- * Sorts voxel elements by identifier
- * @param elements - Map of voxel elements
- * @returns Sorted array of main identifiers
- */
-export function sortVoxelElements(elements: Map<string, VoxelElement>): string[] {
-    return Array.from(elements.entries())
-        .sort((a, b) => {
-            const resourceA = a[1].identifier.resource.split("/").pop() ?? "";
-            const resourceB = b[1].identifier.resource.split("/").pop() ?? "";
-            return resourceA.localeCompare(resourceB);
-        })
-        .map(([key]) => key);
-}
-
-/**
  * Get the identifier from a labeled element
  * @param comp - The labeled element
  * @returns The identifier
