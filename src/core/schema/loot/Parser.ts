@@ -10,7 +10,7 @@ export const LootDataDrivenToVoxelFormat: LootTableParser = ({
     element,
     configurator
 }: ParserParams<MinecraftLootTable>): LootTableProps => {
-    const data = element.data;
+    const data = structuredClone(element.data);
     const items: LootItem[] = [];
     const groups: LootGroup[] = [];
     let itemCounter = 0;

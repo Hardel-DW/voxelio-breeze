@@ -12,13 +12,14 @@ import { type EnchantmentProps, FUNCTIONALITY_TAGS_CACHE } from "./types";
  * @param original
  */
 export const VoxelToEnchantmentDataDriven: Compiler<EnchantmentProps, Enchantment> = (
-    element: EnchantmentProps,
+    originalElement: EnchantmentProps,
     config: keyof Analysers,
     original?: Enchantment
 ): {
     element: DataDrivenRegistryElement<Enchantment>;
     tags: IdentifierObject[];
 } => {
+    const element = structuredClone(originalElement);
     const enchantment = original ? structuredClone(original) : ({} as Enchantment);
     let tags: IdentifierObject[] = processElementTags(element.tags, config);
 
@@ -27,7 +28,7 @@ export const VoxelToEnchantmentDataDriven: Compiler<EnchantmentProps, Enchantmen
     enchantment.anvil_cost = element.anvilCost;
     enchantment.supported_items = element.supportedItems;
     enchantment.slots = element.slots;
-    enchantment.effects = element.effects ? structuredClone(element.effects) : undefined;
+    enchantment.effects = element.effects;
 
     enchantment.min_cost = {
         base: element.minCostBase,

@@ -15,10 +15,11 @@ import { denormalizeIngredient, getOccupiedSlots, slotToPosition } from "./types
  * Compile Voxel recipe format back to Minecraft Recipe format using slot-based system.
  */
 export const VoxelToRecipeDataDriven: RecipeCompiler = (
-    element: RecipeProps,
+    originalElement: RecipeProps,
     _: keyof Analysers,
     original?: MinecraftRecipe
 ): CompilerResult => {
+    const element = structuredClone(originalElement);
     const recipe = original ? structuredClone(original) : ({} as MinecraftRecipe);
 
     recipe.type = element.type;

@@ -16,10 +16,11 @@ import { CONCENTRIC_RINGS_TYPES, RANDOM_SPREAD_TYPES } from "./types";
  * Compile Voxel format back to Minecraft Structure Set
  */
 export const VoxelToStructureSetDataDriven: StructureSetCompiler = (
-    element: StructureSetProps,
+    originalElement: StructureSetProps,
     config: keyof Analysers,
     original?: MinecraftStructureSet
 ): CompilerResult => {
+    const element = structuredClone(originalElement);
     const structureSet = original ? structuredClone(original) : ({} as MinecraftStructureSet);
     const tags: IdentifierObject[] = processElementTags(element.tags, config);
 

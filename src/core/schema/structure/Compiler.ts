@@ -16,10 +16,11 @@ import { JIGSAW_STRUCTURE_TYPES } from "./types";
  * Compile Voxel format back to Minecraft Structure
  */
 export const VoxelToStructureDataDriven: StructureCompiler = (
-    element: StructureProps,
+    originalElement: StructureProps,
     config: keyof Analysers,
     original?: MinecraftStructure
 ): CompilerResult => {
+    const element = structuredClone(originalElement);
     const structure = original ? structuredClone(original) : ({} as MinecraftStructure);
     const tags: IdentifierObject[] = processElementTags(element.tags, config);
 

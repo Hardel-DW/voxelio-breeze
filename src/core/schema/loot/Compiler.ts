@@ -14,10 +14,11 @@ import { KNOWN_POOL_FIELDS } from "./types";
  * Compile Voxel format back to Minecraft LootTable - Ultra-simplified version
  */
 export const VoxelToLootDataDriven: LootTableCompiler = (
-    element: LootTableProps,
+    originalElement: LootTableProps,
     _: keyof Analysers,
     original?: MinecraftLootTable
 ): CompilerResult => {
+    const element = structuredClone(originalElement);
     const lootTable = original ? structuredClone(original) : {};
 
     const itemMap = new Map(element.items.map((item) => [item.id, item]));

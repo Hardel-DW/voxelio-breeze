@@ -17,7 +17,7 @@ import { KNOWN_RECIPE_FIELDS, normalizeIngredient, positionToSlot } from "./type
  * Parse Minecraft Recipe to simplified Voxel format with slot-based system.
  */
 export const RecipeDataDrivenToVoxelFormat: RecipeParser = ({ element, configurator }: ParserParams<MinecraftRecipe>): RecipeProps => {
-    const data = element.data;
+    const data = structuredClone(element.data);
     const slots: Record<string, string[]> = {};
     let gridSize: { width: number; height: number } | undefined;
     let typeSpecific: RecipeTypeSpecific | undefined;

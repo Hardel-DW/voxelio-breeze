@@ -11,7 +11,7 @@ export const StructureSetDataDrivenToVoxelFormat: StructureSetParser = ({
     tags = [],
     configurator
 }: ParserParams<MinecraftStructureSet>): StructureSetProps => {
-    const data = element.data;
+    const data = structuredClone(element.data);
     const placement = data.placement;
 
     const structures: StructureSetStructure[] = data.structures.map((struct) => ({

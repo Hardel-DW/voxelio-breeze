@@ -11,7 +11,7 @@ export const StructureDataDrivenToVoxelFormat: StructureParser = ({
     tags = [],
     configurator
 }: ParserParams<MinecraftStructure>): StructureProps => {
-    const data = element.data;
+    const data = structuredClone(element.data);
 
     const biomes = Array.isArray(data.biomes) ? data.biomes : [data.biomes];
 
