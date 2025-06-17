@@ -175,7 +175,7 @@ describe("Action System", () => {
             const result = await updateData(action, element.data, 48);
             expect(result).toBeDefined();
             expect(result?.minCostBase).toBe(10); // Pas de changement
-            expect(result).toBe(element.data); // Même objet retourné
+            expect(result).toStrictEqual(element.data); // Même objet retourné
         });
 
         it("should handle alternative with if_field_is_undefined condition", async () => {
