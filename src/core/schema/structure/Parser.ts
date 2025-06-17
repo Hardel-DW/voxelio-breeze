@@ -1,14 +1,13 @@
-import type { ParserParams } from "@/core/engine/Parser";
+import type { Parser, ParserParams } from "@/core/engine/Parser";
 import { extractUnknownFields } from "@/core/schema/utils";
-import type { DimensionPadding, MinecraftStructure, MobCategory, PoolAlias, SpawnOverride, StructureParser, StructureProps } from "./types";
+import type { DimensionPadding, MinecraftStructure, MobCategory, PoolAlias, SpawnOverride, StructureProps } from "./types";
 import { JIGSAW_STRUCTURE_TYPES, KNOWN_STRUCTURE_FIELDS } from "./types";
 
 /**
  * Parse Minecraft Structure to simplified Voxel format.
  */
-export const StructureDataDrivenToVoxelFormat: StructureParser = ({
+export const StructureDataDrivenToVoxelFormat: Parser<StructureProps, MinecraftStructure> = ({
     element,
-    tags = [],
     configurator
 }: ParserParams<MinecraftStructure>): StructureProps => {
     const data = structuredClone(element.data);
@@ -30,8 +29,7 @@ export const StructureDataDrivenToVoxelFormat: StructureParser = ({
         type: data.type,
         biomes,
         step: data.step,
-        override: configurator,
-        tags
+        override: configurator
     };
 
     if (spawnOverrides) {

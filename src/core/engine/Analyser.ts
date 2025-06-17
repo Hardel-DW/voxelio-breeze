@@ -73,7 +73,7 @@ export const analyserCollection: VersionedAnalysers = {
     "worldgen/structure": {
         compiler: VoxelToStructureDataDriven,
         parser: StructureDataDrivenToVoxelFormat,
-        hasTag: true
+        hasTag: false
     },
     "worldgen/structure_set": {
         compiler: VoxelToStructureSetDataDriven,

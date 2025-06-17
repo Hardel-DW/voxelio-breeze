@@ -2,24 +2,23 @@ import type { IdentifierObject } from "@/core/Identifier";
 import type { Analysers } from "@/core/engine/Analyser";
 import { processElementTags } from "@/core/schema/utils";
 import type {
-    CompilerResult,
     MinecraftExclusionZone,
     MinecraftStructurePlacement,
     MinecraftStructureSet,
     MinecraftStructureSetElement,
-    StructureSetCompiler,
     StructureSetProps
 } from "./types";
 import { CONCENTRIC_RINGS_TYPES, RANDOM_SPREAD_TYPES } from "./types";
+import type { Compiler } from "@/core/engine/Compiler";
 
 /**
  * Compile Voxel format back to Minecraft Structure Set
  */
-export const VoxelToStructureSetDataDriven: StructureSetCompiler = (
+export const VoxelToStructureSetDataDriven: Compiler<StructureSetProps, MinecraftStructureSet> = (
     originalElement: StructureSetProps,
     config: keyof Analysers,
     original?: MinecraftStructureSet
-): CompilerResult => {
+) => {
     const element = structuredClone(originalElement);
     const structureSet = original ? structuredClone(original) : ({} as MinecraftStructureSet);
     const tags: IdentifierObject[] = processElementTags(element.tags, config);

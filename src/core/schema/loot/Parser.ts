@@ -1,12 +1,12 @@
-import type { ParserParams } from "@/core/engine/Parser";
+import type { Parser, ParserParams } from "@/core/engine/Parser";
 import { extractUnknownFields } from "@/core/schema/utils";
-import type { LootGroup, LootItem, LootTableParser, LootTableProps, MinecraftLootEntry, MinecraftLootTable, PoolData } from "./types";
+import type { LootGroup, LootItem, LootTableProps, MinecraftLootEntry, MinecraftLootTable, PoolData } from "./types";
 import { KNOWN_ENTRY_FIELDS, KNOWN_POOL_FIELDS, KNOWN_TABLE_FIELDS } from "./types";
 
 /**
  * Parse Minecraft LootTable to simplified Voxel format.
  */
-export const LootDataDrivenToVoxelFormat: LootTableParser = ({
+export const LootDataDrivenToVoxelFormat: Parser<LootTableProps, MinecraftLootTable> = ({
     element,
     configurator
 }: ParserParams<MinecraftLootTable>): LootTableProps => {
@@ -32,11 +32,15 @@ export const LootDataDrivenToVoxelFormat: LootTableParser = ({
             ...(extractUnknownFields(pool, KNOWN_POOL_FIELDS) && { unknownFields: extractUnknownFields(pool, KNOWN_POOL_FIELDS) })
         })) || [];
 
+    // Determine if loot table should be disabled
+    const disabled = items.length === 0 && groups.length === 0 && (!data.pools || data.pools.length === 0);
+
     return {
         identifier: element.identifier,
         type: data.type,
         items,
         groups,
+        disabled,
         ...(data.random_sequence && { randomSequence: data.random_sequence }),
         ...(data.functions?.length && { functions: data.functions }),
         ...(pools.length && { pools }),

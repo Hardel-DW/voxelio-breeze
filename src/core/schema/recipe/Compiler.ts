@@ -1,24 +1,16 @@
 import type { Analysers } from "@/core/engine/Analyser";
-import type {
-    CompilerResult,
-    CraftingTransmuteData,
-    MinecraftRecipe,
-    RecipeCompiler,
-    RecipeProps,
-    SmeltingData,
-    SmithingTransformData,
-    SmithingTrimData
-} from "./types";
-import { denormalizeIngredient, getOccupiedSlots, slotToPosition } from "./types";
+import type { CraftingTransmuteData, MinecraftRecipe, RecipeProps, SmeltingData, SmithingTransformData, SmithingTrimData } from "./types";
+import { denormalizeIngredient, getOccupiedSlots } from "./types";
+import type { Compiler } from "@/core/engine/Compiler";
 
 /**
  * Compile Voxel recipe format back to Minecraft Recipe format using slot-based system.
  */
-export const VoxelToRecipeDataDriven: RecipeCompiler = (
+export const VoxelToRecipeDataDriven: Compiler<RecipeProps, MinecraftRecipe> = (
     originalElement: RecipeProps,
     _: keyof Analysers,
     original?: MinecraftRecipe
-): CompilerResult => {
+) => {
     const element = structuredClone(originalElement);
     const recipe = original ? structuredClone(original) : ({} as MinecraftRecipe);
 

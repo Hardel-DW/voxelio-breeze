@@ -1,9 +1,4 @@
 import type { DataDrivenElement, VoxelElement } from "@/core/Element";
-import type { DataDrivenRegistryElement } from "@/core/Element";
-import type { IdentifierObject } from "@/core/Identifier";
-import type { Compiler } from "@/core/engine/Compiler";
-import type { Parser } from "@/core/engine/Parser";
-
 export interface StructureProps extends VoxelElement {
     type: string;
     biomes: string[];
@@ -25,7 +20,6 @@ export interface StructureProps extends VoxelElement {
     typeSpecific?: Record<string, any>;
 
     unknownFields?: Record<string, any>;
-    tags: string[];
 }
 
 export interface SpawnOverride {
@@ -166,15 +160,6 @@ export type MineshaftType = "normal" | "mesa";
 export type BiomeTemperature = "cold" | "warm";
 
 export type RuinedPortalPlacement = "on_land_surface" | "partly_buried" | "on_ocean_floor" | "in_mountain" | "underground" | "in_nether";
-
-// Parser and Compiler type definitions
-export type StructureParser = Parser<StructureProps, MinecraftStructure>;
-export type StructureCompiler = Compiler<StructureProps, MinecraftStructure>;
-
-export interface CompilerResult {
-    element: DataDrivenRegistryElement<MinecraftStructure>;
-    tags: IdentifierObject[];
-}
 
 // Known fields constants for reuse
 export const KNOWN_STRUCTURE_FIELDS = new Set([

@@ -1,28 +1,18 @@
-import type { IdentifierObject } from "@/core/Identifier";
 import type { Analysers } from "@/core/engine/Analyser";
-import { processElementTags } from "@/core/schema/utils";
-import type {
-    CompilerResult,
-    MinecraftPoolAlias,
-    MinecraftSpawnOverride,
-    MinecraftStructure,
-    MobCategory,
-    StructureCompiler,
-    StructureProps
-} from "./types";
+import type { MinecraftPoolAlias, MinecraftSpawnOverride, MinecraftStructure, MobCategory, StructureProps } from "./types";
 import { JIGSAW_STRUCTURE_TYPES } from "./types";
+import type { Compiler } from "@/core/engine/Compiler";
 
 /**
  * Compile Voxel format back to Minecraft Structure
  */
-export const VoxelToStructureDataDriven: StructureCompiler = (
+export const VoxelToStructureDataDriven: Compiler<StructureProps, MinecraftStructure> = (
     originalElement: StructureProps,
-    config: keyof Analysers,
+    _: keyof Analysers,
     original?: MinecraftStructure
-): CompilerResult => {
+) => {
     const element = structuredClone(originalElement);
     const structure = original ? structuredClone(original) : ({} as MinecraftStructure);
-    const tags: IdentifierObject[] = processElementTags(element.tags, config);
 
     structure.type = element.type;
     structure.biomes = element.biomes.length === 1 ? element.biomes[0] : element.biomes;
@@ -68,7 +58,7 @@ export const VoxelToStructureDataDriven: StructureCompiler = (
             data: structure,
             identifier: element.identifier
         },
-        tags
+        tags: []
     };
 };
 

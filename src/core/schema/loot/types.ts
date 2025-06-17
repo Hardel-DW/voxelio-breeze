@@ -1,8 +1,4 @@
 import type { DataDrivenElement, VoxelElement } from "@/core/Element";
-import type { DataDrivenRegistryElement } from "@/core/Element";
-import type { IdentifierObject } from "@/core/Identifier";
-import type { Compiler } from "@/core/engine/Compiler";
-import type { Parser } from "@/core/engine/Parser";
 
 export interface LootTableProps extends VoxelElement {
     type?: string;
@@ -11,6 +7,7 @@ export interface LootTableProps extends VoxelElement {
     randomSequence?: string;
     functions?: any[];
     pools?: PoolData[];
+    disabled: boolean;
     unknownFields?: Record<string, any>;
 }
 
@@ -110,14 +107,6 @@ export interface ProcessingContext {
     groups: LootGroup[];
     itemCounter: number;
     groupCounter: number;
-}
-
-export type LootTableParser = Parser<LootTableProps, MinecraftLootTable>;
-export type LootTableCompiler = Compiler<LootTableProps, MinecraftLootTable>;
-
-export interface CompilerResult {
-    element: DataDrivenRegistryElement<MinecraftLootTable>;
-    tags: IdentifierObject[];
 }
 
 /**

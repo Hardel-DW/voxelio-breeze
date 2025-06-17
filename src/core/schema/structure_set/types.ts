@@ -1,8 +1,4 @@
 import type { DataDrivenElement, VoxelElement } from "@/core/Element";
-import type { DataDrivenRegistryElement } from "@/core/Element";
-import type { IdentifierObject } from "@/core/Identifier";
-import type { Compiler } from "@/core/engine/Compiler";
-import type { Parser } from "@/core/engine/Parser";
 
 export interface StructureSetProps extends VoxelElement {
     structures: StructureSetStructure[];
@@ -29,6 +25,7 @@ export interface StructureSetProps extends VoxelElement {
     spreadType?: SpreadType;
 
     // Preserve unknown fields from mods
+    disabled?: boolean;
     unknownFields?: Record<string, any>;
     tags: string[];
 }
@@ -86,14 +83,6 @@ export type PlacementType = "minecraft:concentric_rings" | "minecraft:random_spr
 export type FrequencyReductionMethod = "default" | "legacy_type_1" | "legacy_type_2" | "legacy_type_3";
 
 export type SpreadType = "linear" | "triangular";
-
-export type StructureSetParser = Parser<StructureSetProps, MinecraftStructureSet>;
-export type StructureSetCompiler = Compiler<StructureSetProps, MinecraftStructureSet>;
-
-export interface CompilerResult {
-    element: DataDrivenRegistryElement<MinecraftStructureSet>;
-    tags: IdentifierObject[];
-}
 
 /**
  * Known Structure Set fields according to Minecraft specification

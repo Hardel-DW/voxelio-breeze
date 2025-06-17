@@ -1,9 +1,8 @@
-import type { ParserParams } from "@/core/engine/Parser";
+import type { Parser, ParserParams } from "@/core/engine/Parser";
 import { extractUnknownFields } from "@/core/schema/utils";
 import type {
     CraftingTransmuteData,
     MinecraftRecipe,
-    RecipeParser,
     RecipeProps,
     RecipeResult,
     RecipeTypeSpecific,
@@ -16,7 +15,10 @@ import { KNOWN_RECIPE_FIELDS, normalizeIngredient, positionToSlot } from "./type
 /**
  * Parse Minecraft Recipe to simplified Voxel format with slot-based system.
  */
-export const RecipeDataDrivenToVoxelFormat: RecipeParser = ({ element, configurator }: ParserParams<MinecraftRecipe>): RecipeProps => {
+export const RecipeDataDrivenToVoxelFormat: Parser<RecipeProps, MinecraftRecipe> = ({
+    element,
+    configurator
+}: ParserParams<MinecraftRecipe>): RecipeProps => {
     const data = structuredClone(element.data);
     const slots: Record<string, string[]> = {};
     let gridSize: { width: number; height: number } | undefined;

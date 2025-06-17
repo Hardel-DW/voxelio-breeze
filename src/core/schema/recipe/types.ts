@@ -1,9 +1,4 @@
 import type { DataDrivenElement, VoxelElement } from "@/core/Element";
-import type { DataDrivenRegistryElement } from "@/core/Element";
-import type { IdentifierObject } from "@/core/Identifier";
-import type { Compiler } from "@/core/engine/Compiler";
-import type { Parser } from "@/core/engine/Parser";
-
 export interface RecipeProps extends VoxelElement {
     type: RecipeType;
     group?: string;
@@ -11,7 +6,7 @@ export interface RecipeProps extends VoxelElement {
     showNotification?: boolean;
     slots: Record<string, string[]>; // "0" -> ["minecraft:diamond"], "1" -> ["#minecraft:logs"]
     gridSize?: { width: number; height: number }; // For shaped crafting only
-
+    disabled?: boolean;
     result: RecipeResult;
     typeSpecific?: RecipeTypeSpecific;
     unknownFields?: Record<string, any>;
@@ -98,14 +93,6 @@ export interface MinecraftRecipe extends DataDrivenElement {
     count?: number; // Legacy stonecutting
 
     [key: string]: any;
-}
-
-export type RecipeParser = Parser<RecipeProps, MinecraftRecipe>;
-export type RecipeCompiler = Compiler<RecipeProps, MinecraftRecipe>;
-
-export interface CompilerResult {
-    element: DataDrivenRegistryElement<MinecraftRecipe>;
-    tags: IdentifierObject[];
 }
 
 export const KNOWN_RECIPE_FIELDS = new Set([

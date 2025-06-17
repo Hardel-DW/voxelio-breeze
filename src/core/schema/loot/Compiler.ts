@@ -1,25 +1,23 @@
 import type { Analysers } from "@/core/engine/Analyser";
-import type {
-    CompilerResult,
-    LootGroup,
-    LootItem,
-    LootTableCompiler,
-    LootTableProps,
-    MinecraftLootEntry,
-    MinecraftLootTable
-} from "./types";
+import type { LootGroup, LootItem, LootTableProps, MinecraftLootEntry, MinecraftLootTable } from "./types";
 import { KNOWN_POOL_FIELDS } from "./types";
+import type { Compiler } from "@/core/engine/Compiler";
 
 /**
  * Compile Voxel format back to Minecraft LootTable - Ultra-simplified version
  */
-export const VoxelToLootDataDriven: LootTableCompiler = (
+export const VoxelToLootDataDriven: Compiler<LootTableProps, MinecraftLootTable> = (
     originalElement: LootTableProps,
     _: keyof Analysers,
     original?: MinecraftLootTable
-): CompilerResult => {
+) => {
     const element = structuredClone(originalElement);
     const lootTable = original ? structuredClone(original) : {};
+
+    // Handle disabled loot tables
+    if (element.disabled) {
+        return { element: { data: {}, identifier: element.identifier }, tags: [] };
+    }
 
     const itemMap = new Map(element.items.map((item) => [item.id, item]));
     const groupMap = new Map(element.groups.map((group) => [group.id, group]));
