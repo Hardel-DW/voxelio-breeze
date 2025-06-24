@@ -28,6 +28,7 @@ function createMockLootTable(overrides: Partial<LootTableProps> = {}): LootTable
                 functions: []
             }
         ],
+        disabled: false,
         groups: [],
         pools: [
             {
@@ -44,6 +45,7 @@ function createComplexLootTable(): LootTableProps {
     return {
         identifier: { namespace: "test", registry: "loot_table", resource: "complex_loot" },
         type: "minecraft:chest",
+        disabled: false,
         items: [
             {
                 id: "item_0",

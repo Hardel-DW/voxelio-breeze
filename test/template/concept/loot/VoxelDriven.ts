@@ -14,6 +14,7 @@ export const VOXEL_TEMPLATE_LOOT_TABLE: VoxelRegistryElement<LootTableProps>[] =
         data: {
             identifier: { namespace: "test", registry: "loot_table", resource: "simple" },
             ...prefiledLootProperties,
+            disabled: false,
             items: [
                 {
                     id: "item_0",
@@ -39,6 +40,7 @@ export const VOXEL_TEMPLATE_LOOT_TABLE: VoxelRegistryElement<LootTableProps>[] =
             ...prefiledLootProperties,
             type: "minecraft:entity",
             randomSequence: "minecraft:entities/wither_skeleton",
+            disabled: false,
             items: [
                 {
                     id: "dynamic_0",
@@ -88,6 +90,7 @@ export const VOXEL_TEMPLATE_LOOT_TABLE: VoxelRegistryElement<LootTableProps>[] =
             ...prefiledLootProperties,
             type: "minecraft:equipment",
             randomSequence: "yggdrasil:equipment",
+            disabled: false,
             items: [
                 {
                     id: "item_0",
