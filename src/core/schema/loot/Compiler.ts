@@ -1,7 +1,7 @@
 import type { Analysers } from "@/core/engine/Analyser";
+import type { Compiler } from "@/core/engine/Compiler";
 import type { LootGroup, LootItem, LootTableProps, MinecraftLootEntry, MinecraftLootTable } from "./types";
 import { KNOWN_POOL_FIELDS } from "./types";
-import type { Compiler } from "@/core/engine/Compiler";
 
 /**
  * Compile Voxel format back to Minecraft LootTable - Ultra-simplified version

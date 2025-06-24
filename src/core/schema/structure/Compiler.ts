@@ -1,7 +1,7 @@
 import type { Analysers } from "@/core/engine/Analyser";
+import type { Compiler } from "@/core/engine/Compiler";
 import type { MinecraftPoolAlias, MinecraftSpawnOverride, MinecraftStructure, MobCategory, StructureProps } from "./types";
 import { JIGSAW_STRUCTURE_TYPES } from "./types";
-import type { Compiler } from "@/core/engine/Compiler";
 
 /**
  * Compile Voxel format back to Minecraft Structure

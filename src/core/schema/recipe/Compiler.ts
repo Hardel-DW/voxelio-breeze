@@ -1,7 +1,7 @@
 import type { Analysers } from "@/core/engine/Analyser";
+import type { Compiler } from "@/core/engine/Compiler";
 import type { CraftingTransmuteData, MinecraftRecipe, RecipeProps, SmeltingData, SmithingTransformData, SmithingTrimData } from "./types";
 import { denormalizeIngredient, getOccupiedSlots } from "./types";
-import type { Compiler } from "@/core/engine/Compiler";
 
 /**
  * Compile Voxel recipe format back to Minecraft Recipe format using slot-based system.
