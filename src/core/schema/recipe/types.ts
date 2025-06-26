@@ -1,4 +1,5 @@
 import type { DataDrivenElement, VoxelElement } from "@/core/Element";
+import { normalizeResourceLocation } from "@/core/Element";
 export interface RecipeProps extends VoxelElement {
     type: RecipeType;
     group?: string;
@@ -55,7 +56,7 @@ export type RecipeType =
     | "minecraft:stonecutting"
     | "minecraft:smithing_transform"
     | "minecraft:smithing_trim"
-    | string; // Allow custom mod recipe types
+    | (string & {}); // Allow custom mod recipe types
 
 export type CraftingBookCategory = "building" | "redstone" | "equipment" | "misc";
 export type CookingBookCategory = "food" | "blocks" | "misc";
@@ -118,16 +119,16 @@ export const KNOWN_RECIPE_FIELDS = new Set([
 
 export function normalizeIngredient(ingredient: any): string[] {
     if (typeof ingredient === "string") {
-        return [ingredient];
+        return [normalizeResourceLocation(ingredient)];
     }
     if (Array.isArray(ingredient)) {
         return ingredient.flatMap(normalizeIngredient);
     }
     if (ingredient?.item) {
-        return [ingredient.item];
+        return [normalizeResourceLocation(ingredient.item)];
     }
     if (ingredient?.tag) {
-        return [`#${ingredient.tag}`];
+        return [`#${normalizeResourceLocation(ingredient.tag)}`];
     }
     return [];
 }

@@ -1,3 +1,4 @@
+import { normalizeResourceLocation } from "@/core/Element";
 import type { Parser, ParserParams } from "@/core/engine/Parser";
 import { extractUnknownFields } from "@/core/schema/utils";
 import type {
@@ -11,10 +12,6 @@ import type {
     SmithingTrimData
 } from "./types";
 import { KNOWN_RECIPE_FIELDS, normalizeIngredient, positionToSlot } from "./types";
-
-/**
- * Parse Minecraft Recipe to simplified Voxel format with slot-based system.
- */
 export const RecipeDataDrivenToVoxelFormat: Parser<RecipeProps, MinecraftRecipe> = ({
     element,
     configurator
@@ -24,7 +21,8 @@ export const RecipeDataDrivenToVoxelFormat: Parser<RecipeProps, MinecraftRecipe>
     let gridSize: { width: number; height: number } | undefined;
     let typeSpecific: RecipeTypeSpecific | undefined;
 
-    switch (data.type) {
+    const normalizedType = normalizeResourceLocation(data.type);
+    switch (normalizedType) {
         case "minecraft:crafting_shaped":
             parseShapedCrafting();
             break;
@@ -55,7 +53,7 @@ export const RecipeDataDrivenToVoxelFormat: Parser<RecipeProps, MinecraftRecipe>
     }
 
     let result: RecipeResult;
-    if (data.type === "minecraft:smithing_trim") {
+    if (normalizedType === "minecraft:smithing_trim") {
         result = {
             item: "minecraft:air",
             count: 1
@@ -71,7 +69,7 @@ export const RecipeDataDrivenToVoxelFormat: Parser<RecipeProps, MinecraftRecipe>
 
     return {
         identifier: element.identifier,
-        type: data.type,
+        type: normalizedType,
         group: data.group,
         category: data.category,
         showNotification: data.show_notification,
@@ -201,21 +199,21 @@ export const RecipeDataDrivenToVoxelFormat: Parser<RecipeProps, MinecraftRecipe>
     function parseResult(result: any, legacyCount?: number): RecipeResult {
         if (typeof result === "string") {
             return {
-                item: result,
+                item: normalizeResourceLocation(result),
                 count: legacyCount || 1
             };
         }
 
         if (result?.item) {
             return {
-                item: result.item,
+                item: normalizeResourceLocation(result.item),
                 count: result.count || legacyCount || 1,
                 components: result.components
             };
         }
 
         return {
-            item: result?.id || "minecraft:air",
+            item: normalizeResourceLocation(result?.id || "minecraft:air"),
             count: result?.count || legacyCount || 1,
             components: result?.components,
             unknownFields: result ? extractUnknownFields(result, new Set(["item", "id", "count", "components"])) : undefined

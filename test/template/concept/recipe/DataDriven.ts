@@ -32,6 +32,27 @@ export const shaped: DataDrivenRegistryElement<MinecraftRecipe> = {
     }
 };
 
+export const shaped2: DataDrivenRegistryElement<MinecraftRecipe> = {
+    identifier: { namespace: "test", registry: "recipe", resource: "shaped2" },
+    data: {
+        type: "crafting_shaped",
+        category: "equipment",
+        key: {
+            "#": "minecraft:iron_ingot",
+            "X": "redstone"
+        },
+        pattern: [
+            " # ",
+            "#X#",
+            " # "
+        ],
+        result: {
+            count: 1,
+            id: "minecraft:compass"
+        }
+    }
+};
+
 export const ShapedWithEmptyLine: DataDrivenRegistryElement<MinecraftRecipe> = {
     identifier: { namespace: "test", registry: "recipe", resource: "shaped_empty_line" },
     data: {
@@ -222,13 +243,33 @@ export const transform: DataDrivenRegistryElement<MinecraftRecipe> = {
     }
 };
 
+export const shapedWithoutNamespace: DataDrivenRegistryElement<MinecraftRecipe> = {
+    identifier: { namespace: "test", registry: "recipe", resource: "shaped_no_namespace" },
+    data: {
+        type: "crafting_shaped",
+        category: "equipment",
+        key: {
+            "#": "iron_ingot",
+            "X": "redstone"
+        },
+        pattern: [
+            " # ",
+            "#X#",
+            " # "
+        ],
+        result: "compass"
+    }
+};
+
 export const recipeDataDriven = [
     shapeless,
     shaped,
+    shaped2,
     ShapedWithEmptyLine,
     ShapedWithEmptyRows,
     shapedTwoByTwo,
     stonecutting,
     blasting,
-    campfire_cooking
+    campfire_cooking,
+    shapedWithoutNamespace
 ];

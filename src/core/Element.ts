@@ -23,6 +23,8 @@ export type ConfiguratorConfigFromDatapack = {
     };
 };
 
+export const normalizeResourceLocation = (id: string) => (id.includes(":") ? id : `minecraft:${id}`);
+
 export function isRegistryVoxelElement<T extends keyof Analysers>(element: any): element is VoxelRegistryElement<GetAnalyserVoxel<T>> {
     return "identifier" in element && "data" in element && typeof element.identifier === "string";
 }
