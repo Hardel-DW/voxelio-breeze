@@ -38,7 +38,7 @@ export const shaped2: DataDrivenRegistryElement<MinecraftRecipe> = {
         type: "crafting_shaped",
         category: "equipment",
         key: {
-            "#": "minecraft:iron_ingot",
+            "#": "#iron_ingot",
             "X": "redstone"
         },
         pattern: [

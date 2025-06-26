@@ -46,7 +46,7 @@ describe("Recipe Schema", () => {
 
             it("should have correct slots", () => {
                 expect(parsed.slots).toBeDefined();
-                expect(parsed.slots["0"]).toEqual(["#minecraft:acacia_logs"]);
+                expect(parsed.slots["0"]).toBe("#minecraft:acacia_logs");
                 expect(Object.keys(parsed.slots)).toHaveLength(1);
             });
 
@@ -196,8 +196,8 @@ describe("Recipe Schema", () => {
             it("should parse smithing transform recipe", () => {
                 expect(transformParsed.type).toBe("minecraft:smithing_transform");
                 expect(transformParsed.slots["0"]).toEqual(["minecraft:wayfinder_armor_trim_smithing_template"]);
-                expect(transformParsed.slots["1"]).toEqual(["#minecraft:trimmable_armor"]);
-                expect(transformParsed.slots["2"]).toEqual(["#minecraft:trim_materials"]);
+                expect(transformParsed.slots["1"]).toBe("#minecraft:trimmable_armor");
+                expect(transformParsed.slots["2"]).toBe("#minecraft:trim_materials");
 
                 const smithingData = transformParsed.typeSpecific as any;
                 expect(smithingData.templateSlot).toBe("0");
@@ -216,7 +216,7 @@ describe("Recipe Schema", () => {
             it("should parse transmute recipe", () => {
                 expect(parsed.type).toBe("minecraft:crafting_transmute");
                 expect(parsed.category).toBe("misc");
-                expect(parsed.slots["0"]).toEqual(["#minecraft:acacia_logs"]);
+                expect(parsed.slots["0"]).toBe("#minecraft:acacia_logs");
                 expect(parsed.slots["1"]).toEqual(["minecraft:acacia_door", "minecraft:acacia_fence_gate"]);
 
                 const transmuteData = parsed.typeSpecific as any;

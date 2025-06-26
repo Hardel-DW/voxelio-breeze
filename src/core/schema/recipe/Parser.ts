@@ -17,7 +17,7 @@ export const RecipeDataDrivenToVoxelFormat: Parser<RecipeProps, MinecraftRecipe>
     configurator
 }: ParserParams<MinecraftRecipe>): RecipeProps => {
     const data = structuredClone(element.data);
-    const slots: Record<string, string[]> = {};
+    const slots: Record<string, string[] | string> = {};
     let gridSize: { width: number; height: number } | undefined;
     let typeSpecific: RecipeTypeSpecific | undefined;
 

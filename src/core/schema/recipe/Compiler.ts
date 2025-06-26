@@ -89,7 +89,7 @@ export const VoxelToRecipeDataDriven: Compiler<RecipeProps, MinecraftRecipe> = (
                 const slotIndex = (row * gridSize.width + col).toString();
                 const items = element.slots[slotIndex];
 
-                if (items && items.length > 0) {
+                if (items && ((typeof items === "string" && items.length > 0) || (Array.isArray(items) && items.length > 0))) {
                     let symbol = findExistingSymbol(items, key);
                     if (!symbol) {
                         symbol = String.fromCharCode(symbolCounter++);
@@ -265,9 +265,9 @@ export const VoxelToRecipeDataDriven: Compiler<RecipeProps, MinecraftRecipe> = (
                 const symbol = originalPattern[row][col];
 
                 if (symbol === " ") {
-                    if (items && items.length > 0) return false;
+                    if (items && ((typeof items === "string" && items.length > 0) || (Array.isArray(items) && items.length > 0))) return false;
                 } else {
-                    if (!items || items.length === 0) return false;
+                    if (!items || ((typeof items === "string" && items.length === 0) || (Array.isArray(items) && items.length === 0))) return false;
                     const expectedIngredient = originalKey[symbol];
                     const actualIngredient = denormalizeIngredient(items);
                     if (JSON.stringify(expectedIngredient) !== JSON.stringify(actualIngredient)) {
@@ -280,7 +280,7 @@ export const VoxelToRecipeDataDriven: Compiler<RecipeProps, MinecraftRecipe> = (
         return true;
     }
 
-    function findExistingSymbol(items: string[], key: Record<string, any>): string | null {
+    function findExistingSymbol(items: string[] | string, key: Record<string, any>): string | null {
         const normalizedTarget = denormalizeIngredient(items);
 
         for (const [symbol, ingredient] of Object.entries(key)) {

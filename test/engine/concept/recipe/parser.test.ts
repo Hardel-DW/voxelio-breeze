@@ -52,11 +52,11 @@ describe("Recipe Schema", () => {
 
             // Pattern should be: " # ", "#X#", " # "
             // Slots: 1=iron, 3=iron, 4=redstone, 5=iron, 7=iron
-            expect(shaped2Recipe.slots["1"]).toEqual(["minecraft:iron_ingot"]);  // top center
-            expect(shaped2Recipe.slots["3"]).toEqual(["minecraft:iron_ingot"]);  // middle left
+            expect(shaped2Recipe.slots["1"]).toBe("#minecraft:iron_ingot");  // top center
+            expect(shaped2Recipe.slots["3"]).toBe("#minecraft:iron_ingot");  // middle left
             expect(shaped2Recipe.slots["4"]).toEqual(["minecraft:redstone"]);    // middle center
-            expect(shaped2Recipe.slots["5"]).toEqual(["minecraft:iron_ingot"]);  // middle right
-            expect(shaped2Recipe.slots["7"]).toEqual(["minecraft:iron_ingot"]);  // bottom center
+            expect(shaped2Recipe.slots["5"]).toBe("#minecraft:iron_ingot");  // middle right
+            expect(shaped2Recipe.slots["7"]).toBe("#minecraft:iron_ingot");  // bottom center
 
             // Empty slots should be undefined
             expect(shaped2Recipe.slots["0"]).toBeUndefined(); // top left
@@ -137,7 +137,7 @@ describe("Recipe Schema", () => {
             expect(shapelessRecipe.type).toBe("minecraft:crafting_shapeless");
 
             // Should have first slot filled with acacia logs tag
-            expect(shapelessRecipe.slots["0"]).toEqual(["#minecraft:acacia_logs"]);
+            expect(shapelessRecipe.slots["0"]).toBe("#minecraft:acacia_logs");
 
             expect(shapelessRecipe.result.item).toBe("minecraft:acacia_planks");
             expect(shapelessRecipe.result.count).toBe(4);

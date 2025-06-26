@@ -5,7 +5,7 @@ export interface RecipeProps extends VoxelElement {
     group?: string;
     category?: string;
     showNotification?: boolean;
-    slots: Record<string, string[]>; // "0" -> ["minecraft:diamond"], "1" -> ["#minecraft:logs"]
+    slots: Record<string, string[] | string>; // string[] -> ["minecraft:diamond"], string -> "#minecraft:logs"
     gridSize?: { width: number; height: number }; // For shaped crafting only
     disabled?: boolean;
     result: RecipeResult;
@@ -117,32 +117,70 @@ export const KNOWN_RECIPE_FIELDS = new Set([
     "count"
 ]);
 
-export function normalizeIngredient(ingredient: any): string[] {
+export function normalizeIngredient(ingredient: any): string[] | string {
     if (typeof ingredient === "string") {
-        return [normalizeResourceLocation(ingredient)];
+        const normalized = normalizeResourceLocation(ingredient);
+        if (normalized.startsWith("#")) {
+            return normalized; // Return single string for tags
+        }
+        return [normalized]; // Return array for single items
     }
     if (Array.isArray(ingredient)) {
-        return ingredient.flatMap(normalizeIngredient);
+        const items = ingredient.flatMap(item => {
+            if (typeof item === "string") {
+                return normalizeResourceLocation(item);
+            }
+            if (item?.item) {
+                return normalizeResourceLocation(item.item);
+            }
+            if (item?.tag) {
+                return `#${normalizeResourceLocation(item.tag)}`;
+            }
+            return [];
+        });
+
+        // Check if array contains tags - this is an error
+        const hasTag = items.some(item => item.startsWith("#"));
+        const hasItem = items.some(item => !item.startsWith("#"));
+
+        if (hasTag && hasItem) {
+            throw new Error("Cannot mix tags and items in the same ingredient array");
+        }
+
+        if (hasTag && items.length === 1) {
+            return items[0]; // Single tag as string
+        }
+
+        if (hasTag) {
+            throw new Error("Multiple tags in the same ingredient slot are not supported");
+        }
+
+        return items; // Items as array
     }
     if (ingredient?.item) {
         return [normalizeResourceLocation(ingredient.item)];
     }
     if (ingredient?.tag) {
-        return [`#${normalizeResourceLocation(ingredient.tag)}`];
+        return `#${normalizeResourceLocation(ingredient.tag)}`;
     }
     return [];
 }
 
-export function denormalizeIngredient(items: string[]): any {
-    if (items.length === 0) return undefined;
-    if (items.length === 1) {
-        const item = items[0];
-        if (item.startsWith("#")) {
-            return { tag: item.slice(1) };
-        }
-        return { item };
+export function denormalizeIngredient(items: string[] | string): any {
+    if (typeof items === "string") {
+        return items.startsWith("#") ? { tag: items.slice(1) } : { item: items };
     }
-    return items.map((item) => (item.startsWith("#") ? { tag: item.slice(1) } : { item }));
+
+    if (Array.isArray(items)) {
+        if (items.length === 0) return undefined;
+        if (items.length === 1) {
+            const item = items[0];
+            return item.startsWith("#") ? { tag: item.slice(1) } : { item };
+        }
+        return items.map((item) => (item.startsWith("#") ? { tag: item.slice(1) } : { item }));
+    }
+
+    return undefined;
 }
 
 /**
@@ -175,9 +213,9 @@ export function slotToPosition(slot: string, width: number): { row: number; col:
  * @param slots Slots record
  * @returns Array of slot indices
  */
-export function getOccupiedSlots(slots: Record<string, string[]>): string[] {
+export function getOccupiedSlots(slots: Record<string, string[] | string>): string[] {
     return Object.entries(slots)
-        .filter(([, items]) => items.length > 0)
+        .filter(([, items]) => (typeof items === "string" ? items.length > 0 : Array.isArray(items) && items.length > 0))
         .map(([slot]) => slot);
 }
 
@@ -187,7 +225,7 @@ export function getOccupiedSlots(slots: Record<string, string[]>): string[] {
  * @param defaultWidth Default grid width
  * @returns Optimized grid size
  */
-export function optimizeGridSize(slots: Record<string, string[]>, defaultWidth = 3): { width: number; height: number } {
+export function optimizeGridSize(slots: Record<string, string[] | string>, defaultWidth = 3): { width: number; height: number } {
     const occupiedSlots = getOccupiedSlots(slots);
     if (occupiedSlots.length === 0) {
         return { width: 1, height: 1 };
