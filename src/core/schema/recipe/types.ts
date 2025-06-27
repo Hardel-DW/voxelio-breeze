@@ -118,69 +118,49 @@ export const KNOWN_RECIPE_FIELDS = new Set([
 ]);
 
 export function normalizeIngredient(ingredient: any): string[] | string {
-    if (typeof ingredient === "string") {
-        const normalized = normalizeResourceLocation(ingredient);
-        if (normalized.startsWith("#")) {
-            return normalized; // Return single string for tags
-        }
-        return [normalized]; // Return array for single items
+    if (!ingredient) return [];
+
+    // Tag Minecraft : { tag: "logs" } → "#minecraft:logs"
+    if (ingredient.tag) return normalizeResourceLocation(ingredient.tag);
+
+    // String avec # : "#logs" → "#minecraft:logs"
+    if (typeof ingredient === "string" && ingredient.startsWith("#")) {
+        return normalizeResourceLocation(ingredient);
     }
-    if (Array.isArray(ingredient)) {
-        const items = ingredient.flatMap(item => {
-            if (typeof item === "string") {
-                return normalizeResourceLocation(item);
-            }
-            if (item?.item) {
-                return normalizeResourceLocation(item.item);
-            }
-            if (item?.tag) {
-                return `#${normalizeResourceLocation(item.tag)}`;
-            }
-            return [];
-        });
 
-        // Check if array contains tags - this is an error
-        const hasTag = items.some(item => item.startsWith("#"));
-        const hasItem = items.some(item => !item.startsWith("#"));
-
-        if (hasTag && hasItem) {
-            throw new Error("Cannot mix tags and items in the same ingredient array");
-        }
-
-        if (hasTag && items.length === 1) {
-            return items[0]; // Single tag as string
-        }
-
-        if (hasTag) {
-            throw new Error("Multiple tags in the same ingredient slot are not supported");
-        }
-
-        return items; // Items as array
+    // Array avec un seul tag : ["#logs"] → "#minecraft:logs"
+    if (Array.isArray(ingredient) && ingredient.length === 1 && ingredient[0].startsWith?.("#")) {
+        return normalizeResourceLocation(ingredient[0]);
     }
-    if (ingredient?.item) {
-        return [normalizeResourceLocation(ingredient.item)];
-    }
-    if (ingredient?.tag) {
-        return `#${normalizeResourceLocation(ingredient.tag)}`;
-    }
-    return [];
+
+    // Items : "diamond" ou ["diamond", "emerald"]
+    const items = Array.isArray(ingredient) ? ingredient : [ingredient];
+    return items.map(item => normalizeResourceLocation(typeof item === "string" ? item : item.item));
 }
 
-export function denormalizeIngredient(items: string[] | string): any {
+export function denormalizeIngredient(items: string[] | string, preserveTagFormat = false): any {
+    if (!items) return undefined;
+
+    // Tag : "#minecraft:logs" → "#minecraft:logs" ou { tag: "minecraft:logs" }
     if (typeof items === "string") {
-        return items.startsWith("#") ? { tag: items.slice(1) } : { item: items };
+        return preserveTagFormat ? items : { tag: items.slice(1) };
     }
 
-    if (Array.isArray(items)) {
-        if (items.length === 0) return undefined;
-        if (items.length === 1) {
-            const item = items[0];
-            return item.startsWith("#") ? { tag: item.slice(1) } : { item };
+    // Single : "#minecraft:logs" ou "minecraft:diamond"
+    if (items.length === 1) {
+        const item = items[0];
+        if (item.startsWith("#")) {
+            return preserveTagFormat ? item : { tag: item.slice(1) };
         }
-        return items.map((item) => (item.startsWith("#") ? { tag: item.slice(1) } : { item }));
+        return item;
     }
 
-    return undefined;
+    // Multiple items : ["minecraft:diamond", "minecraft:emerald"]
+    if (preserveTagFormat) {
+        return items; // Return array of strings directly when preserving format
+    }
+
+    return items.map(item => ({ item })); // Return array of objects for original format
 }
 
 /**
@@ -209,13 +189,20 @@ export function slotToPosition(slot: string, width: number): { row: number; col:
 }
 
 /**
+ * Check if a slot has content
+ */
+export function hasSlotContent(items: string[] | string): boolean {
+    return typeof items === "string" ? items.length > 0 : items.length > 0;
+}
+
+/**
  * Get all occupied slots from a slots object
  * @param slots Slots record
  * @returns Array of slot indices
  */
 export function getOccupiedSlots(slots: Record<string, string[] | string>): string[] {
     return Object.entries(slots)
-        .filter(([, items]) => (typeof items === "string" ? items.length > 0 : Array.isArray(items) && items.length > 0))
+        .filter(([, items]) => hasSlotContent(items))
         .map(([slot]) => slot);
 }
 
@@ -239,4 +226,40 @@ export function optimizeGridSize(slots: Record<string, string[] | string>, defau
         width: maxCol + 1,
         height: maxRow + 1
     };
+}
+
+/**
+ * Compare two ingredients semantically, handling different formats
+ * @param a First ingredient
+ * @param b Second ingredient  
+ * @returns true if ingredients are equivalent
+ */
+export function compareIngredients(a: any, b: any): boolean {
+    if (a === b) return true;
+    if (!a || !b) return false;
+
+    // Normalize both ingredients to compare
+    const normalizeForComparison = (ingredient: any): any => {
+        if (typeof ingredient === "string") {
+            if (ingredient.startsWith("#")) {
+                return { tag: normalizeResourceLocation(ingredient.slice(1)) };
+            }
+            return normalizeResourceLocation(ingredient);
+        }
+
+        if (ingredient.tag) {
+            return { tag: normalizeResourceLocation(ingredient.tag) };
+        }
+
+        if (ingredient.item) {
+            return normalizeResourceLocation(ingredient.item);
+        }
+
+        return ingredient;
+    };
+
+    const normalizedA = normalizeForComparison(a);
+    const normalizedB = normalizeForComparison(b);
+
+    return JSON.stringify(normalizedA) === JSON.stringify(normalizedB);
 }

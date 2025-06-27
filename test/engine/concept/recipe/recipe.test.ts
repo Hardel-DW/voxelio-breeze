@@ -247,12 +247,12 @@ describe("Recipe Schema", () => {
 
             it("should have correct ingredients array", () => {
                 expect(compiled.element.data.ingredients).toHaveLength(1);
-                expect(compiled.element.data.ingredients?.[0]).toEqual({ tag: "minecraft:acacia_logs" });
+                expect(compiled.element.data.ingredients?.[0]).toEqual("#minecraft:acacia_logs");
             });
 
             it("should have correct result", () => {
                 expect(compiled.element.data.result).toEqual({
-                    item: "minecraft:acacia_planks",
+                    id: "minecraft:acacia_planks",
                     count: 4
                 });
             });
@@ -279,7 +279,7 @@ describe("Recipe Schema", () => {
                 const keyMap = key as Record<string, any>;
                 expect(Object.keys(keyMap)).toHaveLength(1);
                 const symbolKey = Object.keys(keyMap)[0];
-                expect(keyMap[symbolKey]).toEqual({ item: "minecraft:acacia_planks" });
+                expect(keyMap[symbolKey]).toEqual("minecraft:acacia_planks");
             });
         });
 
@@ -294,7 +294,7 @@ describe("Recipe Schema", () => {
 
             it("should compile blasting recipe", () => {
                 expect(blastingCompiled.element.data.type).toBe("minecraft:blasting");
-                expect(blastingCompiled.element.data.ingredient).toEqual({ item: "minecraft:iron_ore" });
+                expect(blastingCompiled.element.data.ingredient).toEqual("minecraft:iron_ore");
                 expect(blastingCompiled.element.data.experience).toBe(0.7);
                 expect(blastingCompiled.element.data.cookingtime).toBe(100);
             });
@@ -314,7 +314,7 @@ describe("Recipe Schema", () => {
 
             it("should compile stonecutting with legacy count", () => {
                 expect(compiled.element.data.type).toBe("minecraft:stonecutting");
-                expect(compiled.element.data.ingredient).toEqual({ item: "minecraft:andesite" });
+                expect(compiled.element.data.ingredient).toEqual("minecraft:andesite");
                 expect(compiled.element.data.result).toBe("minecraft:andesite_slab");
                 expect(compiled.element.data.count).toBe(2);
             });
@@ -329,9 +329,9 @@ describe("Recipe Schema", () => {
 
             it("should compile smithing transform", () => {
                 expect(compiled.element.data.type).toBe("minecraft:smithing_transform");
-                expect(compiled.element.data.base).toEqual({ tag: "minecraft:trimmable_armor" });
-                expect(compiled.element.data.addition).toEqual({ tag: "minecraft:trim_materials" });
-                expect(compiled.element.data.template).toEqual({ item: "minecraft:wayfinder_armor_trim_smithing_template" });
+                expect(compiled.element.data.base).toEqual("#minecraft:trimmable_armor");
+                expect(compiled.element.data.addition).toEqual("#minecraft:trim_materials");
+                expect(compiled.element.data.template).toEqual("minecraft:wayfinder_armor_trim_smithing_template");
             });
         });
 

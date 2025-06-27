@@ -6,11 +6,22 @@ Le domaine `recipe` fournit des actions pour manipuler les recettes Minecraft
 utilisant le système de slots unifié. Ces actions permettent de modifier les
 ingrédients, convertir les types de recettes et gérer les slots.
 
+**Format des slots** : Les slots peuvent contenir soit une chaîne unique
+(`string`) pour un tag, soit un tableau (`string[]`) pour un ou plusieurs items
+:
+
+- `"#minecraft:logs"` : Tag unique
+- `["minecraft:diamond"]` : Item unique
+- `["minecraft:diamond", "minecraft:emerald"]` : Plusieurs items
+
+> Attention, le format listes ne peut pas contenir de tag.
+
 ## Actions disponibles
 
 ### `recipe.add_ingredient`
 
-Ajoute des items dans un slot spécifique.
+Ajoute des items dans un slot spécifique. **Ne fonctionne pas sur les recettes
+shapeless**.
 
 **Signature** :
 
@@ -26,20 +37,30 @@ Ajoute des items dans un slot spécifique.
 **Paramètres** :
 
 - `slot` : Identifiant du slot ("0" à "8" pour crafting)
-- `items` : Liste des items à ajouter
+- `items` : Liste des items à ajouter (toujours un tableau)
 - `replace` : Si `true`, remplace le contenu, sinon l'ajoute (défaut: `false`)
+
+**Comportement** :
+
+- **Ignore les recettes shapeless** (utiliser `recipe.add_shapeless_ingredient`)
+- Si `replace: true` : Le slot est remplacé par les nouveaux items
+- Si `replace: false` : Les items sont ajoutés aux existants sans créer de
+  doublons
+- Si le slot n'existe pas, il est créé
+- Le résultat final respecte le format Voxel : `string` pour un tag, `string[]`
+  pour un ou plusieurs items
 
 **Exemples** :
 
 ```typescript
-// Ajouter un item
+// Ajouter un item (résultat : slot = ["minecraft:diamond"])
 const action = {
     type: "recipe.add_ingredient",
     slot: "4",
     items: ["minecraft:diamond"],
 };
 
-// Remplacer le contenu avec plusieurs items
+// Remplacer avec plusieurs items (résultat : slot = ["minecraft:oak_log", "minecraft:birch_log"])
 const action = {
     type: "recipe.add_ingredient",
     slot: "0",
@@ -47,24 +68,70 @@ const action = {
     replace: true,
 };
 
-// Ajouter sans doublons
+// Ajouter à un slot existant contenant "#minecraft:logs"
 const action = {
     type: "recipe.add_ingredient",
     slot: "1",
-    items: ["#minecraft:planks"],
+    items: ["minecraft:stone"],
     replace: false,
 };
+// Résultat : slot = ["#minecraft:logs", "minecraft:stone"]
 ```
 
-**Résultat** :
+### `recipe.add_shapeless_ingredient`
 
-- Si `replace: true` : Le slot est remplacé par les nouveaux items
-- Si `replace: false` : Les items sont ajoutés sans créer de doublons
-- Si le slot n'existe pas, il est créé
+Ajoute un ingrédient à une recette shapeless. **Fonctionne uniquement sur les
+recettes shapeless**.
+
+**Signature** :
+
+```typescript
+{
+    type: "recipe.add_shapeless_ingredient";
+    items: string | string[];
+}
+```
+
+**Paramètres** :
+
+- `items` : Tag (string) ou items (string[]) à ajouter
+
+**Comportement** :
+
+- **Fonctionne uniquement sur les recettes shapeless**
+- Trouve automatiquement le prochain slot libre
+- Respecte le format Voxel : garde le format original (tag=string,
+  items=string[])
+- Ignore les autres types de recettes
+
+**Exemples** :
+
+```typescript
+// Ajouter un tag
+const action = {
+    type: "recipe.add_shapeless_ingredient",
+    items: "#minecraft:logs",
+};
+// Résultat : nouveau slot = "#minecraft:logs"
+
+// Ajouter un item unique
+const action = {
+    type: "recipe.add_shapeless_ingredient",
+    items: ["minecraft:diamond"],
+};
+// Résultat : nouveau slot = ["minecraft:diamond"]
+
+// Ajouter plusieurs items
+const action = {
+    type: "recipe.add_shapeless_ingredient",
+    items: ["minecraft:oak_log", "minecraft:birch_log"],
+};
+// Résultat : nouveau slot = ["minecraft:oak_log", "minecraft:birch_log"]
+```
 
 ### `recipe.remove_ingredient`
 
-Retire des items d'un slot ou vide le slot.
+Retire des items d'un slot ou supprime le slot entier.
 
 **Signature** :
 
@@ -81,10 +148,19 @@ Retire des items d'un slot ou vide le slot.
 - `slot` : Identifiant du slot à modifier
 - `items` : Items à retirer. Si omis, supprime le slot entier
 
+**Comportement** :
+
+- Si `items` spécifié : Retire uniquement ces items du slot
+- Si `items` omis : Supprime le slot entier
+- Si le slot devient vide après suppression d'items, il est automatiquement
+  supprimé
+- Le résultat respecte le format Voxel : `string` pour un tag, `string[]` pour
+  un ou plusieurs items
+
 **Exemples** :
 
 ```typescript
-// Retirer des items spécifiques
+// Retirer des items spécifiques d'un slot multiple
 const action = {
     type: "recipe.remove_ingredient",
     slot: "0",
@@ -98,11 +174,98 @@ const action = {
 };
 ```
 
-**Résultat** :
+### `recipe.remove_item_everywhere`
 
-- Si `items` spécifié : Retire uniquement ces items du slot
-- Si `items` omis : Supprime le slot entier
-- Si le slot devient vide après suppression d'items, il est supprimé
+Supprime toutes les occurrences des items spécifiés dans tous les slots de la
+recette.
+
+**Signature** :
+
+```typescript
+{
+    type: "recipe.remove_item_everywhere";
+    items: string[];
+}
+```
+
+**Paramètres** :
+
+- `items` : Liste des items/tags à supprimer de tous les slots
+
+**Comportement** :
+
+- Parcourt tous les slots de la recette
+- Supprime les items correspondants des slots `string[]`
+- Supprime complètement les slots `string` qui correspondent
+- Si un slot devient vide, il est automatiquement supprimé
+- Gère les tags et items selon le format Voxel
+
+**Exemples** :
+
+```typescript
+// Supprimer toutes les occurrences de certains items
+const action = {
+    type: "recipe.remove_item_everywhere",
+    items: ["minecraft:oak_log", "minecraft:birch_log"],
+};
+
+// Supprimer un tag partout
+const action = {
+    type: "recipe.remove_item_everywhere",
+    items: ["#minecraft:logs"],
+};
+```
+
+### `recipe.replace_item_everywhere`
+
+Remplace toutes les occurrences d'un item/tag par un autre dans tous les slots.
+
+**Signature** :
+
+```typescript
+{
+    type: "recipe.replace_item_everywhere";
+    from: string;
+    to: string;
+}
+```
+
+**Paramètres** :
+
+- `from` : Item/tag à remplacer
+- `to` : Item/tag de remplacement
+
+**Comportement** :
+
+- Parcourt tous les slots de la recette
+- Remplace toutes les occurrences de `from` par `to`
+- Gère automatiquement les doublons (supprime les duplicatas)
+- Fonctionne sur les tags (`string`) et items (`string[]`)
+
+**Exemples** :
+
+```typescript
+// Remplacer un item par un autre partout
+const action = {
+    type: "recipe.replace_item_everywhere",
+    from: "minecraft:oak_log",
+    to: "minecraft:spruce_log",
+};
+
+// Remplacer un tag par un item
+const action = {
+    type: "recipe.replace_item_everywhere",
+    from: "#minecraft:logs",
+    to: "minecraft:oak_log",
+};
+
+// Remplacer un item par un tag
+const action = {
+    type: "recipe.replace_item_everywhere",
+    from: "minecraft:oak_log",
+    to: "#minecraft:planks",
+};
+```
 
 ### `recipe.convert_recipe_type`
 
@@ -122,6 +285,15 @@ Convertit une recette vers un autre type.
 
 - `newType` : Nouveau type de recette
 - `preserveIngredients` : Conserver les ingrédients (défaut: `true`)
+
+**Logique de conversion** :
+
+- **`minecraft:crafting_shapeless`** : Supprime `gridSize`
+- **`minecraft:crafting_shaped`** : Ajoute `gridSize` par défaut (3x3)
+- **Smelting/Blasting/Smoking/Campfire** : Premier item trouvé → slot "0"
+  (format string), supprime `gridSize`
+- **`minecraft:stonecutting`** : Premier item → slot "0" (format string),
+  supprime `gridSize` et `typeSpecific`
 
 **Exemples** :
 
@@ -146,46 +318,6 @@ const action = {
     preserveIngredients: false,
 };
 ```
-
-**Logique de conversion** :
-
-- **`minecraft:crafting_shapeless`** : Supprime `gridSize`
-- **`minecraft:crafting_shaped`** : Ajoute `gridSize` par défaut (3x3)
-- **Smelting/Blasting/Smoking/Campfire** : Premier item → slot "0", supprime
-  `gridSize`
-- **`minecraft:stonecutting`** : Premier item → slot "0", supprime `gridSize` et
-  `typeSpecific`
-
-### `recipe.swap_slots`
-
-Échange le contenu de deux slots.
-
-**Signature** :
-
-```typescript
-{
-    type: "recipe.swap_slots";
-    fromSlot: string;
-    toSlot: string;
-}
-```
-
-**Exemples** :
-
-```typescript
-// Échanger deux slots
-const action = {
-    type: "recipe.swap_slots",
-    fromSlot: "0",
-    toSlot: "4",
-};
-```
-
-**Résultat** :
-
-- Le contenu de `fromSlot` va dans `toSlot`
-- Le contenu de `toSlot` va dans `fromSlot`
-- Si un slot est vide, l'autre devient vide après l'échange
 
 ### `recipe.clear_slot`
 
@@ -259,13 +391,13 @@ const convertToShapeless = {
 };
 ```
 
-### Modification d'ingrédients
+### Modification d'ingrédients avec gestion des formats
 
 ```typescript
 const modifyIngredients = {
     type: "core.sequential",
     actions: [
-        // Remplacer par un tag
+        // Remplacer un item par un tag
         {
             type: "recipe.remove_ingredient",
             slot: "0",
@@ -276,7 +408,7 @@ const modifyIngredients = {
             slot: "0",
             items: ["#minecraft:logs"],
         },
-        // Ajouter des alternatives
+        // Ajouter des alternatives (créera un tableau)
         {
             type: "recipe.add_ingredient",
             slot: "4",
@@ -286,27 +418,75 @@ const modifyIngredients = {
 };
 ```
 
-### Réorganisation de slots
+### Nettoyage de slots
 
 ```typescript
-const reorganizeSlots = {
+const cleanupSlots = {
     type: "core.sequential",
     actions: [
-        // Décaler vers la droite
         {
-            type: "recipe.swap_slots",
-            fromSlot: "0",
-            toSlot: "1",
+            type: "recipe.clear_slot",
+            slot: "6",
         },
         {
-            type: "recipe.swap_slots",
-            fromSlot: "3",
-            toSlot: "4",
+            type: "recipe.clear_slot",
+            slot: "7",
         },
-        // Nettoyer les slots vides
         {
             type: "recipe.clear_slot",
             slot: "8",
+        },
+    ],
+};
+```
+
+### Suppression d'items dans toute la recette
+
+```typescript
+const removeWoodItems = {
+    type: "core.sequential",
+    actions: [
+        // Supprimer tous les types de bois
+        {
+            type: "recipe.remove_item_everywhere",
+            items: [
+                "minecraft:oak_log",
+                "minecraft:birch_log",
+                "minecraft:spruce_log",
+            ],
+        },
+        // Supprimer aussi le tag des planches
+        {
+            type: "recipe.remove_item_everywhere",
+            items: ["#minecraft:planks"],
+        },
+    ],
+};
+```
+
+### Remplacement d'items dans toute la recette
+
+```typescript
+const upgradeRecipe = {
+    type: "core.sequential",
+    actions: [
+        // Remplacer le fer par du diamant
+        {
+            type: "recipe.replace_item_everywhere",
+            from: "minecraft:iron_ingot",
+            to: "minecraft:diamond",
+        },
+        // Remplacer le tag bois par un bois spécifique
+        {
+            type: "recipe.replace_item_everywhere",
+            from: "#minecraft:logs",
+            to: "minecraft:oak_log",
+        },
+        // Remplacer un item par un tag
+        {
+            type: "recipe.replace_item_everywhere",
+            from: "minecraft:stone",
+            to: "#minecraft:stone",
         },
     ],
 };
@@ -318,7 +498,7 @@ const reorganizeSlots = {
 const convertToSmelting = {
     type: "core.sequential",
     actions: [
-        // Convertir le type
+        // Convertir le type (premier item → slot "0")
         {
             type: "recipe.convert_recipe_type",
             newType: "minecraft:smelting",
@@ -341,6 +521,33 @@ const convertToSmelting = {
 
 ## Système de slots
 
+### Format Voxel des slots
+
+Les slots utilisent le format propriétaire Voxel :
+
+```typescript
+// Tag unique
+{
+    slots: {
+        "0": "#minecraft:logs"  // string
+    }
+}
+
+// Item unique  
+{
+    slots: {
+        "0": ["minecraft:diamond"]  // string[] (toujours un tableau pour les items)
+    }
+}
+
+// Plusieurs items
+{
+    slots: {
+        "0": ["minecraft:oak_log", "minecraft:birch_log"]  // string[]
+    }
+}
+```
+
 ### Crafting (Shaped/Shapeless)
 
 ```typescript
@@ -352,7 +559,7 @@ const convertToSmelting = {
 const example = {
     slots: {
         "0": ["minecraft:stick"],
-        "4": ["#minecraft:planks"],
+        "4": "#minecraft:planks",
         "8": ["minecraft:iron_ingot"],
     },
 };
@@ -361,10 +568,10 @@ const example = {
 ### Smelting/Blasting/Smoking
 
 ```typescript
-// Un seul ingrédient dans le slot "0"
+// Un seul ingrédient dans le slot "0" (tag ou item selon le type)
 const smeltingExample = {
     slots: {
-        "0": ["minecraft:iron_ore"],
+        "0": "#minecraft:iron_ores", // Tag (string)
     },
     typeSpecific: {
         experience: 0.7,
@@ -379,7 +586,7 @@ const smeltingExample = {
 // Un ingrédient, pas de propriétés spéciales
 const stonecuttingExample = {
     slots: {
-        "0": ["#minecraft:stone"],
+        "0": "#minecraft:stone", // Tag (string)
     },
 };
 ```
@@ -392,14 +599,28 @@ L'action `add_ingredient` avec `replace: false` évite automatiquement les
 doublons :
 
 ```typescript
-// Slot existant : ["minecraft:oak_log"]
+// Slot existant : "#minecraft:logs"
 const action = {
     type: "recipe.add_ingredient",
     slot: "0",
-    items: ["minecraft:oak_log", "minecraft:birch_log"], // oak_log ignoré
+    items: ["#minecraft:logs", "minecraft:stone"], // logs ignoré
     replace: false,
 };
-// Résultat : ["minecraft:oak_log", "minecraft:birch_log"]
+// Résultat : ["#minecraft:logs", "minecraft:stone"]
+```
+
+### Respect du format Voxel
+
+Les actions respectent toujours le format Voxel :
+
+```typescript
+// Après suppression, le format reste cohérent
+const action = {
+    type: "recipe.remove_ingredient",
+    slot: "0",
+    items: ["minecraft:oak_log"], // Retire un item d'un tableau
+};
+// Résultat : slot reste ["minecraft:birch_log"] (toujours un tableau pour les items)
 ```
 
 ### Nettoyage automatique
@@ -418,13 +639,14 @@ const action = {
 
 ### Conversion intelligente
 
-Le `convert_recipe_type` adapte automatiquement les propriétés :
+Le `convert_recipe_type` adapte automatiquement les propriétés et utilise le
+premier item trouvé :
 
 ```typescript
 // Shaped → Shapeless : supprime gridSize
-// Crafting → Smelting : premier item → slot "0"
-// Vers Stonecutting : supprime typeSpecific
+// Crafting → Smelting : premier item → slot "0" (garde le format : tag=string, item=string[])
+// Vers Stonecutting : supprime typeSpecific, premier item → slot "0"
 ```
 
 Ces actions offrent un contrôle précis sur les recettes tout en maintenant la
-cohérence des données.
+cohérence des données et le respect du format propriétaire Voxel.

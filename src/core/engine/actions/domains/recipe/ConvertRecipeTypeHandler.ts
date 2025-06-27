@@ -29,15 +29,15 @@ export class ConvertRecipeTypeHandler implements ActionHandler<RecipeAction> {
                 case "minecraft:blasting":
                 case "minecraft:smoking":
                 case "minecraft:campfire_cooking": {
-                    const allItems = this.getAllItemsFromSlots(newRecipe.slots);
-                    newRecipe.slots = allItems.length > 0 ? { "0": [allItems[0]] } : {};
+                    const firstSlotWithContent = this.getFirstSlotWithContent(newRecipe.slots);
+                    newRecipe.slots = firstSlotWithContent ? { "0": firstSlotWithContent } : {};
                     newRecipe.gridSize = undefined;
                     break;
                 }
 
                 case "minecraft:stonecutting": {
-                    const stoneItems = this.getAllItemsFromSlots(newRecipe.slots);
-                    newRecipe.slots = stoneItems.length > 0 ? { "0": [stoneItems[0]] } : {};
+                    const firstSlotWithContent = this.getFirstSlotWithContent(newRecipe.slots);
+                    newRecipe.slots = firstSlotWithContent ? { "0": firstSlotWithContent } : {};
                     newRecipe.gridSize = undefined;
                     newRecipe.typeSpecific = undefined;
                     break;
@@ -48,7 +48,16 @@ export class ConvertRecipeTypeHandler implements ActionHandler<RecipeAction> {
         return newRecipe;
     }
 
-    private getAllItemsFromSlots(slots: Record<string, string[]>): string[] {
-        return Object.values(slots).flat();
+    private getFirstSlotWithContent(slots: Record<string, string[] | string>): string[] | string | null {
+        for (const slotContent of Object.values(slots)) {
+            if (slotContent && (typeof slotContent === "string" || slotContent.length > 0)) {
+                // For cooking recipe types, we only want the first item
+                if (Array.isArray(slotContent) && slotContent.length > 1) {
+                    return [slotContent[0]]; // Return only the first item as an array
+                }
+                return slotContent;
+            }
+        }
+        return null;
     }
 }

@@ -1,7 +1,8 @@
 import type { Analysers } from "@/core/engine/Analyser";
 import type { Compiler } from "@/core/engine/Compiler";
 import type { CraftingTransmuteData, MinecraftRecipe, RecipeProps, SmeltingData, SmithingTransformData, SmithingTrimData } from "./types";
-import { denormalizeIngredient, getOccupiedSlots } from "./types";
+import { denormalizeIngredient, getOccupiedSlots, hasSlotContent, compareIngredients } from "./types";
+import { normalizeResourceLocation } from "@/core/Element";
 
 /**
  * Compile Voxel recipe format back to Minecraft Recipe format using slot-based system.
@@ -74,7 +75,16 @@ export const VoxelToRecipeDataDriven: Compiler<RecipeProps, MinecraftRecipe> = (
 
             if (canReuseOriginal) {
                 recipe.pattern = originalPattern;
-                recipe.key = original.key;
+                recipe.key = {};
+                for (const [symbol, ingredient] of Object.entries(original.key)) {
+                    if (typeof ingredient === "string" && ingredient.startsWith("#")) {
+                        recipe.key[symbol] = normalizeResourceLocation(ingredient);
+                    } else if (typeof ingredient === "string") {
+                        recipe.key[symbol] = normalizeResourceLocation(ingredient);
+                    } else {
+                        recipe.key[symbol] = ingredient;
+                    }
+                }
                 return;
             }
         }
@@ -89,11 +99,13 @@ export const VoxelToRecipeDataDriven: Compiler<RecipeProps, MinecraftRecipe> = (
                 const slotIndex = (row * gridSize.width + col).toString();
                 const items = element.slots[slotIndex];
 
-                if (items && ((typeof items === "string" && items.length > 0) || (Array.isArray(items) && items.length > 0))) {
+                if (items && hasSlotContent(items)) {
                     let symbol = findExistingSymbol(items, key);
                     if (!symbol) {
                         symbol = String.fromCharCode(symbolCounter++);
-                        key[symbol] = denormalizeIngredient(items);
+                        // Use preserveTagFormat=true when there's no original to maintain string format
+                        const shouldPreserveTagFormat = !original?.key;
+                        key[symbol] = denormalizeIngredient(items, shouldPreserveTagFormat);
                     }
                     patternRow += symbol;
                 } else {
@@ -115,7 +127,7 @@ export const VoxelToRecipeDataDriven: Compiler<RecipeProps, MinecraftRecipe> = (
         } else {
             recipe.ingredients = occupiedSlots
                 .map((slot) => element.slots[slot])
-                .map((items) => denormalizeIngredient(items))
+                .map((items) => denormalizeIngredient(items, true))
                 .filter((ing) => ing !== undefined);
         }
     }
@@ -128,10 +140,10 @@ export const VoxelToRecipeDataDriven: Compiler<RecipeProps, MinecraftRecipe> = (
         const materialItems = element.slots[transmuteData.materialSlot];
 
         if (inputItems) {
-            recipe.input = original?.input || denormalizeIngredient(inputItems);
+            recipe.input = original?.input || denormalizeIngredient(inputItems, true);
         }
         if (materialItems) {
-            recipe.material = original?.material || denormalizeIngredient(materialItems);
+            recipe.material = original?.material || denormalizeIngredient(materialItems, true);
         }
     }
 
@@ -140,7 +152,7 @@ export const VoxelToRecipeDataDriven: Compiler<RecipeProps, MinecraftRecipe> = (
 
         const ingredientItems = element.slots["0"];
         if (ingredientItems) {
-            recipe.ingredient = original?.ingredient || denormalizeIngredient(ingredientItems);
+            recipe.ingredient = original?.ingredient || denormalizeIngredient(ingredientItems, true);
         }
 
         if (smeltingData?.experience !== undefined) {
@@ -154,7 +166,7 @@ export const VoxelToRecipeDataDriven: Compiler<RecipeProps, MinecraftRecipe> = (
     function compileStonecutting() {
         const ingredientItems = element.slots["0"];
         if (ingredientItems) {
-            recipe.ingredient = original?.ingredient || denormalizeIngredient(ingredientItems);
+            recipe.ingredient = original?.ingredient || denormalizeIngredient(ingredientItems, true);
         }
 
         if (element.result.count && element.result.count > 1) {
@@ -171,13 +183,13 @@ export const VoxelToRecipeDataDriven: Compiler<RecipeProps, MinecraftRecipe> = (
         const additionItems = element.slots[smithingData.additionSlot];
 
         if (templateItems) {
-            recipe.template = original?.template || denormalizeIngredient(templateItems);
+            recipe.template = original?.template || denormalizeIngredient(templateItems, true);
         }
         if (baseItems) {
-            recipe.base = original?.base || denormalizeIngredient(baseItems);
+            recipe.base = original?.base || denormalizeIngredient(baseItems, true);
         }
         if (additionItems) {
-            recipe.addition = original?.addition || denormalizeIngredient(additionItems);
+            recipe.addition = original?.addition || denormalizeIngredient(additionItems, true);
         }
     }
 
@@ -190,13 +202,13 @@ export const VoxelToRecipeDataDriven: Compiler<RecipeProps, MinecraftRecipe> = (
         const additionItems = element.slots[trimData.additionSlot];
 
         if (templateItems) {
-            recipe.template = original?.template || denormalizeIngredient(templateItems);
+            recipe.template = original?.template || denormalizeIngredient(templateItems, true);
         }
         if (baseItems) {
-            recipe.base = original?.base || denormalizeIngredient(baseItems);
+            recipe.base = original?.base || denormalizeIngredient(baseItems, true);
         }
         if (additionItems) {
-            recipe.addition = original?.addition || denormalizeIngredient(additionItems);
+            recipe.addition = original?.addition || denormalizeIngredient(additionItems, true);
         }
         if (trimData.pattern) {
             recipe.pattern_trim = trimData.pattern;
@@ -209,11 +221,11 @@ export const VoxelToRecipeDataDriven: Compiler<RecipeProps, MinecraftRecipe> = (
         if (occupiedSlots.length > 0) {
             if (occupiedSlots.length === 1) {
                 const items = element.slots[occupiedSlots[0]];
-                recipe.ingredient = denormalizeIngredient(items);
+                recipe.ingredient = denormalizeIngredient(items, true);
             } else {
                 recipe.ingredients = occupiedSlots
                     .map((slot) => element.slots[slot])
-                    .map((items) => denormalizeIngredient(items))
+                    .map((items) => denormalizeIngredient(items, true))
                     .filter((ing) => ing !== undefined);
             }
         }
@@ -232,7 +244,7 @@ export const VoxelToRecipeDataDriven: Compiler<RecipeProps, MinecraftRecipe> = (
 
         if (result.components) {
             return {
-                item: result.item,
+                id: result.item,
                 ...(result.count && result.count > 1 && { count: result.count }),
                 components: result.components,
                 ...result.unknownFields
@@ -241,7 +253,7 @@ export const VoxelToRecipeDataDriven: Compiler<RecipeProps, MinecraftRecipe> = (
 
         if (result.count && result.count > 1) {
             return {
-                item: result.item,
+                id: result.item,
                 count: result.count,
                 ...result.unknownFields
             };
@@ -265,12 +277,12 @@ export const VoxelToRecipeDataDriven: Compiler<RecipeProps, MinecraftRecipe> = (
                 const symbol = originalPattern[row][col];
 
                 if (symbol === " ") {
-                    if (items && ((typeof items === "string" && items.length > 0) || (Array.isArray(items) && items.length > 0))) return false;
+                    if (items && hasSlotContent(items)) return false;
                 } else {
-                    if (!items || ((typeof items === "string" && items.length === 0) || (Array.isArray(items) && items.length === 0))) return false;
+                    if (!items || !hasSlotContent(items)) return false;
                     const expectedIngredient = originalKey[symbol];
-                    const actualIngredient = denormalizeIngredient(items);
-                    if (JSON.stringify(expectedIngredient) !== JSON.stringify(actualIngredient)) {
+                    const actualIngredient = denormalizeIngredient(items, true);
+                    if (!compareIngredients(expectedIngredient, actualIngredient)) {
                         return false;
                     }
                 }
@@ -281,10 +293,8 @@ export const VoxelToRecipeDataDriven: Compiler<RecipeProps, MinecraftRecipe> = (
     }
 
     function findExistingSymbol(items: string[] | string, key: Record<string, any>): string | null {
-        const normalizedTarget = denormalizeIngredient(items);
-
         for (const [symbol, ingredient] of Object.entries(key)) {
-            if (JSON.stringify(normalizedTarget) === JSON.stringify(ingredient)) {
+            if (compareIngredients(denormalizeIngredient(items, true), ingredient)) {
                 return symbol;
             }
         }

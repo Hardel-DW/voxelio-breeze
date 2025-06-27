@@ -255,41 +255,6 @@ describe("Recipe Actions", () => {
             });
         });
 
-        describe("swap_slots", () => {
-            it("should swap contents of two slots", async () => {
-                // Vérifie l'état initial
-                expect(mockRecipe.slots["0"]).toEqual(["minecraft:diamond"]);
-                expect(mockRecipe.slots["1"]).toEqual(["minecraft:stick"]);
-
-                const action: RecipeAction = {
-                    type: "recipe.swap_slots",
-                    fromSlot: "0",
-                    toSlot: "1"
-                };
-
-                const result = await updateRecipe(action, mockRecipe);
-                expect(result.slots["0"]).toEqual(["minecraft:stick"]);
-                expect(result.slots["1"]).toEqual(["minecraft:diamond"]);
-
-                // Vérifie que l'objet original n'a pas changé
-                expect(mockRecipe.slots["0"]).toEqual(["minecraft:diamond"]);
-                expect(mockRecipe.slots["1"]).toEqual(["minecraft:stick"]);
-                expect(result).not.toBe(mockRecipe);
-            });
-
-            it("should handle swapping with empty slot", async () => {
-                const action: RecipeAction = {
-                    type: "recipe.swap_slots",
-                    fromSlot: "0",
-                    toSlot: "99" // Slot vide
-                };
-
-                const result = await updateRecipe(action, mockRecipe);
-                expect(result.slots["0"]).toBeUndefined();
-                expect(result.slots["99"]).toEqual(["minecraft:diamond"]);
-            });
-        });
-
         describe("clear_slot", () => {
             it("should clear a specific slot", async () => {
                 // Vérifie l'état initial
@@ -335,11 +300,6 @@ describe("Recipe Actions", () => {
                     {
                         type: "recipe.remove_ingredient",
                         slot: "1"
-                    },
-                    {
-                        type: "recipe.swap_slots",
-                        fromSlot: "0",
-                        toSlot: "4"
                     }
                 ]
             };
@@ -347,13 +307,10 @@ describe("Recipe Actions", () => {
             const result = await updateRecipe(sequentialAction, mockRecipe);
             expect(result.slots["2"]).toEqual(["minecraft:emerald"]); // Ajouté
             expect(result.slots["1"]).toBeUndefined(); // Supprimé
-            expect(result.slots["0"]).toEqual(["minecraft:stick"]); // Swappé
-            expect(result.slots["4"]).toEqual(["minecraft:diamond"]); // Swappé
 
             // Vérifie que l'objet original n'a pas changé
             expect(mockRecipe.slots["0"]).toEqual(["minecraft:diamond"]);
             expect(mockRecipe.slots["1"]).toEqual(["minecraft:stick"]);
-            expect(mockRecipe.slots["4"]).toEqual(["minecraft:stick"]);
             expect(result).not.toBe(mockRecipe);
         });
 
@@ -389,7 +346,7 @@ describe("Recipe Actions", () => {
 
             const result = await updateRecipe(action, complexRecipe);
             expect(result.type).toBe("minecraft:campfire_cooking");
-            expect(result.slots).toEqual({ "0": ["minecraft:coal"] }); // Premier item seulement
+            expect(result.slots).toEqual({ "0": ["minecraft:coal"] });
             expect(result.gridSize).toBeUndefined();
         });
     });

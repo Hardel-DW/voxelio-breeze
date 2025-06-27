@@ -66,7 +66,7 @@ export const shapelessVoxel: DataDrivenRegistryElement<RecipeProps> = {
         group: "planks",
         category: "building",
         slots: {
-            "0": ["#minecraft:acacia_logs"]
+            "0": "#minecraft:acacia_logs"
         },
         result: {
             item: "minecraft:acacia_planks",

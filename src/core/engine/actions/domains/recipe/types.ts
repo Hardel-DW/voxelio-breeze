@@ -6,17 +6,23 @@ export interface RecipeActions {
         items: string[];
         replace?: boolean;
     };
+    add_shapeless_ingredient: {
+        items: string | string[];
+    };
     remove_ingredient: {
         slot: string;
         items?: string[];
     };
+    remove_item_everywhere: {
+        items: string[];
+    };
+    replace_item_everywhere: {
+        from: string;
+        to: string;
+    };
     convert_recipe_type: {
         newType: string;
         preserveIngredients?: boolean;
-    };
-    swap_slots: {
-        fromSlot: string;
-        toSlot: string;
     };
     clear_slot: {
         slot: string;
