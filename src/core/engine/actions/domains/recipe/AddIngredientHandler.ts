@@ -35,19 +35,9 @@ export class AddShapelessIngredientHandler implements ActionHandler<RecipeAction
         element: Record<string, unknown>
     ): Record<string, unknown> | undefined {
         const recipe = structuredClone(element) as RecipeProps;
-
-        if (recipe.type !== "minecraft:crafting_shapeless") {
-            return recipe;
-        }
-
-        const { items } = action;
-
-        let nextSlot = 0;
-        while (recipe.slots[nextSlot.toString()]) {
-            nextSlot++;
-        }
-
-        recipe.slots[nextSlot.toString()] = items;
+        if (recipe.type !== "minecraft:crafting_shapeless") return recipe;
+        const nextSlot = Object.keys(recipe.slots).length.toString();
+        recipe.slots[nextSlot] = action.items;
 
         return recipe;
     }
@@ -115,19 +105,28 @@ export class ReplaceItemEverywhereHandler implements ActionHandler<RecipeAction>
         const { from, to } = action;
 
         for (const [slotKey, slotContent] of Object.entries(recipe.slots)) {
-            if (typeof slotContent === "string" && slotContent === from) recipe.slots[slotKey] = to;
-            else if (Array.isArray(slotContent)) {
-                const replacedItems = slotContent.map(item => item === from ? to : item);
-                const uniqueItems: string[] = [];
-                const seen = new Set<string>();
-                for (const item of replacedItems) {
-                    if (!seen.has(item)) {
-                        uniqueItems.push(item);
-                        seen.add(item);
-                    }
-                }
+            if (typeof slotContent === "string" && slotContent === from) {
 
-                recipe.slots[slotKey] = uniqueItems;
+                recipe.slots[slotKey] = to.startsWith('#') ? to : [to];
+            } else if (Array.isArray(slotContent)) {
+                const hasReplacement = slotContent.includes(from);
+                if (!hasReplacement) continue;
+
+                const replacedItems = slotContent.map(item => item === from ? to : item);
+                if (to.startsWith('#')) {
+                    recipe.slots[slotKey] = to;
+                } else {
+                    const uniqueItems: string[] = [];
+                    const seen = new Set<string>();
+                    for (const item of replacedItems) {
+                        if (!seen.has(item)) {
+                            uniqueItems.push(item);
+                            seen.add(item);
+                        }
+                    }
+
+                    recipe.slots[slotKey] = uniqueItems;
+                }
             }
         }
 

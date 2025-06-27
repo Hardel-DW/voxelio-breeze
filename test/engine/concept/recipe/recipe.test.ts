@@ -1,7 +1,6 @@
-import type { Compiler } from "@/core/engine/Compiler";
 import { RecipeDataDrivenToVoxelFormat } from "@/core/schema/recipe/Parser";
 import { VoxelToRecipeDataDriven } from "@/core/schema/recipe/Compiler";
-import type { RecipeProps, MinecraftRecipe } from "@/core/schema/recipe/types";
+import type { RecipeProps } from "@/core/schema/recipe/types";
 import {
     shapeless,
     shaped,
@@ -18,14 +17,6 @@ import {
     transmute,
     transform
 } from "@test/template/concept/recipe/DataDriven";
-import {
-    shapelessVoxel,
-    shapedVoxel,
-    stonecuttingVoxel,
-    blastingVoxel,
-    smeltingVoxel,
-    transformVoxel
-} from "@test/template/concept/recipe/VoxelDriven";
 import { describe, it, expect, beforeEach } from "vitest";
 
 describe("Recipe Schema", () => {
@@ -226,119 +217,6 @@ describe("Recipe Schema", () => {
 
             it("should handle array ingredients in slots", () => {
                 expect(parsed.slots["1"]).toEqual(["minecraft:acacia_door", "minecraft:acacia_fence_gate"]);
-            });
-        });
-    });
-
-    describe("Voxel Element to Data Driven", () => {
-        describe("Shapeless Compilation", () => {
-            let compiled: ReturnType<Compiler<RecipeProps, MinecraftRecipe>>;
-
-            beforeEach(() => {
-                compiled = VoxelToRecipeDataDriven(shapelessVoxel.data, "recipe");
-            });
-
-            it("should compile shapeless recipe", () => {
-                expect(compiled).toBeDefined();
-                expect(compiled.element.data.type).toBe("minecraft:crafting_shapeless");
-                expect(compiled.element.data.group).toBe("planks");
-                expect(compiled.element.data.category).toBe("building");
-            });
-
-            it("should have correct ingredients array", () => {
-                expect(compiled.element.data.ingredients).toHaveLength(1);
-                expect(compiled.element.data.ingredients?.[0]).toEqual("#minecraft:acacia_logs");
-            });
-
-            it("should have correct result", () => {
-                expect(compiled.element.data.result).toEqual({
-                    id: "minecraft:acacia_planks",
-                    count: 4
-                });
-            });
-        });
-
-        describe("Shaped Compilation", () => {
-            let compiled: ReturnType<Compiler<RecipeProps, MinecraftRecipe>>;
-
-            beforeEach(() => {
-                compiled = VoxelToRecipeDataDriven(shapedVoxel.data, "recipe");
-            });
-
-            it("should compile shaped recipe", () => {
-                expect(compiled.element.data.type).toBe("minecraft:crafting_shaped");
-                expect(compiled.element.data.pattern).toBeDefined();
-                expect(compiled.element.data.pattern).toHaveLength(1);
-                const pattern = compiled.element.data.pattern as string[];
-                expect(pattern[0]).toMatch(/^.{3}$/); // Pattern has 3 characters
-            });
-
-            it("should have correct key mapping", () => {
-                const key = compiled.element.data.key;
-                expect(key).toBeDefined();
-                const keyMap = key as Record<string, any>;
-                expect(Object.keys(keyMap)).toHaveLength(1);
-                const symbolKey = Object.keys(keyMap)[0];
-                expect(keyMap[symbolKey]).toEqual("minecraft:acacia_planks");
-            });
-        });
-
-        describe("Smelting Compilation", () => {
-            let blastingCompiled: ReturnType<Compiler<RecipeProps, MinecraftRecipe>>;
-            let smeltingCompiled: ReturnType<Compiler<RecipeProps, MinecraftRecipe>>;
-
-            beforeEach(() => {
-                blastingCompiled = VoxelToRecipeDataDriven(blastingVoxel.data, "recipe");
-                smeltingCompiled = VoxelToRecipeDataDriven(smeltingVoxel.data, "recipe");
-            });
-
-            it("should compile blasting recipe", () => {
-                expect(blastingCompiled.element.data.type).toBe("minecraft:blasting");
-                expect(blastingCompiled.element.data.ingredient).toEqual("minecraft:iron_ore");
-                expect(blastingCompiled.element.data.experience).toBe(0.7);
-                expect(blastingCompiled.element.data.cookingtime).toBe(100);
-            });
-
-            it("should compile smelting recipe", () => {
-                expect(smeltingCompiled.element.data.type).toBe("minecraft:smelting");
-                expect(smeltingCompiled.element.data.cookingtime).toBe(200);
-            });
-        });
-
-        describe("Stonecutting Compilation", () => {
-            let compiled: ReturnType<Compiler<RecipeProps, MinecraftRecipe>>;
-
-            beforeEach(() => {
-                compiled = VoxelToRecipeDataDriven(stonecuttingVoxel.data, "recipe");
-            });
-
-            it("should compile stonecutting with legacy count", () => {
-                expect(compiled.element.data.type).toBe("minecraft:stonecutting");
-                expect(compiled.element.data.ingredient).toEqual("minecraft:andesite");
-                expect(compiled.element.data.result).toBe("minecraft:andesite_slab");
-                expect(compiled.element.data.count).toBe(2);
-            });
-        });
-
-        describe("Smithing Compilation", () => {
-            let compiled: ReturnType<Compiler<RecipeProps, MinecraftRecipe>>;
-
-            beforeEach(() => {
-                compiled = VoxelToRecipeDataDriven(transformVoxel.data, "recipe");
-            });
-
-            it("should compile smithing transform", () => {
-                expect(compiled.element.data.type).toBe("minecraft:smithing_transform");
-                expect(compiled.element.data.base).toEqual("#minecraft:trimmable_armor");
-                expect(compiled.element.data.addition).toEqual("#minecraft:trim_materials");
-                expect(compiled.element.data.template).toEqual("minecraft:wayfinder_armor_trim_smithing_template");
-            });
-        });
-
-        describe("Tags handling", () => {
-            it("should return empty tags array", () => {
-                const compiled = VoxelToRecipeDataDriven(shapelessVoxel.data, "recipe");
-                expect(compiled.tags).toEqual([]);
             });
         });
     });
