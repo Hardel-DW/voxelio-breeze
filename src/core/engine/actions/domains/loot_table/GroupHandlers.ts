@@ -9,8 +9,7 @@ export class CreateLootGroupHandler implements ActionHandler<LootTableAction> {
         action: Extract<LootTableAction, { type: "loot_table.create_loot_group" }>,
         element: Record<string, unknown>
     ): Record<string, unknown> | undefined {
-        const lootTable = element as LootTableProps;
-        const clone = structuredClone(lootTable);
+        const lootTable = structuredClone(element) as LootTableProps;
 
         const newGroup: LootGroup = {
             id: `group_${globalGroupCounter++}`,
@@ -19,8 +18,8 @@ export class CreateLootGroupHandler implements ActionHandler<LootTableAction> {
             poolIndex: action.poolIndex,
             entryIndex: action.entryIndex || 0
         };
-        clone.groups.push(newGroup);
-        return clone;
+        lootTable.groups.push(newGroup);
+        return lootTable;
     }
 }
 
@@ -29,10 +28,9 @@ export class ModifyLootGroupHandler implements ActionHandler<LootTableAction> {
         action: Extract<LootTableAction, { type: "loot_table.modify_loot_group" }>,
         element: Record<string, unknown>
     ): Record<string, unknown> | undefined {
-        const lootTable = element as LootTableProps;
-        const clone = structuredClone(lootTable);
+        const lootTable = structuredClone(element) as LootTableProps;
 
-        const group = clone.groups.find((g) => g.id === action.groupId);
+        const group = lootTable.groups.find((g) => g.id === action.groupId);
         if (group) {
             switch (action.operation) {
                 case "add_item":
@@ -48,7 +46,7 @@ export class ModifyLootGroupHandler implements ActionHandler<LootTableAction> {
                     break;
             }
         }
-        return clone;
+        return lootTable;
     }
 }
 
@@ -57,16 +55,12 @@ export class DissolveLootGroupHandler implements ActionHandler<LootTableAction> 
         action: Extract<LootTableAction, { type: "loot_table.dissolve_loot_group" }>,
         element: Record<string, unknown>
     ): Record<string, unknown> | undefined {
-        const lootTable = element as LootTableProps;
-        const clone = structuredClone(lootTable);
-
-        // Remove group but keep items
-        clone.groups = clone.groups.filter((group) => group.id !== action.groupId);
-        // Remove group references from other groups
-        for (const group of clone.groups) {
+        const lootTable = structuredClone(element) as LootTableProps;
+        lootTable.groups = lootTable.groups.filter((group) => group.id !== action.groupId);
+        for (const group of lootTable.groups) {
             group.items = group.items.filter((itemId) => itemId !== action.groupId);
         }
-        return clone;
+        return lootTable;
     }
 }
 
@@ -75,10 +69,9 @@ export class ConvertItemToGroupHandler implements ActionHandler<LootTableAction>
         action: Extract<LootTableAction, { type: "loot_table.convert_item_to_group" }>,
         element: Record<string, unknown>
     ): Record<string, unknown> | undefined {
-        const lootTable = element as LootTableProps;
-        const clone = structuredClone(lootTable);
+        const lootTable = structuredClone(element) as LootTableProps;
 
-        const item = clone.items.find((item) => item.id === action.itemId);
+        const item = lootTable.items.find((item) => item.id === action.itemId);
         if (item) {
             const newGroup: LootGroup = {
                 id: `group_${globalGroupCounter++}`,
@@ -87,9 +80,9 @@ export class ConvertItemToGroupHandler implements ActionHandler<LootTableAction>
                 poolIndex: item.poolIndex,
                 entryIndex: item.entryIndex
             };
-            clone.groups.push(newGroup);
+            lootTable.groups.push(newGroup);
         }
-        return clone;
+        return lootTable;
     }
 }
 
@@ -98,27 +91,23 @@ export class ConvertGroupToItemHandler implements ActionHandler<LootTableAction>
         action: Extract<LootTableAction, { type: "loot_table.convert_group_to_item" }>,
         element: Record<string, unknown>
     ): Record<string, unknown> | undefined {
-        const lootTable = element as LootTableProps;
-        const clone = structuredClone(lootTable);
+        const lootTable = structuredClone(element) as LootTableProps;
 
-        const group = clone.groups.find((group) => group.id === action.groupId);
+        const group = lootTable.groups.find((group) => group.id === action.groupId);
         if (group && group.items.length > 0) {
             if (action.keepFirstItem) {
-                // Keep only the first item, remove the group
-                clone.groups = clone.groups.filter((g) => g.id !== action.groupId);
-                // Remove group references
-                for (const g of clone.groups) {
+                lootTable.groups = lootTable.groups.filter((g) => g.id !== action.groupId);
+                for (const g of lootTable.groups) {
                     g.items = g.items.filter((itemId) => itemId !== action.groupId);
                 }
             } else {
-                // Remove all items in the group
                 for (const itemId of group.items) {
-                    clone.items = clone.items.filter((item) => item.id !== itemId);
+                    lootTable.items = lootTable.items.filter((item) => item.id !== itemId);
                 }
-                clone.groups = clone.groups.filter((g) => g.id !== action.groupId);
+                lootTable.groups = lootTable.groups.filter((g) => g.id !== action.groupId);
             }
         }
-        return clone;
+        return lootTable;
     }
 }
 
@@ -127,15 +116,14 @@ export class NestGroupInGroupHandler implements ActionHandler<LootTableAction> {
         action: Extract<LootTableAction, { type: "loot_table.nest_group_in_group" }>,
         element: Record<string, unknown>
     ): Record<string, unknown> | undefined {
-        const lootTable = element as LootTableProps;
-        const clone = structuredClone(lootTable);
+        const lootTable = structuredClone(element) as LootTableProps;
 
-        const parentGroup = clone.groups.find((group) => group.id === action.parentGroupId);
+        const parentGroup = lootTable.groups.find((group) => group.id === action.parentGroupId);
         if (parentGroup) {
             const position = action.position ?? parentGroup.items.length;
             parentGroup.items.splice(position, 0, action.childGroupId);
         }
-        return clone;
+        return lootTable;
     }
 }
 
@@ -144,12 +132,11 @@ export class UnnestGroupHandler implements ActionHandler<LootTableAction> {
         action: Extract<LootTableAction, { type: "loot_table.unnest_group" }>,
         element: Record<string, unknown>
     ): Record<string, unknown> | undefined {
-        const lootTable = element as LootTableProps;
-        const clone = structuredClone(lootTable);
+        const lootTable = structuredClone(element) as LootTableProps;
 
-        for (const group of clone.groups) {
+        for (const group of lootTable.groups) {
             group.items = group.items.filter((itemId) => itemId !== action.groupId);
         }
-        return clone;
+        return lootTable;
     }
 }

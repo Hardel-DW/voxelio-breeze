@@ -19,7 +19,7 @@ class ToggleEnchantmentToExclusiveSetHandler implements ActionHandler<Enchantmen
         action: Extract<EnchantmentAction, { type: "enchantment.toggle_enchantment_to_exclusive_set" }>,
         element: Record<string, unknown>
     ) {
-        const props = { ...element } as EnchantmentProps;
+        const props = structuredClone(element) as EnchantmentProps;
         if (typeof props.exclusiveSet === "string") {
             if (props.exclusiveSet.startsWith("#")) {
                 props.tags = props.tags.filter((tag) => tag !== props.exclusiveSet);
@@ -44,7 +44,7 @@ class ToggleEnchantmentToExclusiveSetHandler implements ActionHandler<Enchantmen
 
 class SetExclusiveSetWithTagsHandler implements ActionHandler<EnchantmentAction> {
     execute(action: Extract<EnchantmentAction, { type: "enchantment.set_exclusive_set_with_tags" }>, element: Record<string, unknown>) {
-        const props = { ...element } as EnchantmentProps;
+        const props = structuredClone(element) as EnchantmentProps;
         if (!action.value.startsWith("#")) {
             return props;
         }

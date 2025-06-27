@@ -7,23 +7,21 @@ export class ConfigureConcentricRingsHandler implements ActionHandler<StructureS
         action: Extract<StructureSetAction, { type: "structure_set.configure_concentric_rings" }>,
         element: Record<string, unknown>
     ): Record<string, unknown> {
-        const structureSet = element as StructureSetProps;
-
-        const updatedElement = { ...structureSet };
+        const structureSet = structuredClone(element) as StructureSetProps;
 
         if (action.distance !== undefined) {
-            updatedElement.distance = action.distance;
+            structureSet.distance = action.distance;
         }
         if (action.spread !== undefined) {
-            updatedElement.spread = action.spread;
+            structureSet.spread = action.spread;
         }
         if (action.count !== undefined) {
-            updatedElement.count = action.count;
+            structureSet.count = action.count;
         }
         if (action.preferredBiomes !== undefined) {
-            updatedElement.preferredBiomes = action.preferredBiomes;
+            structureSet.preferredBiomes = action.preferredBiomes;
         }
 
-        return updatedElement;
+        return structureSet;
     }
 }

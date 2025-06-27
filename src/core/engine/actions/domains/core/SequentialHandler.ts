@@ -3,14 +3,14 @@ import type { ActionHandler } from "../../types";
 import type { CoreAction } from "./types";
 
 export class SequentialHandler implements ActionHandler<CoreAction> {
-    constructor(private registry?: ActionRegistry) {}
+    constructor(private registry?: ActionRegistry) { }
 
     async execute(
         action: Extract<CoreAction, { type: "core.sequential" }>,
         element: Record<string, unknown>,
         version?: number
     ): Promise<Record<string, unknown> | undefined> {
-        let currentElement = element;
+        let currentElement = structuredClone(element);
 
         for (const subAction of action.actions) {
             if (!this.registry) {

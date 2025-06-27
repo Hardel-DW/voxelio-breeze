@@ -4,14 +4,14 @@ import type { ActionHandler } from "../../types";
 import type { CoreAction } from "./types";
 
 export class AlternativeHandler implements ActionHandler<CoreAction> {
-    constructor(private registry: ActionRegistry) {}
+    constructor(private registry: ActionRegistry) { }
 
     async execute(
         action: Extract<CoreAction, { type: "core.alternative" }>,
         element: Record<string, unknown>,
         version?: number
     ): Promise<Record<string, unknown> | undefined> {
-        const currentElement = { ...element } as VoxelElement;
+        const currentElement = structuredClone(element) as VoxelElement;
         if (typeof action.condition === "function" ? action.condition(currentElement) : action.condition) {
             return await this.registry.execute(action.ifTrue, currentElement, version);
         }

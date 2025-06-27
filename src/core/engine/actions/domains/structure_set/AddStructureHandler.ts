@@ -7,7 +7,7 @@ export class AddStructureHandler implements ActionHandler<StructureSetAction> {
         action: Extract<StructureSetAction, { type: "structure_set.add_structure" }>,
         element: Record<string, unknown>
     ): Record<string, unknown> {
-        const structureSet = element as StructureSetProps;
+        const structureSet = structuredClone(element) as StructureSetProps;
 
         const newStructure: StructureSetStructure = {
             structure: action.structure,
@@ -22,9 +22,7 @@ export class AddStructureHandler implements ActionHandler<StructureSetAction> {
             updatedStructures.push(newStructure);
         }
 
-        return {
-            ...structureSet,
-            structures: updatedStructures
-        };
+        structureSet.structures = updatedStructures;
+        return structureSet;
     }
 }

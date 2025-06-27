@@ -7,21 +7,20 @@ export class ConvertRecipeTypeHandler implements ActionHandler<RecipeAction> {
         action: Extract<RecipeAction, { type: "recipe.convert_recipe_type" }>,
         element: Record<string, unknown>
     ): Record<string, unknown> | undefined {
-        const recipe = element as RecipeProps;
-        const newRecipe = { ...recipe };
+        const recipe = structuredClone(element) as RecipeProps;
 
         const { newType, preserveIngredients } = action;
-        newRecipe.type = newType as any;
+        recipe.type = newType as any;
 
         if (preserveIngredients !== false) {
             switch (newType) {
                 case "minecraft:crafting_shapeless":
-                    newRecipe.gridSize = undefined;
+                    recipe.gridSize = undefined;
                     break;
 
                 case "minecraft:crafting_shaped":
-                    if (!newRecipe.gridSize) {
-                        newRecipe.gridSize = { width: 3, height: 3 };
+                    if (!recipe.gridSize) {
+                        recipe.gridSize = { width: 3, height: 3 };
                     }
                     break;
 
@@ -29,31 +28,30 @@ export class ConvertRecipeTypeHandler implements ActionHandler<RecipeAction> {
                 case "minecraft:blasting":
                 case "minecraft:smoking":
                 case "minecraft:campfire_cooking": {
-                    const firstSlotWithContent = this.getFirstSlotWithContent(newRecipe.slots);
-                    newRecipe.slots = firstSlotWithContent ? { "0": firstSlotWithContent } : {};
-                    newRecipe.gridSize = undefined;
+                    const firstSlotWithContent = this.getFirstSlotWithContent(recipe.slots);
+                    recipe.slots = firstSlotWithContent ? { "0": firstSlotWithContent } : {};
+                    recipe.gridSize = undefined;
                     break;
                 }
 
                 case "minecraft:stonecutting": {
-                    const firstSlotWithContent = this.getFirstSlotWithContent(newRecipe.slots);
-                    newRecipe.slots = firstSlotWithContent ? { "0": firstSlotWithContent } : {};
-                    newRecipe.gridSize = undefined;
-                    newRecipe.typeSpecific = undefined;
+                    const firstSlotWithContent = this.getFirstSlotWithContent(recipe.slots);
+                    recipe.slots = firstSlotWithContent ? { "0": firstSlotWithContent } : {};
+                    recipe.gridSize = undefined;
+                    recipe.typeSpecific = undefined;
                     break;
                 }
             }
         }
 
-        return newRecipe;
+        return recipe;
     }
 
     private getFirstSlotWithContent(slots: Record<string, string[] | string>): string[] | string | null {
         for (const slotContent of Object.values(slots)) {
             if (slotContent && (typeof slotContent === "string" || slotContent.length > 0)) {
-                // For cooking recipe types, we only want the first item
                 if (Array.isArray(slotContent) && slotContent.length > 1) {
-                    return [slotContent[0]]; // Return only the first item as an array
+                    return [slotContent[0]];
                 }
                 return slotContent;
             }

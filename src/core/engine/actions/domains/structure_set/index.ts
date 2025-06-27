@@ -1,3 +1,4 @@
+import type { StructureSetProps } from "@/core/schema/structure_set/types";
 import type { ActionHandler } from "../../types";
 import { AddStructureHandler } from "./AddStructureHandler";
 import { ConfigureConcentricRingsHandler } from "./ConfigureConcentricRingsHandler";
@@ -27,14 +28,12 @@ class RemoveStructureHandler implements ActionHandler<StructureSetAction> {
         action: Extract<StructureSetAction, { type: "structure_set.remove_structure" }>,
         element: Record<string, unknown>
     ): Record<string, unknown> {
-        const structureSet = element as any;
+        const structureSet = structuredClone(element) as StructureSetProps;
 
         const updatedStructures = structureSet.structures.filter((_: any, index: number) => `structure_${index}` !== action.structureId);
 
-        return {
-            ...structureSet,
-            structures: updatedStructures
-        };
+        structureSet.structures = updatedStructures;
+        return structureSet;
     }
 }
 
@@ -43,7 +42,7 @@ class ModifyStructureHandler implements ActionHandler<StructureSetAction> {
         action: Extract<StructureSetAction, { type: "structure_set.modify_structure" }>,
         element: Record<string, unknown>
     ): Record<string, unknown> {
-        const structureSet = element as any;
+        const structureSet = structuredClone(element) as StructureSetProps;
         const structureIndex = Number.parseInt(action.structureId.replace("structure_", ""));
 
         if (structureIndex < 0 || structureIndex >= structureSet.structures.length) {
@@ -56,10 +55,8 @@ class ModifyStructureHandler implements ActionHandler<StructureSetAction> {
             [action.property]: action.value
         };
 
-        return {
-            ...structureSet,
-            structures: updatedStructures
-        };
+        structureSet.structures = updatedStructures;
+        return structureSet;
     }
 }
 
@@ -68,12 +65,9 @@ class SetPlacementTypeHandler implements ActionHandler<StructureSetAction> {
         action: Extract<StructureSetAction, { type: "structure_set.set_placement_type" }>,
         element: Record<string, unknown>
     ): Record<string, unknown> {
-        const structureSet = element as any;
-
-        return {
-            ...structureSet,
-            placementType: action.placementType
-        };
+        const structureSet = structuredClone(element) as StructureSetProps;
+        structureSet.placementType = action.placementType;
+        return structureSet;
     }
 }
 
@@ -82,15 +76,12 @@ class SetExclusionZoneHandler implements ActionHandler<StructureSetAction> {
         action: Extract<StructureSetAction, { type: "structure_set.set_exclusion_zone" }>,
         element: Record<string, unknown>
     ): Record<string, unknown> {
-        const structureSet = element as any;
-
-        return {
-            ...structureSet,
-            exclusionZone: {
-                otherSet: action.otherSet,
-                chunkCount: action.chunkCount
-            }
+        const structureSet = structuredClone(element) as StructureSetProps;
+        structureSet.exclusionZone = {
+            otherSet: action.otherSet,
+            chunkCount: action.chunkCount
         };
+        return structureSet;
     }
 }
 
@@ -99,9 +90,9 @@ class RemoveExclusionZoneHandler implements ActionHandler<StructureSetAction> {
         action: Extract<StructureSetAction, { type: "structure_set.remove_exclusion_zone" }>,
         element: Record<string, unknown>
     ): Record<string, unknown> {
-        const structureSet = element as any;
+        const structureSet = structuredClone(element) as StructureSetProps;
         const { exclusionZone, ...rest } = structureSet;
-        return rest;
+        return { ...rest };
     }
 }
 
@@ -110,21 +101,19 @@ class ConfigureRandomSpreadHandler implements ActionHandler<StructureSetAction> 
         action: Extract<StructureSetAction, { type: "structure_set.configure_random_spread" }>,
         element: Record<string, unknown>
     ): Record<string, unknown> {
-        const structureSet = element as any;
-
-        const updatedElement = { ...structureSet };
+        const structureSet = structuredClone(element) as StructureSetProps;
 
         if (action.spacing !== undefined) {
-            updatedElement.spacing = action.spacing;
+            structureSet.spacing = action.spacing;
         }
         if (action.separation !== undefined) {
-            updatedElement.separation = action.separation;
+            structureSet.separation = action.separation;
         }
         if (action.spreadType !== undefined) {
-            updatedElement.spreadType = action.spreadType;
+            structureSet.spreadType = action.spreadType;
         }
 
-        return updatedElement;
+        return structureSet;
     }
 }
 
@@ -133,7 +122,7 @@ class ReorderStructuresHandler implements ActionHandler<StructureSetAction> {
         action: Extract<StructureSetAction, { type: "structure_set.reorder_structures" }>,
         element: Record<string, unknown>
     ): Record<string, unknown> {
-        const structureSet = element as any;
+        const structureSet = structuredClone(element) as StructureSetProps;
 
         const reorderedStructures = action.structureIds
             .map((id) => {
@@ -142,9 +131,7 @@ class ReorderStructuresHandler implements ActionHandler<StructureSetAction> {
             })
             .filter(Boolean);
 
-        return {
-            ...structureSet,
-            structures: reorderedStructures
-        };
+        structureSet.structures = reorderedStructures;
+        return structureSet;
     }
 }

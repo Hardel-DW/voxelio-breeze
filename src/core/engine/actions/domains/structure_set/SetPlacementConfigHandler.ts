@@ -7,23 +7,21 @@ export class SetPlacementConfigHandler implements ActionHandler<StructureSetActi
         action: Extract<StructureSetAction, { type: "structure_set.configure_placement" }>,
         element: Record<string, unknown>
     ): Record<string, unknown> {
-        const structureSet = element as StructureSetProps;
-
-        const updatedElement = { ...structureSet };
+        const structureSet = structuredClone(element) as StructureSetProps;
 
         if (action.salt !== undefined) {
-            updatedElement.salt = action.salt;
+            structureSet.salt = action.salt;
         }
         if (action.frequencyReductionMethod !== undefined) {
-            updatedElement.frequencyReductionMethod = action.frequencyReductionMethod;
+            structureSet.frequencyReductionMethod = action.frequencyReductionMethod;
         }
         if (action.frequency !== undefined) {
-            updatedElement.frequency = action.frequency;
+            structureSet.frequency = action.frequency;
         }
         if (action.locateOffset !== undefined) {
-            updatedElement.locateOffset = action.locateOffset;
+            structureSet.locateOffset = action.locateOffset;
         }
 
-        return updatedElement;
+        return structureSet;
     }
 }

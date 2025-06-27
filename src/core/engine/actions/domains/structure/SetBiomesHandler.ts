@@ -1,13 +1,16 @@
+import type { StructureProps } from "@/core/schema/structure/types";
 import type { ActionHandler } from "../../types";
 import type { StructureAction } from "./types";
 
 export class SetBiomesHandler implements ActionHandler<StructureAction> {
     execute(action: Extract<StructureAction, { type: "structure.set_biomes" }>, element: Record<string, unknown>): Record<string, unknown> {
+        const structure = structuredClone(element) as StructureProps;
         if (action.replace) {
-            return { ...element, biomes: action.biomes };
+            structure.biomes = action.biomes;
+            return structure;
         }
 
-        const currentBiomes = Array.isArray(element.biomes) ? element.biomes : [];
+        const currentBiomes = Array.isArray(structure.biomes) ? structure.biomes : [];
         const existingBiomes = new Set(currentBiomes);
         const newBiomes = [...currentBiomes];
 
@@ -17,6 +20,7 @@ export class SetBiomesHandler implements ActionHandler<StructureAction> {
             }
         }
 
-        return { ...element, biomes: newBiomes };
+        structure.biomes = newBiomes;
+        return structure;
     }
 }

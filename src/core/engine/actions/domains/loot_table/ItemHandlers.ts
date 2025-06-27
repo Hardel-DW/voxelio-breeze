@@ -9,8 +9,7 @@ export class AddLootItemHandler implements ActionHandler<LootTableAction> {
         action: Extract<LootTableAction, { type: "loot_table.add_loot_item" }>,
         element: Record<string, unknown>
     ): Record<string, unknown> | undefined {
-        const lootTable = element as LootTableProps;
-        const clone = structuredClone(lootTable);
+        const lootTable = structuredClone(element) as LootTableProps;
 
         const newItem: LootItem = {
             id: `item_${globalItemCounter++}`,
@@ -23,8 +22,8 @@ export class AddLootItemHandler implements ActionHandler<LootTableAction> {
             entryIndex: 0,
             entryType: "minecraft:item"
         };
-        clone.items.push(newItem);
-        return clone;
+        lootTable.items.push(newItem);
+        return lootTable;
     }
 }
 
@@ -33,15 +32,14 @@ export class RemoveLootItemHandler implements ActionHandler<LootTableAction> {
         action: Extract<LootTableAction, { type: "loot_table.remove_loot_item" }>,
         element: Record<string, unknown>
     ): Record<string, unknown> | undefined {
-        const lootTable = element as LootTableProps;
-        const clone = structuredClone(lootTable);
+        const lootTable = structuredClone(element) as LootTableProps;
 
-        clone.items = clone.items.filter((item) => item.id !== action.itemId);
-        for (const group of clone.groups) {
+        lootTable.items = lootTable.items.filter((item) => item.id !== action.itemId);
+        for (const group of lootTable.groups) {
             group.items = group.items.filter((itemId) => itemId !== action.itemId);
         }
-        clone.groups = clone.groups.filter((group) => group.items.length > 0);
-        return clone;
+        lootTable.groups = lootTable.groups.filter((group) => group.items.length > 0);
+        return lootTable;
     }
 }
 
@@ -50,10 +48,9 @@ export class ModifyLootItemHandler implements ActionHandler<LootTableAction> {
         action: Extract<LootTableAction, { type: "loot_table.modify_loot_item" }>,
         element: Record<string, unknown>
     ): Record<string, unknown> | undefined {
-        const lootTable = element as LootTableProps;
-        const clone = structuredClone(lootTable);
+        const lootTable = structuredClone(element) as LootTableProps;
 
-        const item = clone.items.find((item) => item.id === action.itemId);
+        const item = lootTable.items.find((item) => item.id === action.itemId);
         if (item) {
             switch (action.property) {
                 case "name":
@@ -67,7 +64,7 @@ export class ModifyLootItemHandler implements ActionHandler<LootTableAction> {
                     break;
             }
         }
-        return clone;
+        return lootTable;
     }
 }
 
@@ -76,19 +73,18 @@ export class DuplicateLootItemHandler implements ActionHandler<LootTableAction> 
         action: Extract<LootTableAction, { type: "loot_table.duplicate_loot_item" }>,
         element: Record<string, unknown>
     ): Record<string, unknown> | undefined {
-        const lootTable = element as LootTableProps;
-        const clone = structuredClone(lootTable);
+        const lootTable = structuredClone(element) as LootTableProps;
 
-        const originalItem = clone.items.find((item) => item.id === action.itemId);
+        const originalItem = lootTable.items.find((item) => item.id === action.itemId);
         if (originalItem) {
             const duplicatedItem: LootItem = {
                 ...originalItem,
                 id: `item_${globalItemCounter++}`,
                 poolIndex: action.targetPoolIndex ?? originalItem.poolIndex
             };
-            clone.items.push(duplicatedItem);
+            lootTable.items.push(duplicatedItem);
         }
-        return clone;
+        return lootTable;
     }
 }
 
@@ -97,11 +93,10 @@ export class BulkModifyItemsHandler implements ActionHandler<LootTableAction> {
         action: Extract<LootTableAction, { type: "loot_table.bulk_modify_items" }>,
         element: Record<string, unknown>
     ): Record<string, unknown> | undefined {
-        const lootTable = element as LootTableProps;
-        const clone = structuredClone(lootTable);
+        const lootTable = structuredClone(element) as LootTableProps;
 
         for (const itemId of action.itemIds) {
-            const item = clone.items.find((item) => item.id === itemId);
+            const item = lootTable.items.find((item) => item.id === itemId);
             if (item) {
                 const currentValue = (action.property === "weight" ? item.weight : item.quality) || 0;
                 let newValue: number;
@@ -127,6 +122,6 @@ export class BulkModifyItemsHandler implements ActionHandler<LootTableAction> {
                 }
             }
         }
-        return clone;
+        return lootTable;
     }
 }

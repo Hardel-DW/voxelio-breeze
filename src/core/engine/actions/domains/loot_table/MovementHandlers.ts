@@ -7,14 +7,13 @@ export class MoveItemBetweenPoolsHandler implements ActionHandler<LootTableActio
         action: Extract<LootTableAction, { type: "loot_table.move_item_between_pools" }>,
         element: Record<string, unknown>
     ): Record<string, unknown> | undefined {
-        const lootTable = element as LootTableProps;
-        const clone = structuredClone(lootTable);
+        const lootTable = structuredClone(element) as LootTableProps;
 
-        const item = clone.items.find((item) => item.id === action.itemId);
+        const item = lootTable.items.find((item) => item.id === action.itemId);
         if (item) {
             item.poolIndex = action.targetPoolIndex;
         }
-        return clone;
+        return lootTable;
     }
 }
 
@@ -23,14 +22,13 @@ export class MoveGroupBetweenPoolsHandler implements ActionHandler<LootTableActi
         action: Extract<LootTableAction, { type: "loot_table.move_group_between_pools" }>,
         element: Record<string, unknown>
     ): Record<string, unknown> | undefined {
-        const lootTable = element as LootTableProps;
-        const clone = structuredClone(lootTable);
+        const lootTable = structuredClone(element) as LootTableProps;
 
-        const group = clone.groups.find((group) => group.id === action.groupId);
+        const group = lootTable.groups.find((group) => group.id === action.groupId);
         if (group) {
             group.poolIndex = action.targetPoolIndex;
         }
-        return clone;
+        return lootTable;
     }
 }
 
@@ -39,10 +37,9 @@ export class BalanceWeightsHandler implements ActionHandler<LootTableAction> {
         action: Extract<LootTableAction, { type: "loot_table.balance_weights" }>,
         element: Record<string, unknown>
     ): Record<string, unknown> | undefined {
-        const lootTable = element as LootTableProps;
-        const clone = structuredClone(lootTable);
+        const lootTable = structuredClone(element) as LootTableProps;
 
-        const poolItems = clone.items.filter((item) => item.poolIndex === action.poolIndex);
+        const poolItems = lootTable.items.filter((item) => item.poolIndex === action.poolIndex);
         const targetTotal = action.targetTotal || 100;
         const itemCount = poolItems.length;
 
@@ -52,7 +49,7 @@ export class BalanceWeightsHandler implements ActionHandler<LootTableAction> {
                 item.weight = weightPerItem;
             }
         }
-        return clone;
+        return lootTable;
     }
 }
 
@@ -61,23 +58,22 @@ export class ConditionalLootHandler implements ActionHandler<LootTableAction> {
         action: Extract<LootTableAction, { type: "loot_table.conditional_loot" }>,
         element: Record<string, unknown>
     ): Record<string, unknown> | undefined {
-        const lootTable = element as LootTableProps;
-        const clone = structuredClone(lootTable);
+        const lootTable = structuredClone(element) as LootTableProps;
 
         let conditionMet = false;
 
         switch (action.condition.type) {
             case "pool_empty":
                 if (action.condition.poolIndex !== undefined) {
-                    const poolItems = clone.items.filter((item) => item.poolIndex === action.condition.poolIndex);
+                    const poolItems = lootTable.items.filter((item) => item.poolIndex === action.condition.poolIndex);
                     conditionMet = poolItems.length === 0;
                 }
                 break;
             case "item_count":
-                conditionMet = clone.items.length >= (action.condition.count || 0);
+                conditionMet = lootTable.items.length >= (action.condition.count || 0);
                 break;
             case "group_exists":
-                conditionMet = clone.groups.some((group) => group.id === action.condition.groupId);
+                conditionMet = lootTable.groups.some((group) => group.id === action.condition.groupId);
                 break;
         }
 
@@ -85,8 +81,8 @@ export class ConditionalLootHandler implements ActionHandler<LootTableAction> {
         if (actionToExecute) {
             // Recursive - we need to call the new action system
             // For now we just return clone, it will be fixed later
-            return clone;
+            return lootTable;
         }
-        return clone;
+        return lootTable;
     }
 }
