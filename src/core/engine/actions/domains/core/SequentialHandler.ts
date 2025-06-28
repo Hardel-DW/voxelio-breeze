@@ -3,7 +3,7 @@ import type { ActionHandler } from "../../types";
 import type { CoreAction } from "./types";
 
 export class SequentialHandler implements ActionHandler<CoreAction> {
-    constructor(private registry?: ActionRegistry) { }
+    constructor(private registry?: ActionRegistry) {}
 
     async execute(
         action: Extract<CoreAction, { type: "core.sequential" }>,

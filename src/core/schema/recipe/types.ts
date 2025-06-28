@@ -135,7 +135,7 @@ export function normalizeIngredient(ingredient: any): string[] | string {
 
     // Items : "diamond" ou ["diamond", "emerald"]
     const items = Array.isArray(ingredient) ? ingredient : [ingredient];
-    return items.map(item => normalizeResourceLocation(typeof item === "string" ? item : item.item));
+    return items.map((item) => normalizeResourceLocation(typeof item === "string" ? item : item.item));
 }
 
 export function denormalizeIngredient(items: string[] | string, preserveTagFormat = false): any {
@@ -160,7 +160,7 @@ export function denormalizeIngredient(items: string[] | string, preserveTagForma
         return items; // Return array of strings directly when preserving format
     }
 
-    return items.map(item => ({ item })); // Return array of objects for original format
+    return items.map((item) => ({ item })); // Return array of objects for original format
 }
 
 /**
@@ -231,7 +231,7 @@ export function optimizeGridSize(slots: Record<string, string[] | string>, defau
 /**
  * Compare two ingredients semantically, handling different formats
  * @param a First ingredient
- * @param b Second ingredient  
+ * @param b Second ingredient
  * @returns true if ingredients are equivalent
  */
 export function compareIngredients(a: any, b: any): boolean {

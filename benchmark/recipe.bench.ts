@@ -16,25 +16,12 @@ import {
     transmute,
     transform
 } from "@test/template/concept/recipe/DataDriven";
-import {
-    shapelessVoxel,
-    shapedVoxel,
-    stonecuttingVoxel,
-    blastingVoxel,
-    smeltingVoxel,
-    transformVoxel
-} from "@test/template/concept/recipe/VoxelDriven";
 
 describe("Recipe Performance", () => {
     const simpleShapeless = shapeless;
     const complexShaped = ShapedWithEmptyLine;
     const smeltingRecipe = smelting;
     const smithingRecipe = transform;
-
-    const simpleVoxel = shapelessVoxel.data;
-    const complexVoxel = shapedVoxel.data;
-    const smeltingVoxelData = smeltingVoxel.data;
-    const smithingVoxel = transformVoxel.data;
 
     const largeShapedRecipe: DataDrivenRegistryElement<MinecraftRecipe> = {
         identifier: { namespace: "test", registry: "recipe", resource: "large_shaped" },
@@ -156,22 +143,6 @@ describe("Recipe Performance", () => {
     });
 
     describe("Compilation Performance", () => {
-        bench("Compile simple shapeless recipe", () => {
-            VoxelToRecipeDataDriven(simpleVoxel, "recipe");
-        });
-
-        bench("Compile complex shaped recipe", () => {
-            VoxelToRecipeDataDriven(complexVoxel, "recipe");
-        });
-
-        bench("Compile smelting recipe", () => {
-            VoxelToRecipeDataDriven(smeltingVoxelData, "recipe");
-        });
-
-        bench("Compile smithing recipe", () => {
-            VoxelToRecipeDataDriven(smithingVoxel, "recipe");
-        });
-
         bench("Compile large shaped recipe", () => {
             const largeVoxel = RecipeDataDrivenToVoxelFormat({ element: largeShapedRecipe });
             VoxelToRecipeDataDriven(largeVoxel, "recipe", largeShapedRecipe.data);

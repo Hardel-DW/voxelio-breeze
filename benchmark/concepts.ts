@@ -10,8 +10,7 @@ import { StructureSetDataDrivenToVoxelFormat } from "../src/core/schema/structur
 import { VoxelToStructureSetDataDriven } from "../src/core/schema/structure_set/Compiler";
 import { DATA_DRIVEN_TEMPLATE_ENCHANTMENT } from "../test/template/concept/enchant/DataDriven";
 import { VOXEL_TEMPLATE_ENCHANTMENT } from "../test/template/concept/enchant/VoxelDriven";
-import { shapeless, shaped, smelting, transform } from "../test/template/concept/recipe/DataDriven";
-import { shapelessVoxel } from "../test/template/concept/recipe/VoxelDriven";
+import { shaped, smelting, transform } from "../test/template/concept/recipe/DataDriven";
 import { DATA_DRIVEN_TEMPLATE_LOOT_TABLE } from "../test/template/concept/loot/DataDriven";
 import { VOXEL_TEMPLATE_LOOT_TABLE } from "../test/template/concept/loot/VoxelDriven";
 import { village, mineshaft, bastion, fortress } from "../test/template/concept/structure/DataDriven";
@@ -139,12 +138,6 @@ const concepts: ConceptConfig[] = [
         compiler: (voxel, original) => VoxelToRecipeDataDriven(voxel, "recipe", original),
         registry: "recipe",
         testCases: [
-            {
-                name: "shapeless",
-                datadriven: shapeless,
-                voxel: shapelessVoxel.data,
-                size: "~1.5KB"
-            },
             {
                 name: "shaped",
                 datadriven: shaped,
@@ -402,10 +395,10 @@ parseRanking.forEach((perf, index) => {
         index === 0
             ? "Best for real-time editing"
             : index === 1
-              ? "Good for most use cases"
-              : index === 2
-                ? "Consider optimization for heavy usage"
-                : "Needs performance improvements";
+                ? "Good for most use cases"
+                : index === 2
+                    ? "Consider optimization for heavy usage"
+                    : "Needs performance improvements";
     console.log(`  ${index + 1}. ${perf.icon} ${perf.displayName} - ${recommendation}`);
 });
 

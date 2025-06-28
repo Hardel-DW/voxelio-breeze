@@ -13,6 +13,13 @@ export class RecipeActionBuilder extends ActionBuilder<RecipeAction> {
     }
 
     /**
+     * Add ingredient to shapeless recipe
+     */
+    addShapelessIngredient(): AddShapelessIngredientBuilder {
+        return new AddShapelessIngredientBuilder();
+    }
+
+    /**
      * Remove ingredients from a slot
      */
     removeIngredient(slot: string): RemoveIngredientBuilder {
@@ -20,17 +27,24 @@ export class RecipeActionBuilder extends ActionBuilder<RecipeAction> {
     }
 
     /**
+     * Remove items from all slots in recipe
+     */
+    removeItemEverywhere(): RemoveItemEverywhereBuilder {
+        return new RemoveItemEverywhereBuilder();
+    }
+
+    /**
+     * Replace item everywhere in recipe
+     */
+    replaceItemEverywhere(from: string): ReplaceItemEverywhereBuilder {
+        return new ReplaceItemEverywhereBuilder(from);
+    }
+
+    /**
      * Clear a slot completely
      */
     clearSlot(slot: string): ClearSlotBuilder {
         return new ClearSlotBuilder(slot);
-    }
-
-    /**
-     * Swap contents of two slots
-     */
-    swapSlots(fromSlot: string, toSlot: string): SwapSlotsBuilder {
-        return new SwapSlotsBuilder(fromSlot, toSlot);
     }
 
     /**
@@ -83,6 +97,36 @@ class AddIngredientBuilder extends ActionBuilder<Extract<RecipeAction, { type: "
     }
 }
 
+class AddShapelessIngredientBuilder extends ActionBuilder<Extract<RecipeAction, { type: "recipe.add_shapeless_ingredient" }>> {
+    private itemsValue?: string | string[];
+    /**
+     * Set tag (string) to add
+     */
+    tag(tag: string): this {
+        this.itemsValue = tag;
+        return this;
+    }
+
+    /**
+     * Set items (string[]) to add
+     */
+    items(...items: string[]): this {
+        this.itemsValue = items;
+        return this;
+    }
+
+    build() {
+        if (!this.itemsValue) {
+            throw new Error("Items or tag must be specified");
+        }
+
+        return {
+            type: "recipe.add_shapeless_ingredient" as const,
+            items: this.itemsValue
+        };
+    }
+}
+
 class RemoveIngredientBuilder extends ActionBuilder<Extract<RecipeAction, { type: "recipe.remove_ingredient" }>> {
     private itemsList?: string[];
 
@@ -107,6 +151,57 @@ class RemoveIngredientBuilder extends ActionBuilder<Extract<RecipeAction, { type
     }
 }
 
+class RemoveItemEverywhereBuilder extends ActionBuilder<Extract<RecipeAction, { type: "recipe.remove_item_everywhere" }>> {
+    private itemsList: string[] = [];
+
+    /**
+     * Items to remove from all slots
+     */
+    items(...items: string[]): this {
+        this.itemsList.push(...items);
+        return this;
+    }
+
+    build() {
+        if (this.itemsList.length === 0) {
+            throw new Error("At least one item must be specified");
+        }
+
+        return {
+            type: "recipe.remove_item_everywhere" as const,
+            items: this.itemsList
+        };
+    }
+}
+
+class ReplaceItemEverywhereBuilder extends ActionBuilder<Extract<RecipeAction, { type: "recipe.replace_item_everywhere" }>> {
+    private toValue?: string;
+
+    constructor(private from: string) {
+        super();
+    }
+
+    /**
+     * Item/tag to replace with
+     */
+    with(to: string): this {
+        this.toValue = to;
+        return this;
+    }
+
+    build() {
+        if (!this.toValue) {
+            throw new Error("Replacement item must be specified using .with()");
+        }
+
+        return {
+            type: "recipe.replace_item_everywhere" as const,
+            from: this.from,
+            to: this.toValue
+        };
+    }
+}
+
 class ClearSlotBuilder extends ActionBuilder<Extract<RecipeAction, { type: "recipe.clear_slot" }>> {
     constructor(private slot: string) {
         super();
@@ -116,23 +211,6 @@ class ClearSlotBuilder extends ActionBuilder<Extract<RecipeAction, { type: "reci
         return {
             type: "recipe.clear_slot" as const,
             slot: this.slot
-        };
-    }
-}
-
-class SwapSlotsBuilder extends ActionBuilder<Extract<RecipeAction, { type: "recipe.swap_slots" }>> {
-    constructor(
-        private fromSlot: string,
-        private toSlot: string
-    ) {
-        super();
-    }
-
-    build() {
-        return {
-            type: "recipe.swap_slots" as const,
-            fromSlot: this.fromSlot,
-            toSlot: this.toSlot
         };
     }
 }

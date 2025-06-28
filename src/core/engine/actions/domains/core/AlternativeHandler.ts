@@ -4,7 +4,7 @@ import type { ActionHandler } from "../../types";
 import type { CoreAction } from "./types";
 
 export class AlternativeHandler implements ActionHandler<CoreAction> {
-    constructor(private registry: ActionRegistry) { }
+    constructor(private registry: ActionRegistry) {}
 
     async execute(
         action: Extract<CoreAction, { type: "core.alternative" }>,

@@ -1,6 +1,13 @@
 import type { ActionHandler } from "../../types";
-import { AddIngredientHandler, AddShapelessIngredientHandler, ClearSlotHandler, RemoveIngredientHandler, RemoveItemEverywhereHandler, ReplaceItemEverywhereHandler } from "./AddIngredientHandler";
-import { ConvertRecipeTypeHandler } from "./ConvertRecipeTypeHandler";
+import {
+    AddIngredientHandler,
+    AddShapelessIngredientHandler,
+    ClearSlotHandler,
+    ConvertRecipeTypeHandler,
+    RemoveIngredientHandler,
+    RemoveItemEverywhereHandler,
+    ReplaceItemEverywhereHandler
+} from "./AddIngredientHandler";
 import type { RecipeAction } from "./types";
 import { createRecipeHandlers } from "./types";
 

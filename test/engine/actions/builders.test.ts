@@ -140,17 +140,6 @@ describe("Action Builders", () => {
             });
         });
 
-        it("should create swapSlots action", () => {
-            const action = new RecipeActionBuilder().swapSlots("0", "1");
-            const built = action.build();
-
-            expect(built).toEqual({
-                type: "recipe.swap_slots",
-                fromSlot: "0",
-                toSlot: "1"
-            });
-        });
-
         it("should create convertType action", () => {
             const action = new RecipeActionBuilder().convertType("minecraft:smelting").clearIngredients();
 

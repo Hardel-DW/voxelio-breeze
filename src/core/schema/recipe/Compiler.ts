@@ -1,8 +1,8 @@
+import { normalizeResourceLocation } from "@/core/Element";
 import type { Analysers } from "@/core/engine/Analyser";
 import type { Compiler } from "@/core/engine/Compiler";
 import type { CraftingTransmuteData, MinecraftRecipe, RecipeProps, SmeltingData, SmithingTransformData, SmithingTrimData } from "./types";
-import { denormalizeIngredient, getOccupiedSlots, hasSlotContent, compareIngredients } from "./types";
-import { normalizeResourceLocation } from "@/core/Element";
+import { compareIngredients, denormalizeIngredient, getOccupiedSlots, hasSlotContent } from "./types";
 
 /**
  * Compile Voxel recipe format back to Minecraft Recipe format using slot-based system.
