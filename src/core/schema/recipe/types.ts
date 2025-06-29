@@ -119,21 +119,16 @@ export const KNOWN_RECIPE_FIELDS = new Set([
 
 export function normalizeIngredient(ingredient: any): string[] | string {
     if (!ingredient) return [];
-
-    // Tag Minecraft : { tag: "logs" } → "#minecraft:logs"
     if (ingredient.tag) return normalizeResourceLocation(ingredient.tag);
 
-    // String avec # : "#logs" → "#minecraft:logs"
     if (typeof ingredient === "string" && ingredient.startsWith("#")) {
         return normalizeResourceLocation(ingredient);
     }
 
-    // Array avec un seul tag : ["#logs"] → "#minecraft:logs"
     if (Array.isArray(ingredient) && ingredient.length === 1 && ingredient[0].startsWith?.("#")) {
         return normalizeResourceLocation(ingredient[0]);
     }
 
-    // Items : "diamond" ou ["diamond", "emerald"]
     const items = Array.isArray(ingredient) ? ingredient : [ingredient];
     return items.map((item) => normalizeResourceLocation(typeof item === "string" ? item : item.item));
 }
@@ -141,12 +136,10 @@ export function normalizeIngredient(ingredient: any): string[] | string {
 export function denormalizeIngredient(items: string[] | string, preserveTagFormat = false): any {
     if (!items) return undefined;
 
-    // Tag : "#minecraft:logs" → "#minecraft:logs" ou { tag: "minecraft:logs" }
     if (typeof items === "string") {
         return preserveTagFormat ? items : { tag: items.slice(1) };
     }
 
-    // Single : "#minecraft:logs" ou "minecraft:diamond"
     if (items.length === 1) {
         const item = items[0];
         if (item.startsWith("#")) {
@@ -155,12 +148,11 @@ export function denormalizeIngredient(items: string[] | string, preserveTagForma
         return item;
     }
 
-    // Multiple items : ["minecraft:diamond", "minecraft:emerald"]
     if (preserveTagFormat) {
-        return items; // Return array of strings directly when preserving format
+        return items;
     }
 
-    return items.map((item) => ({ item })); // Return array of objects for original format
+    return items.map((item) => ({ item }));
 }
 
 /**
@@ -238,7 +230,6 @@ export function compareIngredients(a: any, b: any): boolean {
     if (a === b) return true;
     if (!a || !b) return false;
 
-    // Normalize both ingredients to compare
     const normalizeForComparison = (ingredient: any): any => {
         if (typeof ingredient === "string") {
             if (ingredient.startsWith("#")) {

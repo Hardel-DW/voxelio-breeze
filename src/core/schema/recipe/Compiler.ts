@@ -93,13 +93,10 @@ export const VoxelToRecipeDataDriven: Compiler<RecipeProps, MinecraftRecipe> = (
         const key: Record<string, any> = {};
         let symbolCounter = 65;
 
-        // Always use 3x3 grid for slot calculation to match UI
-        const UIGridWidth = 3;
-
         for (let row = 0; row < gridSize.height; row++) {
             let patternRow = "";
             for (let col = 0; col < gridSize.width; col++) {
-                const slotIndex = (row * UIGridWidth + col).toString();
+                const slotIndex = (row * 3 + col).toString();
                 const items = element.slots[slotIndex];
 
                 if (items && hasSlotContent(items)) {
@@ -273,12 +270,9 @@ export const VoxelToRecipeDataDriven: Compiler<RecipeProps, MinecraftRecipe> = (
         if (originalPattern.length !== gridSize.height) return false;
         if (originalPattern.some((row) => row.length !== gridSize.width)) return false;
 
-        // Always use 3x3 grid for slot calculation to match UI
-        const UIGridWidth = 3;
-
         for (let row = 0; row < gridSize.height; row++) {
             for (let col = 0; col < gridSize.width; col++) {
-                const slotIndex = (row * UIGridWidth + col).toString();
+                const slotIndex = (row * 3 + col).toString();
                 const items = element.slots[slotIndex];
                 const symbol = originalPattern[row][col];
 

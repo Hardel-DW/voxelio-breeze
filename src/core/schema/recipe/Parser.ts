@@ -12,6 +12,7 @@ import type {
     SmithingTrimData
 } from "./types";
 import { KNOWN_RECIPE_FIELDS, normalizeIngredient, positionToSlot } from "./types";
+
 export const RecipeDataDrivenToVoxelFormat: Parser<RecipeProps, MinecraftRecipe> = ({
     element,
     configurator
