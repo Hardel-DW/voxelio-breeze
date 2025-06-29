@@ -15,6 +15,26 @@ export const shapeless: DataDrivenRegistryElement<MinecraftRecipe> = {
     }
 };
 
+export const shapedtwobytwo: DataDrivenRegistryElement<MinecraftRecipe> = {
+    identifier: { namespace: "test", registry: "recipe", resource: "shapedtwobytwo" },
+    data: {
+        type: "crafting_shaped",
+        category: "building",
+        group: "wooden_stairs",
+        pattern: [
+            "# ",
+            "##"
+        ],
+        key: {
+            "#": "acacia_planks"
+        },
+        result: {
+            id: "acacia_stairs",
+            count: 4
+        }
+    }
+}
+
 export const shaped: DataDrivenRegistryElement<MinecraftRecipe> = {
     identifier: { namespace: "test", registry: "recipe", resource: "shaped" },
     data: {
@@ -271,5 +291,6 @@ export const recipeDataDriven = [
     stonecutting,
     blasting,
     campfire_cooking,
-    shapedWithoutNamespace
+    shapedWithoutNamespace,
+    shapedtwobytwo
 ];

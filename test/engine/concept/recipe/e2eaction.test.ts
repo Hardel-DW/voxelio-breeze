@@ -32,7 +32,7 @@ describe("Recipe E2E Actions Tests", () => {
             );
 
             expect(recipes).toBeDefined();
-            expect(recipes).toHaveLength(10);
+            expect(recipes).toHaveLength(11);
 
             const foundShapeless = recipes.find((r) => r.identifier.resource === "shapeless");
             const foundShaped = recipes.find((r) => r.identifier.resource === "shaped");

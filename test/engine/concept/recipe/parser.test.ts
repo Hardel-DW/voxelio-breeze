@@ -18,7 +18,7 @@ describe("Recipe Schema", () => {
         );
 
         expect(recipes).toBeDefined();
-        expect(recipes).toHaveLength(10);
+        expect(recipes).toHaveLength(11);
     });
 
     describe("Shaped Crafting Recipes", () => {
@@ -79,8 +79,8 @@ describe("Recipe Schema", () => {
             // All 4 slots should be filled with chicken
             expect(twoByTwoRecipe.slots["0"]).toEqual(["minecraft:chicken"]);
             expect(twoByTwoRecipe.slots["1"]).toEqual(["minecraft:chicken"]);
-            expect(twoByTwoRecipe.slots["2"]).toEqual(["minecraft:chicken"]);
             expect(twoByTwoRecipe.slots["3"]).toEqual(["minecraft:chicken"]);
+            expect(twoByTwoRecipe.slots["4"]).toEqual(["minecraft:chicken"]);
 
             expect(twoByTwoRecipe.result.item).toBe("minecraft:acacia_button");
             expect(twoByTwoRecipe.result.count).toBe(1);

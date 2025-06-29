@@ -2,7 +2,7 @@ import { parseDatapack } from "@/core/engine/Parser";
 import { VoxelToRecipeDataDriven } from "@/core/schema/recipe/Compiler";
 import type { RecipeProps } from "@/core/schema/recipe/types";
 import { recipeFile } from "@test/template/datapack";
-import { shapeless, shaped, shaped2, blasting, stonecutting } from "@test/template/concept/recipe/DataDriven";
+import { shapeless, shaped, shaped2, blasting, stonecutting, shapedtwobytwo } from "@test/template/concept/recipe/DataDriven";
 import { createZipFile } from "@test/template/utils";
 import { describe, it, expect, beforeEach } from "vitest";
 
@@ -14,6 +14,7 @@ describe("Recipe E2E Tests", () => {
         let shaped2Recipe: RecipeProps;
         let blastingRecipe: RecipeProps;
         let stonecuttingRecipe: RecipeProps;
+        let shapedtwobytwoRecipe: RecipeProps;
 
         beforeEach(async () => {
             parsedDatapack = await parseDatapack(await createZipFile(recipeFile));
@@ -23,25 +24,28 @@ describe("Recipe E2E Tests", () => {
             );
 
             expect(recipes).toBeDefined();
-            expect(recipes).toHaveLength(10);
+            expect(recipes).toHaveLength(11);
 
             const foundShapeless = recipes.find((r) => r.identifier.resource === "shapeless");
             const foundShaped = recipes.find((r) => r.identifier.resource === "shaped");
             const foundShaped2 = recipes.find((r) => r.identifier.resource === "shaped2");
             const foundBlasting = recipes.find((r) => r.identifier.resource === "blasting");
             const foundStonecutting = recipes.find((r) => r.identifier.resource === "stonecutting");
+            const foundShapedtwobytwo = recipes.find((r) => r.identifier.resource === "shapedtwobytwo");
 
             expect(foundShapeless).toBeDefined();
             expect(foundShaped).toBeDefined();
             expect(foundShaped2).toBeDefined();
             expect(foundBlasting).toBeDefined();
             expect(foundStonecutting).toBeDefined();
+            expect(foundShapedtwobytwo).toBeDefined();
 
             shapelessRecipe = foundShapeless as RecipeProps;
             shapedRecipe = foundShaped as RecipeProps;
             shaped2Recipe = foundShaped2 as RecipeProps;
             blastingRecipe = foundBlasting as RecipeProps;
             stonecuttingRecipe = foundStonecutting as RecipeProps;
+            shapedtwobytwoRecipe = foundShapedtwobytwo as RecipeProps;
         });
 
         describe("Round-trip purity (Parse → Compile without actions)", () => {
@@ -79,6 +83,24 @@ describe("Recipe E2E Tests", () => {
 
                 expect(compiled.element.identifier).toEqual(shapedRecipe.identifier);
             });
+
+            it("should preserve 2x2 shaped recipe data perfectly", () => {
+                const compiled = VoxelToRecipeDataDriven(shapedtwobytwoRecipe, "recipe", shapedtwobytwo.data);
+
+                expect(compiled.element.data.type).toBe("minecraft:crafting_shaped");
+                expect(compiled.element.data.category).toBe("building");
+                expect(compiled.element.data.group).toBe("wooden_stairs");
+                expect(compiled.element.data.pattern).toEqual(["# ", "##"]);
+
+                expect(compiled.element.data.result).toEqual({
+                    count: 4,
+                    id: "acacia_stairs"
+                });
+
+                expect(compiled.element.data.pattern).toEqual(shapedtwobytwo.data.pattern);
+                expect(compiled.element.identifier).toEqual(shapedtwobytwoRecipe.identifier);
+            });
+
 
             it("should preserve complex shaped recipe with tags perfectly", () => {
                 const compiled = VoxelToRecipeDataDriven(shaped2Recipe, "recipe", shaped2.data);
@@ -238,6 +260,13 @@ describe("Recipe E2E Tests", () => {
                 expect(shaped2Recipe.slots["5"]).toBe("#minecraft:iron_ingot");  // middle right
                 expect(shaped2Recipe.slots["7"]).toBe("#minecraft:iron_ingot");  // bottom center
                 expect(shaped2Recipe.gridSize).toEqual({ width: 3, height: 3 });
+            });
+
+            it("should correctly map shaped 2x2 with empty slot pattern to slots", () => {
+                expect(shapedtwobytwoRecipe.gridSize).toEqual({ width: 2, height: 2 });
+                expect(shapedtwobytwoRecipe.slots["0"]).toEqual(["minecraft:acacia_planks"]);
+                expect(shapedtwobytwoRecipe.slots["3"]).toEqual(["minecraft:acacia_planks"]);
+                expect(shapedtwobytwoRecipe.slots["4"]).toEqual(["minecraft:acacia_planks"]);
             });
 
             it("should correctly map smelting ingredient to slot", () => {

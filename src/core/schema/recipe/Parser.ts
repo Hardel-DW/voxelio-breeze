@@ -91,12 +91,15 @@ export const RecipeDataDrivenToVoxelFormat: Parser<RecipeProps, MinecraftRecipe>
         const width = Math.max(...pattern.map((row) => row.length));
         gridSize = { width, height };
 
+        // Always use 3x3 grid for slot calculation to match UI
+        const UIGridWidth = 3;
+
         for (let row = 0; row < height; row++) {
             const patternRow = pattern[row] || "";
             for (let col = 0; col < width; col++) {
                 const symbol = patternRow[col];
                 if (symbol && symbol !== " " && key[symbol]) {
-                    const slotIndex = positionToSlot(row, col, width);
+                    const slotIndex = positionToSlot(row, col, UIGridWidth);
                     slots[slotIndex] = normalizeIngredient(key[symbol]);
                 }
             }
