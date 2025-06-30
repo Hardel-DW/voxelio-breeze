@@ -228,7 +228,7 @@ describe("Datapack", () => {
                 }
             ];
 
-            const result = datapack.labelElements("enchantment", true, newElements);
+            const result = datapack.labelElements("enchantment", newElements, undefined);
 
             expect(result.some((r) => r.type === "new")).toBe(true);
             expect(result.some((r) => r.type === "deleted")).toBe(true);

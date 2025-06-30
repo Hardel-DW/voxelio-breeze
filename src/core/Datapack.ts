@@ -3,13 +3,17 @@ import type { DataDrivenElement, DataDrivenRegistryElement, LabeledElement } fro
 import { Identifier, type IdentifierObject } from "@/core/Identifier";
 import { Tags, createTagFromElement, mergeDataDrivenRegistryElement } from "@/core/Tag";
 import { getMinecraftVersion } from "@/core/Version";
-import type { Analysers, GetAnalyserMinecraft } from "@/core/engine/Analyser";
+import type { Analysers } from "@/core/engine/Analyser";
 import type { Compiler } from "@/core/engine/Compiler";
 import type { Logger } from "@/core/engine/migrations/logger";
 import type { ChangeSet } from "@/core/engine/migrations/types";
 import type { TagType } from "@/schema/TagType";
 import { downloadZip, extractZip } from "@voxelio/zip";
 import type { InputWithoutMeta } from "@voxelio/zip";
+
+export interface RegistryCache {
+    [registry: string]: Map<string, DataDrivenRegistryElement<any>>;
+}
 
 export interface PackMcmeta {
     pack: {
@@ -23,6 +27,8 @@ export class Datapack {
     private pack: PackMcmeta;
     private files: Record<string, Uint8Array<ArrayBufferLike>>;
     private fileVersion: number;
+    private registryCache = new Map<string, DataDrivenRegistryElement<any>[]>();
+    private indexCache = new Map<string, Map<string, DataDrivenRegistryElement<any>>>();
 
     constructor(files: Record<string, Uint8Array<ArrayBufferLike>>, fileName?: string) {
         this.files = files;
@@ -146,6 +152,22 @@ export class Datapack {
     }
 
     /**
+     * Pre-compute all registry data in a single pass for optimal performance
+     * @param logger - Optional logger to determine modified elements
+     * @returns Indexed registry data and modified elements set
+     */
+    getIndex(registry: string): Map<string, DataDrivenRegistryElement<any>> {
+        if (!this.indexCache.has(registry)) {
+            const map = new Map<string, DataDrivenRegistryElement<any>>();
+            for (const el of [...this.getRegistry(registry), ...this.getRegistry(`tags/${registry}`)]) {
+                map.set(new Identifier(el.identifier).toString(), el);
+            }
+            this.indexCache.set(registry, map);
+        }
+        return this.indexCache.get(registry) ?? new Map();
+    }
+
+    /**
      * For an element, get all the tags where the identifier appears.
      * @param registry - The registry of the tags.
      * @param identifier - The identifier of the tags.
@@ -173,9 +195,13 @@ export class Datapack {
         path?: string,
         excludeNamespaces?: string[]
     ): DataDrivenRegistryElement<T>[] {
-        const registries: DataDrivenRegistryElement<T>[] = [];
-        if (!registry) return registries;
+        if (!registry) return [];
+        const cacheKey = `${registry}|${path || ''}|${excludeNamespaces?.join(',') || ''}`;
+        if (this.registryCache.has(cacheKey)) {
+            return this.registryCache.get(cacheKey) as DataDrivenRegistryElement<T>[];
+        }
 
+        const registries: DataDrivenRegistryElement<T>[] = [];
         for (const file of Object.keys(this.files)) {
             const fileParts = file.split("/");
             if (!file.endsWith(".json")) continue;
@@ -199,6 +225,7 @@ export class Datapack {
             });
         }
 
+        this.registryCache.set(cacheKey, registries);
         return registries;
     }
 
@@ -252,63 +279,39 @@ export class Datapack {
         return JSON.parse(new TextDecoder().decode(this.files[file]));
     }
 
-    /**
-     * Determine if the element is new, updated or deleted.
-     * If the ones that were there at the beginning are no longer there, I'll delete them.
-     * If it wasn't in the initial list but is new, I create it.
-     * If it was there at the beginning and is still there at the end, just keep it.
-     * if it wasn't there at the beginning and isn't there at the end, I do nothing.
-     * @param concept - The concept of the elements.
-     * @param hasTag - Whether the element has a tag.
-     * @param elements - The elements of the datapack.
-     * @returns The elements of the datapack.
-     */
-    labelElements<T extends keyof Analysers>(
-        concept: keyof Analysers,
-        hasTag: boolean,
+    labelElements<K extends keyof Analysers>(
+        registry: K,
         elements: DataDrivenRegistryElement<DataDrivenElement>[],
         logger?: Logger
     ): LabeledElement[] {
-        const mainRegistry = this.getRegistry<GetAnalyserMinecraft<T>>(concept);
-        const tagsRegistry = hasTag ? this.getRegistry<TagType>(`tags/${concept}`) : [];
-        const originalElements = [...mainRegistry, ...tagsRegistry];
-
-        const originalIdentifiers = originalElements.map((element) => element.identifier);
-        const result: LabeledElement[] = [];
-        const processedIds = new Set<string>();
-
-        const modifiedElements = new Set<string>();
+        const originalIndex = this.getIndex(registry);
+        const compiledSet = new Set(elements.map((el) => new Identifier(el.identifier).toUniqueKey()));
+        const modified = new Set<string>();
         if (logger) {
             for (const change of logger.getChanges()) {
-                if (change.identifier && change.registry === concept) {
-                    modifiedElements.add(`${change.identifier}$${change.registry}`);
+                if (change.identifier && change.registry) {
+                    modified.add(`${change.identifier}$${change.registry}`);
                 }
             }
         }
 
-        for (const original of originalIdentifiers) {
-            const element = elements.find((el) => new Identifier(el.identifier).equalsObject(original));
-            if (!element) {
-                result.push({ type: "deleted", identifier: original });
-            } else {
-                const uniqueKey = new Identifier(element.identifier).toUniqueKey();
-                const isModified = !logger || modifiedElements.has(uniqueKey);
-
-                if (isModified) {
-                    result.push({ type: "updated", element });
-                }
-
-                processedIds.add(new Identifier(element.identifier).toString());
+        const results: LabeledElement[] = [];
+        for (const el of elements) {
+            const key = new Identifier(el.identifier).toUniqueKey();
+            if (!originalIndex.has(key)) {
+                results.push({ type: "new", element: el });
+            } else if (modified.has(key)) {
+                results.push({ type: "updated", element: el });
             }
         }
 
-        for (const element of elements) {
-            if (!processedIds.has(new Identifier(element.identifier).toString())) {
-                result.push({ type: "new", element });
+        for (const [id, originalEl] of originalIndex) {
+            if (!compiledSet.has(id)) {
+                results.push({ type: "deleted", identifier: originalEl.identifier });
             }
         }
 
-        return result;
+        return results;
     }
 
     /**

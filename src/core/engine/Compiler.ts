@@ -1,9 +1,9 @@
 import { Datapack } from "@/core/Datapack";
-import type { DataDrivenElement, LabeledElement, VoxelElement } from "@/core/Element";
-import type { DataDrivenRegistryElement } from "@/core/Element";
+import type { DataDrivenElement, DataDrivenRegistryElement, LabeledElement, VoxelElement } from "@/core/Element";
 import type { IdentifierObject } from "@/core/Identifier";
 import { type Analysers, type GetAnalyserVoxel, analyserCollection } from "@/core/engine/Analyser";
 import type { Logger } from "@/core/engine/migrations/logger";
+import type { Analyser } from "@/core/engine/Analyser";
 
 export type Compiler<T extends VoxelElement = VoxelElement, K extends DataDrivenElement = DataDrivenElement> = (
     element: T,
@@ -14,41 +14,28 @@ export type Compiler<T extends VoxelElement = VoxelElement, K extends DataDriven
     tags: IdentifierObject[];
 };
 
-export function compileDatapack({
-    elements,
-    files,
-    logger
-}: {
+export function compileDatapack({ elements, files, logger }: {
     elements: GetAnalyserVoxel<keyof Analysers>[];
     files: Record<string, Uint8Array>;
     logger?: Logger;
 }): Array<LabeledElement> {
     const datapack = new Datapack(files);
-    const allLabeledElements: LabeledElement[] = [];
+    const results: LabeledElement[] = [];
+    const registryGroups = new Map<keyof Analysers, GetAnalyserVoxel<keyof Analysers>[]>();
 
-    // Group elements by their identifier registry
-    const elementsByRegistry = new Map<keyof Analysers, GetAnalyserVoxel<keyof Analysers>[]>();
     for (const element of elements) {
         const registry = element.identifier.registry as keyof Analysers;
-        if (!elementsByRegistry.has(registry)) {
-            elementsByRegistry.set(registry, []);
-        }
-        elementsByRegistry.get(registry)?.push(element);
+        if (!registryGroups.has(registry)) registryGroups.set(registry, []);
+        registryGroups.get(registry)?.push(element);
     }
 
-    // Type-safe registry processing
-    function processRegistry<K extends keyof Analysers>(registry: K, elements: GetAnalyserVoxel<K>[]) {
-        const { compiler, hasTag } = analyserCollection[registry];
-        const compiled = elements.map((element) => compiler(element, registry, datapack.readFile(element.identifier)));
-        const compiledElements = compiled.map((element) => element.element);
-        const compiledTags = hasTag ? datapack.getCompiledTags(compiled, registry) : [];
-        allLabeledElements.push(...datapack.labelElements(registry, hasTag, [...compiledElements, ...compiledTags], logger));
+    for (const [registry, registryElements] of registryGroups) {
+        const { compiler, hasTag } = analyserCollection[registry] as Analyser<typeof registry>;
+        const compiled = registryElements.map((element) => compiler(element, registry, datapack.readFile(element.identifier)));
+        const compiledElements = compiled.map(r => r.element);
+        const compiledTags = hasTag ? [...compiledElements, ...datapack.getCompiledTags(compiled, registry)] : compiledElements;
+        results.push(...datapack.labelElements(registry, compiledTags, logger));
     }
 
-    // Process all registries from the map
-    for (const [registry, registryElements] of elementsByRegistry.entries()) {
-        processRegistry(registry, registryElements);
-    }
-
-    return allLabeledElements;
+    return results;
 }
