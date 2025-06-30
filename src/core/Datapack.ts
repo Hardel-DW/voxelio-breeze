@@ -266,7 +266,8 @@ export class Datapack {
     labelElements<T extends keyof Analysers>(
         concept: keyof Analysers,
         hasTag: boolean,
-        elements: DataDrivenRegistryElement<DataDrivenElement>[]
+        elements: DataDrivenRegistryElement<DataDrivenElement>[],
+        logger?: Logger
     ): LabeledElement[] {
         const mainRegistry = this.getRegistry<GetAnalyserMinecraft<T>>(concept);
         const tagsRegistry = hasTag ? this.getRegistry<TagType>(`tags/${concept}`) : [];
@@ -276,12 +277,27 @@ export class Datapack {
         const result: LabeledElement[] = [];
         const processedIds = new Set<string>();
 
+        const modifiedElements = new Set<string>();
+        if (logger) {
+            for (const change of logger.getChanges()) {
+                if (change.identifier && change.registry === concept) {
+                    modifiedElements.add(`${change.identifier}$${change.registry}`);
+                }
+            }
+        }
+
         for (const original of originalIdentifiers) {
             const element = elements.find((el) => new Identifier(el.identifier).equalsObject(original));
             if (!element) {
                 result.push({ type: "deleted", identifier: original });
             } else {
-                result.push({ type: "updated", element });
+                const uniqueKey = new Identifier(element.identifier).toUniqueKey();
+                const isModified = !logger || modifiedElements.has(uniqueKey);
+
+                if (isModified) {
+                    result.push({ type: "updated", element });
+                }
+
                 processedIds.add(new Identifier(element.identifier).toString());
             }
         }
