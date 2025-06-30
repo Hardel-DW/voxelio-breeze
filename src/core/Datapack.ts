@@ -6,6 +6,7 @@ import { getMinecraftVersion } from "@/core/Version";
 import type { Analysers, GetAnalyserMinecraft } from "@/core/engine/Analyser";
 import type { Compiler } from "@/core/engine/Compiler";
 import type { Logger } from "@/core/engine/migrations/logger";
+import type { ChangeSet } from "@/core/engine/migrations/types";
 import type { TagType } from "@/schema/TagType";
 import { downloadZip, extractZip } from "@voxelio/zip";
 import type { InputWithoutMeta } from "@voxelio/zip";
@@ -21,10 +22,16 @@ export class Datapack {
     private fileName: string;
     private pack: PackMcmeta;
     private files: Record<string, Uint8Array<ArrayBufferLike>>;
+    private fileVersion: number;
 
     constructor(files: Record<string, Uint8Array<ArrayBufferLike>>, fileName?: string) {
         this.files = files;
         this.fileName = fileName ?? "Datapack";
+
+        const nameWithoutExtension = this.fileName.replace(/\.(zip|jar)$/, "");
+        const versionMatch = nameWithoutExtension.match(/^V(\d+)-/);
+        this.fileVersion = versionMatch?.[1] ? +versionMatch[1] + 1 : 0;
+
         const packMcmeta = files["pack.mcmeta"];
         if (!packMcmeta) throw new DatapackError("tools.error.failed_to_get_pack_mcmeta");
 
@@ -93,20 +100,41 @@ export class Datapack {
      */
     getFileName(): string {
         const nameWithoutExtension = this.fileName.replace(/\.(zip|jar)$/, "");
-        const versionMatch = nameWithoutExtension.match(/^V(\d+)-/);
-        if (!versionMatch?.[1]) return `V0-${nameWithoutExtension}`;
+        if (nameWithoutExtension.startsWith("V")) {
+            return nameWithoutExtension.replace(/^V\d+-/, `V${this.fileVersion}-`);
+        }
 
-        const currentVersion = +versionMatch[1];
-        const newVersion = currentVersion + 1;
-        return nameWithoutExtension.replace(/^V\d+-/, `V${newVersion}-`);
+        return `V0-${nameWithoutExtension}`;
     }
 
     /**
-     * Get the voxel logs of the datapack. from the logs.json file.
-     * @returns The voxel logs of the datapack.
+     * Get the voxel logs of the current version
      */
-    getVoxelLogs() {
-        return this.files?.["voxel/logs.json"];
+    getVoxelLogs(version?: number) {
+        const versionToGet = version ?? this.fileVersion;
+        return this.files?.[`voxel/v${versionToGet}.json`];
+    }
+
+    /**
+     * Get all changes from all log versions combined
+     * @returns Flattened array of all ChangeSet from all versions
+     */
+    getAllChanges(): ChangeSet[] {
+        const allChanges: ChangeSet[] = [];
+        for (const [path, data] of Object.entries(this.files)) {
+            if (!path.startsWith("voxel/v") || !path.endsWith(".json")) continue;
+
+            try {
+                const logContent = JSON.parse(new TextDecoder().decode(data));
+                if (logContent.logs && Array.isArray(logContent.logs)) {
+                    allChanges.push(...logContent.logs);
+                }
+            } catch (error) {
+                console.warn(`Failed to parse log file ${path}:`, error);
+            }
+        }
+
+        return allChanges;
     }
 
     /**
@@ -367,7 +395,7 @@ export class Datapack {
     private prepareLogger(files: InputWithoutMeta[], logger: Logger | undefined, isMinified: boolean) {
         if (logger) {
             const logData = logger.exportJson();
-            files.push(this.prepareFile("voxel/logs.json", logData, isMinified));
+            files.push(this.prepareFile(`voxel/v${this.fileVersion}.json`, logData, isMinified));
         }
     }
 }

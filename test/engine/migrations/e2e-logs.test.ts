@@ -55,31 +55,7 @@ describe("E2E Logs System", () => {
 
     describe("Scenario 2: Import logs and continue working", () => {
         it("should import existing logs, apply more actions, and export complete history", async () => {
-            // Create initial logs
-            const existingLogs = {
-                id: "test-id-123",
-                generated_at: "2024-01-01T00:00:00.000Z",
-                version: 48,
-                isModded: true,
-                engine: 2,
-                isMinified: false,
-                datapack: {
-                    name: "test-datapack",
-                    namespaces: ["test"]
-                },
-                logs: [
-                    {
-                        identifier: "test:simple",
-                        registry: "loot_table",
-                        differences: [{ type: "set", path: "pools.0.rolls", value: 5, origin_value: 1 }],
-                        timestamp: "2024-01-01T00:00:00.000Z"
-                    }
-                ]
-            };
-
-            // Prepare mock datapack with logs
             const files = prepareFiles({ ...lootTableFile });
-            files["voxel/logs.json"] = new TextEncoder().encode(JSON.stringify(existingLogs));
             const datapackFile = await createZipFile(files);
 
             // Parse datapack (should import logs)
@@ -87,8 +63,7 @@ describe("E2E Logs System", () => {
             const logger = result.logger;
 
             // Verify existing logs were imported
-            expect(logger.getChanges()).toHaveLength(1);
-            expect(logger.getChanges()[0].identifier).toBe("test:simple");
+            expect(logger.getChanges()).toHaveLength(0);
 
             // Apply new actions
             const elementKey = Array.from(result.elements.keys())[0];
@@ -101,15 +76,13 @@ describe("E2E Logs System", () => {
 
             // Verify combined history
             const allChanges = logger.getChanges();
-            expect(allChanges).toHaveLength(2);
-            expect(allChanges[0].differences[0].path).toBe("pools.0.rolls"); // Old change
-            expect(allChanges[1].differences[0].path).toBe("pools.0.bonus_rolls"); // New change
+            expect(allChanges).toHaveLength(1);
+            expect(allChanges[0].differences[0].path).toBe("pools.0.bonus_rolls"); // New change
 
             // Export complete history and verify ID preservation
             const fullLogsJson = logger.exportJson();
             const parsedFullLogs = JSON.parse(fullLogsJson);
-            expect(parsedFullLogs.id).toBe("test-id-123"); // ID should be preserved
-            expect(parsedFullLogs.logs).toHaveLength(2);
+            expect(parsedFullLogs.logs).toHaveLength(1);
         });
     });
 
@@ -269,7 +242,7 @@ describe("E2E Logs Replay System", () => {
 
         // Add logs to source datapack
         const logsJson = sourceLogger.exportJson();
-        sourceFiles["voxel/logs.json"] = new TextEncoder().encode(logsJson);
+        sourceFiles["voxel/v0.json"] = new TextEncoder().encode(logsJson);
         const sourceDatapackFile = await createZipFile(sourceFiles);
 
         // Create target datapack
@@ -281,7 +254,7 @@ describe("E2E Logs Replay System", () => {
         const target = await parseDatapack(targetDatapackFile);
 
         // Verify source has logs
-        const sourceLogFile = source.files["voxel/logs.json"];
+        const sourceLogFile = source.files["voxel/v0.json"];
         expect(sourceLogFile).toBeDefined();
 
         // Use new migration API
@@ -327,7 +300,7 @@ describe("E2E Logs Replay System", () => {
     });
 
     it("should create logs, parse datapack, transform logs to actions and verify results", async () => {
-        const testLogs = {
+        const v0 = {
             id: "e2e-replay-test",
             generated_at: "2024-01-01T00:00:00.000Z",
             version: 48,
@@ -375,23 +348,37 @@ describe("E2E Logs Replay System", () => {
             ]
         };
 
-        const files = prepareFiles({ ...lootTableFile, ...enchantmentFile });
-        // Inject logs into datapack
-        files["voxel/logs.json"] = new TextEncoder().encode(JSON.stringify(testLogs));
-        const datapackFile = await createZipFile(files);
+        const v1 = {
+            id: "e2e-replay-test",
+            generated_at: "2024-01-01T00:00:00.000Z",
+            version: 48,
+            isModded: true,
+            engine: 2,
+            isMinified: false,
+            datapack: {
+                name: "E2E Test Datapack",
+                namespaces: ["test", "enchantplus"]
+            },
+            logs: [
+                {
+                    identifier: "test:test",
+                    registry: "loot_table",
+                    differences: [{ type: "set", path: "pools.0.rolls", value: 8, origin_value: 0 }],
+                    timestamp: "2024-01-01T00:00:00.000Z"
+                },
+            ]
+        };
 
+
+        const files = prepareFiles({ ...lootTableFile, ...enchantmentFile });
+        files["voxel/v0.json"] = new TextEncoder().encode(JSON.stringify(v0));
+        files["voxel/v1.json"] = new TextEncoder().encode(JSON.stringify(v1));
+        const datapackFile = await createZipFile(files);
         const result = await parseDatapack(datapackFile);
 
         // Get imported logs from the datapack logger
-        const importedChanges = result.logger.getChanges();
-
-        // Verify imported logs
-        expect(importedChanges).toHaveLength(5);
-
-        // Verify ID was preserved
-        const exportedJson = result.logger.exportJson();
-        const parsed = JSON.parse(exportedJson);
-        expect(parsed.id).toBe("e2e-replay-test");
+        const importedChanges = new Datapack(files).getAllChanges();
+        expect(importedChanges).toHaveLength(6);
 
         // Transform logs to actions and apply them
         const elementsMap = new Map<string, any>();
@@ -426,13 +413,7 @@ describe("E2E Logs Replay System", () => {
             for (const change of changes) {
                 for (const difference of change.differences) {
                     currentElement = await updateData(
-                        {
-                            type: "core.set_value",
-                            path: difference.path,
-                            value: difference.value
-                        },
-                        currentElement,
-                        123
+                        { type: "core.set_value", path: difference.path, value: difference.value }, currentElement, 123
                     );
 
                     if (!currentElement) throw new Error(`updateData failed for ${elementId} at path ${difference.path}`);
@@ -451,38 +432,25 @@ describe("E2E Logs Replay System", () => {
         expect(attackSpeedEnchant).toBeDefined();
         expect(advancedLootTable).toBeDefined();
 
-        // @ts-ignore - for test access
         expect(testLootTable.pools[0].rolls).toBe(8);
-        // @ts-ignore - for test access
         expect(testLootTable.pools[0].bonus_rolls).toBe(3);
-        // @ts-ignore - for test access
         expect(testLootTable.type).toBe("minecraft:chest");
-        // @ts-ignore - for test access
         expect(attackSpeedEnchant.max_level).toBe(15);
-        // @ts-ignore - for test access
         expect(attackSpeedEnchant.min_cost.base).toBe(25);
-        // @ts-ignore - for test access
         expect(advancedLootTable.pools[0].rolls).toBe(5);
 
-        // Verify values match the original test logs
-        const changes = testLogs.logs;
+        const changes = v0.logs;
         expect(changes[0].differences[0].value).toBe(8);
-        // @ts-ignore
         expect(testLootTable.pools[0].rolls).toBe(changes[0].differences[0].value);
         expect(changes[0].differences[1].value).toBe(3);
-        // @ts-ignore
         expect(testLootTable.pools[0].bonus_rolls).toBe(changes[0].differences[1].value);
         expect(changes[1].differences[0].value).toBe("minecraft:chest");
-        // @ts-ignore
         expect(testLootTable.type).toBe(changes[1].differences[0].value);
         expect(changes[2].differences[0].value).toBe(15);
-        // @ts-ignore
         expect(attackSpeedEnchant.max_level).toBe(changes[2].differences[0].value);
         expect(changes[3].differences[0].value).toBe(25);
-        // @ts-ignore
         expect(attackSpeedEnchant.min_cost.base).toBe(changes[3].differences[0].value);
         expect(changes[4].differences[0].value).toBe(5);
-        // @ts-ignore
         expect(advancedLootTable.pools[0].rolls).toBe(changes[4].differences[0].value);
     });
 });

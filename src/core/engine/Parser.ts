@@ -34,7 +34,6 @@ export async function parseDatapack<T extends keyof Analysers>(file: File): Prom
     const description = datapack.getDescription();
     const isModded = datapack.isModded();
     const name = datapack.getFileName();
-    const logs = datapack.getVoxelLogs();
     const files = datapack.getFiles();
 
     const elements = new Map<string, GetAnalyserVoxel<T>>();
@@ -59,7 +58,7 @@ export async function parseDatapack<T extends keyof Analysers>(file: File): Prom
     }
 
     if (elements.size === 0) throw new DatapackError("tools.warning.no_elements");
-    const logger = new Logger(logs ? new TextDecoder().decode(logs) : undefined);
+    const logger = new Logger();
 
     // Set datapack information for the logger
     logger.setDatapackInfo({ name, description, namespaces, version, isModded, isMinified: false });
