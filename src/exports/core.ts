@@ -18,6 +18,7 @@ export * from "@/core/engine/actions/builders";
 
 export * from "@/VoxelDatapack";
 
+export * from "@/core/calculation/NumberProvider";
 export * from "@/core/calculation/EnchantmentSimulation";
 export * from "@/core/calculation/LootTableProbability";
 
