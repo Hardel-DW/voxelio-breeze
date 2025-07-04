@@ -196,7 +196,7 @@ export class Datapack {
         excludeNamespaces?: string[]
     ): DataDrivenRegistryElement<T>[] {
         if (!registry) return [];
-        const cacheKey = `${registry}|${path || ''}|${excludeNamespaces?.join(',') || ''}`;
+        const cacheKey = `${registry}|${path || ""}|${excludeNamespaces?.join(",") || ""}`;
         if (this.registryCache.has(cacheKey)) {
             return this.registryCache.get(cacheKey) as DataDrivenRegistryElement<T>[];
         }
